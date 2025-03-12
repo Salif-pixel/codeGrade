@@ -43,7 +43,7 @@ export default function LandingPage() {
                                 {t('nav.login')}
                             </Link>
                             <Button
-                                className="bg-primary cursor-pointer text-white px-6 py-2 rounded-full transition-colors">
+                                className="hidden  md:inline-block bg-primary cursor-pointer text-white px-6 py-2 rounded-full transition-colors">
                                 {t('nav.start')}
                             </Button>
                             <LanguageSwitcher/>
