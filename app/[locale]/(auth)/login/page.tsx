@@ -397,7 +397,7 @@ export function SignInView  ()  {
                     </div>
                 </div>
                 <div
-                    className=" bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:20px_20px] relative hidden h-full flex-col bg-zinc-900 p-10 rounded-md text-white relative dark:border-r lg:flex"
+                    className=" bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:20px_20px] relative hidden h-full flex-col bg-zinc-800 dark:bg-zinc-900 p-10 rounded-md text-white relative dark:border-r lg:flex"
                 >
                     <div className="relative z-20 flex flex-row items-center text-lg w-fit font-medium">
                         <Terminal className="text-primary" />
