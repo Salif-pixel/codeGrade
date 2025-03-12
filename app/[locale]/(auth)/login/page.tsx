@@ -123,7 +123,7 @@ export function SignInView  ()  {
                     email: email,
                     password: password,
                     name: name,
-                    callbackURL: "/Homepage",
+                    callbackURL: `/${locale}/dashboard`,
                 },
                 {
                     onRequest: () => {
@@ -143,6 +143,7 @@ export function SignInView  ()  {
                     },
                     onError: (ctx) => {
                         const errorMap = {
+                            "Password too short": t("signup-auth.passwordTooShort"),
                             "Email already in use": t("signup-auth.emailInUse"),
                             "Server error": t("signup-auth.error"),
                             "Network request failed": t("signup-auth.networkError"),

@@ -341,7 +341,9 @@
       "error": "Erreur d'inscription",
       "emailInUse": "Cette adresse e-mail est déjà utilisée. Veuillez essayer une adresse différente ou vous connecter avec votre compte existant.",
       "networkError": "Problème de connexion réseau. Veuillez vérifier votre connexion internet et réessayer.",
-      "unknownError": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard."
+      "unknownError": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
+      "passwordWeak": "Le mot de passe est trop faible. Veuillez choisir un mot de passe plus sécurisé.",
+      "passwordTooShort": "Le mot de passe est trop court. Veuillez choisir un mot de passe d'au moins 6 caractères."
     }
   }
 }

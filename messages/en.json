@@ -338,7 +338,9 @@
       "error": "Registration Error",
       "emailInUse": "This email address is already in use. Please try a different one or login with your existing account.",
       "networkError": "Network connection issue. Please check your internet connection and try again.",
-      "unknownError": "An unexpected error occurred. Please try again later."
+      "unknownError": "An unexpected error occurred. Please try again later.",
+      "passwordWeak": "Password is too weak. Please use a stronger password.",
+      "passwordTooShort": "Password is too short. Please use at least 6 characters."
     }
   }
 
