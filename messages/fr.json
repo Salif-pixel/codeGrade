@@ -1,4 +1,12 @@
 {
+  "404": {
+    "title": "404",
+    "error_message": "C'EST UNE ERREUR.",
+    "page_not_found": "LA PAGE QUE VOUS CHERCHEZ N'EXISTE PAS.",
+    "tetris_suggestion": "Pendant que vous attendez, pourquoi ne pas faire une partie de Tetris?",
+    "back_home": "RETOUR À L'ACCUEIL →",
+    "footer": "Plateforme d'organisation de devoirs pour professeurs"
+  },
   "HomePage": {
     "title": "titre de la page d'accueil"
   },
