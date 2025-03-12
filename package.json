@@ -26,6 +26,7 @@
     "better-auth": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.4.11",
     "gsap": "^3.12.7",

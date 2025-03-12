@@ -142,6 +142,7 @@ export function SignInView  ()  {
                         );
                     },
                     onError: (ctx) => {
+                        console.log(ctx);
                         const errorMap = {
                             "Password too short": t("signup-auth.passwordTooShort"),
                             "Email already in use": t("signup-auth.emailInUse"),
