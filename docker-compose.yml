@@ -6,11 +6,11 @@ services:
     container_name: postgres_container
     restart: always
     environment:
-      POSTGRES_USER: salif
+      POSTGRES_USER: codegrade_user
       POSTGRES_PASSWORD: passer
       POSTGRES_DB: codegrade
     ports:
-      - "5000:5432"
+      - "5832:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
