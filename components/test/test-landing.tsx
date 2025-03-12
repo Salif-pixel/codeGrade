@@ -6,13 +6,13 @@ import DemoSection from './demo-section'
 import Testimonials from './testimonials'
 import Navbar from './navbar'
 
-export default function Home() {
+export default function TestLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-white">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-20 pb-32 flex flex-col items-center text-center">
+      <section className="container mx-auto px-4 pt-32 pb-32 flex flex-col gap-6 items-center text-center">
         <div className="inline-flex items-center px-4 py-2 bg-gray-800/50 rounded-full mb-8 border border-gray-700">
           <Sparkles className="h-4 w-4 mr-2 text-purple-400" />
           <span className="text-sm">AI-powered exam creation and grading</span>
@@ -36,12 +36,13 @@ export default function Home() {
           </Button>
         </div>
         
-        <div className="relative w-full max-w-5xl mx-auto rounded-xl overflow-hidden border border-gray-800 shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-pink-500/10"></div>
+        <div className="relative w-full max-w-5xl mx-auto rounded-xl border border-gray-800 shadow-2xl">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 w-4/5 h-64 bg-purple-600/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-1/4 w-4/5 h-64 bg-pink-600/20 rounded-full blur-3xl"></div>
           <img 
-            src="/placeholder.svg?height=600&width=1000" 
+            src="/assets/placeholder-dark.svg?height=600&width=1000" 
             alt="codeGrade platform interface" 
-            className="w-full h-auto"
+            className="w-full h-auto aspect-16/9 object-cover relative z-10"
           />
         </div>
       </section>

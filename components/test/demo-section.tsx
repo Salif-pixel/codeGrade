@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -67,7 +69,7 @@ export default function DemoSection() {
               </div>
               <div className="bg-gray-950 p-4 flex items-center justify-center">
                 <img 
-                  src="/placeholder.svg?height=400&width=500" 
+                  src="/assets/placeholder-dark.svg?height=400&width=500" 
                   alt="Exam creation interface" 
                   className="rounded-lg border border-gray-800 shadow-lg"
                 />
@@ -108,7 +110,7 @@ export default function DemoSection() {
               </div>
               <div className="bg-gray-950 p-4 flex items-center justify-center">
                 <img 
-                  src="/placeholder.svg?height=400&width=500" 
+                  src="/assets/placeholder-dark.svg?height=400&width=500" 
                   alt="Student exam interface" 
                   className="rounded-lg border border-gray-800 shadow-lg"
                 />
@@ -149,7 +151,7 @@ export default function DemoSection() {
               </div>
               <div className="bg-gray-950 p-4 flex items-center justify-center">
                 <img 
-                  src="/placeholder.svg?height=400&width=500" 
+                  src="/assets/placeholder-dark.svg?height=400&width=500" 
                   alt="AI grading dashboard" 
                   className="rounded-lg border border-gray-800 shadow-lg"
                 />
