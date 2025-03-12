@@ -41,23 +41,20 @@ export default async function LocaleLayout({
     const messages = await getMessages();
 
     return (
-        <html lang={locale} suppressHydrationWarning={true}>
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-
+        <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
+        <body>
         <NextIntlClientProvider messages={messages}>
             <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-            >
-                {children}
-                <Toaster />
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    {children}
+                    <Toaster />
             </ThemeProvider>
         </NextIntlClientProvider>
         </body>
         </html>
-);
+    );
 }

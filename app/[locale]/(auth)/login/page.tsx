@@ -22,7 +22,7 @@ import {useLocale, useTranslations} from "next-intl";
 import LanguageSwitcher from "@/components/internalization/language-switcher";
 import {authClient} from "@/lib/auth-client";
 import {useState} from "react";
-import { useCustomToast } from "@/components/spectrum/alert";
+import { useCustomToast } from "@/components/Alert/alert";
 
 // Schéma de validation pour la connexion
 

@@ -1,4 +1,12 @@
 {
+  "404": {
+    "title": "404",
+    "error_message": "THAT'S AN ERROR.",
+    "page_not_found": "THE PAGE YOU WERE LOOKING FOR DOESN'T EXIST.",
+    "tetris_suggestion": "While you wait, why not play a game of Tetris?",
+    "back_home": "BACK TO HOME →",
+    "footer": "Homework organization platform for teachers"
+  },
   "HomePage": {
     "title": "Hello world!"
   },
