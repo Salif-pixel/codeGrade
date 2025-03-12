@@ -71,7 +71,7 @@ export function SignInView  ()  {
                 {
                     email: email,
                     password: password,
-                    callbackURL: `/${locale}/Homepage`,
+                    callbackURL: `/${locale}/dashboard`,
                 },
                 {
                     onRequest: () => {
