@@ -1,0 +1,338 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "LandingPage": {
+    "nav": {
+      "brand": "CodeGrade",
+      "login": "Log in",
+      "start": "Get Started"
+    },
+    "hero": {
+      "title": "Transform Programming Assessments",
+      "subtitle": "Automate grading, provide instant feedback, and focus on teaching."
+    },
+    "floating": {
+      "fileName": "test.py",
+      "aiAnalysis": "AI Analysis",
+      "testsPassed": "Tests Passed: 5/5",
+      "complexity": "Complexity: O(2^n)",
+      "suggestion": "Suggestion: Use memoization to improve performance",
+      "satisfactionRate": "98%",
+      "assignment": "Assignment: Recursive Algorithms",
+      "deadline": "Deadline: June 15",
+      "studentsCount": "25 students"
+    },
+    "features": {
+      "title": "Why Choose CodeGrade?",
+      "aiGrading": {
+        "title": "AI Grading",
+        "description": "Our AI analyzes student code, checks syntax, runs tests, and provides personalized feedback."
+      },
+      "timeSaving": {
+        "title": "Time Saving",
+        "description": "Automate repetitive tasks and focus on guiding your students."
+      },
+      "fairEvaluation": {
+        "title": "Fair Evaluation",
+        "description": "Consistent grading criteria for all students, with detailed and transparent reports."
+      }
+    },
+    "stats": {
+      "studentsEvaluated": "Students Evaluated",
+      "institutions": "Institutions",
+      "satisfaction": "Satisfaction"
+    },
+    "cta": {
+      "title": "Ready to Transform Your Programming Assessments?",
+      "subtitle": "Join hundreds of institutions trusting CodeGrade for their evaluations.",
+      "button": "Start for Free"
+    },
+    "footer": {
+      "description": "The code assessment platform that simplifies teachers' lives.",
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "testimonials": "Testimonials",
+        "guide": "User Guide"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About",
+        "blog": "Blog",
+        "careers": "Careers",
+        "contact": "Contact"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacy",
+        "terms": "Terms of Use",
+        "cookies": "Cookies"
+      },
+      "copyright": "© {year} CodeGrade. All rights reserved."
+    }
+  },
+  "hero-section": {
+    "tagline": "Revolutionizing Education",
+    "headline": "Plan. Assess. Automate",
+    "description": "Create, distribute, and automatically grade programming assessments with quizzes, integrated code editors, or PDF submissions, all analyzed by AI.",
+    "cta": {
+      "learnMore": "Learn More",
+      "tryFree": "Try for Free"
+    },
+    "features": [
+      "Reliable for over 500 schools",
+      "99.8% Accuracy",
+      "24/7 Support"
+    ],
+
+    "instantFeedback": {
+      "title": "Instant Feedback",
+      "description": "Students receive feedback in under 5 minutes."
+    },
+    "timeSaved": {
+      "title": "Time Saved",
+      "description": "Teachers save 3 hours per week."
+    }
+  },
+  "workflow-section": {
+    "title": "Educational Workflow",
+    "description": "From exercise creation to grade submission, automate every step while keeping full pedagogical control.",
+    "features": {
+      "title": "Key Features",
+      "list": {
+        "instantDeployment": {
+          "name": "Instant Deployment of Exercises",
+          "description": "Publish your assignments with a single click. Students can access them immediately in their integrated development environment."
+        },
+        "automatedGrading": {
+          "name": "Automated Secure Grading",
+          "description": "Our system runs tests in an isolated environment with anti-cheat verification and code similarity analysis."
+        },
+        "deadlineManagement": {
+          "name": "Deadline and Late Submission Management",
+          "description": "Set deadlines for assignments and automate late submissions and penalty management."
+        },
+        "automaticBackup": {
+          "name": "Automatic Backup",
+          "description": "All submissions and evaluations are automatically backed up and accessible at all times without data loss."
+        },
+        "aiFeedback": {
+          "name": "AI-Powered Feedback",
+          "description": "Our AI analyzes the code and provides personalized feedback on quality, best practices, and potential optimizations."
+        }
+      }
+    },
+    "exercise": {
+      "title": "Student Environment - Code Exercise",
+      "deadline": "2 days remaining",
+      "description": "Implement a function that calculates the factorial of an integer n. The factorial of n (denoted n!) is the product of all positive integers less than or equal to n.",
+      "file": "solution.py",
+      "autosaved": "Autosaved",
+      "testFile": "tests.py",
+      "language": "Python",
+      "feedback": {
+        "title": "AI Feedback",
+        "content": [
+          "You handled the base case (n=0) well, but you need to complete the function for the general case.",
+          "Consider using recursion or a loop to calculate the product of all numbers from 1 to n.",
+          "Hint: For n > 0, factorial(n) = n * factorial(n-1)"
+        ]
+      },
+      "tests": {
+        "testResult":"Results of tests",
+        "result": "2/4 tests passed",
+        "test1": {
+          "name": "Test #1: Base Case",
+          "description": "factorial(0) should return 1 ✓"
+        },
+        "test2": {
+          "name": "Test #2: Simple Case",
+          "description": "factorial(1) should return 1 ✓"
+        },
+        "test3": {
+          "name": "Test #3: General Case",
+          "description": "Expected factorial(5) to be 120, but got undefined"
+        },
+        "test4": {
+          "name": "Test #4: Large Number",
+          "description": "Expected factorial(10) to be 3628800, but got undefined"
+        }
+      },
+      "aiFeedback": {
+        "title": "AI Feedback",
+        "content": {
+          "first": "You handled the base case (n=0) well, but you need to complete the function for the general case.",
+          "second": "Consider using recursion or a loop to calculate the product of all numbers from 1 to n.",
+          "third": "Hint: For n > 0, factorial(n) = n * factorial(n-1)"
+        },
+        "hint": "Hint: For n > 0, factorial(n) = n * factorial(n-1)",
+        "hintDescription": "You handled the base case (n=0) well, but you need to complete the function for the general case."
+      }
+
+    },
+    "progress": {
+      "title": "Progression of the exercise",
+      "description": "You have completed 50% of the exercise. Keep up the good work!"
+    }
+  },
+  "workflow-grade": {
+    "title": "Pedagogical Flexibility",
+    "heading": "All types of assignments supported",
+    "description": "Adapt your evaluation methods to each subject and type of exercise.",
+    "assignment-types": {
+      "coding": {
+        "title": "Programming Assignments",
+        "status": "In Progress",
+        "file": "solution.js",
+        "code": "function factorial(n) {\n  return n <= 1 ? 1 : n * factorial(n - 1);\n}"
+      },
+      "qcm": {
+        "title": "Automated Quizzes",
+        "status": "Answered",
+        "question": "Question 1/5",
+        "prompt": "Which HTTP method is used to create a resource?",
+        "options": ["GET", "POST", "PUT", "DELETE"]
+      },
+      "pdf": {
+        "title": "Document Submission",
+        "status": "Submitted",
+        "file": "java_assignment.pdf",
+        "placeholder": "polymorphism_report.pdf",
+        "date": "Submitted on 06/12 at 14:30"
+      }
+    },
+    "details": "View details",
+    "click-to-show": "Click to display"
+  },
+  "for-teachers": {
+    "badge": "For Teachers",
+    "title": "Save Time and Improve Your Teaching",
+    "description": "Our AI-powered grading platform allows teachers to focus on what they do best: inspiring and educating students, without spending hours grading papers.",
+    "benefits": [
+      "Create exams and assignments in a few clicks",
+      "Evaluate students objectively and consistently",
+      "Automatically grade papers with advanced AI",
+      "Track student progress with detailed analytics",
+      "Identify learning gaps for targeted intervention",
+      "Easy integration with your Learning Management System (LMS)"
+    ],
+    "cta": "View Dashboard",
+    "image-alt": "Teacher using AI-powered grading platform",
+    "stats": {
+      "time-saved": {
+        "label": "Time Saved",
+        "value": "6+ h/week"
+      },
+      "correction-speed": {
+        "label": "Grading Speed",
+        "value": "100x faster"
+      }
+    }
+  },
+  "for-students": {
+    "badge": "For Students",
+    "title": "Accelerate Your Learning with Instant Feedback",
+    "description": "Students progress faster with personalized feedback that helps them understand concepts and build confidence.",
+    "benefits": [
+      "Receive instant and detailed feedback on your assignments",
+      "Understand exactly where you need to improve",
+      "Track your progress with visual analytics",
+      "Get personalized learning recommendations",
+      "Practice with AI-generated similar exercises",
+      "Gain confidence through regular feedback"
+    ],
+    "cta": "Discover the Student Experience",
+    "image-alt": "Student receiving instant feedback",
+    "stats": {
+      "feedback-time": {
+        "label": "Feedback Time",
+        "value": "< 10 sec"
+      },
+      "improvement": {
+        "label": "Improvement",
+        "value": "+27%"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What Teachers and Students Say",
+    "description": "Our AI-powered grading platform is making a real difference in classrooms around the world.",
+    "testimonials": [
+      {
+        "quote": "This AI grading platform has completely transformed my classroom management. I save hours every week and can provide more relevant feedback to my students.",
+        "author": "Sarah Johnson",
+        "role": "High School French Teacher",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "As a math teacher, I was skeptical about AI grading, but this platform is incredibly accurate. It even detects subtle errors in reasoning that I might miss.",
+        "author": "Michael Chen",
+        "role": "Middle School Math Teacher",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Instant feedback has made a huge difference for my students. They are more motivated and engaged when they don't have to wait days for their results.",
+        "author": "Emily Rodriguez",
+        "role": "Elementary School Teacher",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Our academy has seen measurable improvements in student outcomes since implementing this AI grading system. It has been a game-changer for our teachers.",
+        "author": "Dr. James Wilson",
+        "role": "Academic Director",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "As a student, I love getting immediate feedback on my work. It helps me understand what I'm doing well and where I need to improve right away.",
+        "author": "Aisha Patel",
+        "role": "High School Student",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      }
+    ],
+    "go-to-testimonial": "Go to testimonial {index}"
+  },
+  "authentication": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "email-placeholder": "Enter your email",
+    "password": "Password",
+    "password-placeholder": "Enter your password",
+    "name": "Name",
+    "name-placeholder": "Enter your name",
+    "or": "OR",
+    "login-with-google": "Login with Google",
+    "login-with-github": "Login with GitHub",
+    "signup-with-google": "Sign up with Google",
+    "signup-with-github": "Sign up with GitHub",
+    "auth-message": "Sign in to access your account.",
+    "auth-image-alt": "Authentication illustration",
+    "invalid-email": "Invalid email",
+    "password-min-length": "Password must be at least 6 characters",
+    "name-required": "Name is required",
+    "login-auth": {
+      "pending": "Logging in...",
+      "pendingDescription": "Please wait while we log you into your account.",
+      "success": "Login successful! 🎉",
+      "successDescription": "You are now logged into your account.",
+      "error": "Login error",
+      "invalidCredentials": "Your credentials are incorrect. Please try again.",
+      "unknownError": "An error occurred during login.",
+      "networkError": "A network error occurred. Please check your connection and try again."
+    },
+    "signup-auth": {
+      "pending": "Creating Account",
+      "pendingDescription": "Please wait while we create your account...",
+      "success": "Account Created",
+      "successDescription": "Your account has been successfully created. You can now log in.",
+      "error": "Registration Error",
+      "emailInUse": "This email address is already in use. Please try a different one or login with your existing account.",
+      "networkError": "Network connection issue. Please check your internet connection and try again.",
+      "unknownError": "An unexpected error occurred. Please try again later."
+    }
+  }
+
+
+}
