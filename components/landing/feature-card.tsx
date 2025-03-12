@@ -7,7 +7,7 @@ export function FeatureCard({ icon, title, description, delay = 0 }: { icon: Rea
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay }}
             viewport={{ once: true }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"
+            className="bg-white dark:bg-background p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"
         >
             <div className="mb-4">{icon}</div>
             <h3 className="text-xl font-semibold mb-2">{title}</h3>
