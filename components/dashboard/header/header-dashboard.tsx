@@ -1,6 +1,6 @@
 'use client';
 
-import {Bell, LogOut, Search, Settings, Terminal, User, Menu, X} from "lucide-react";
+import {Bell, LogOut, Search, Settings, Terminal, User2, Menu, X, ChevronRight} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -19,8 +19,13 @@ import {
     SheetContent,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { User } from "@prisma/client";
+import {ModeToggle} from "@/components/theme/button-theme";
+import LanguageSwitcher from "@/components/internalization/language-switcher";
 
-export default function HeaderDashboard() {
+
+
+export default function HeaderDashboard({ user }: { user: User }) {
     const [activeTab, setActiveTab] = useState("dashboard");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -46,17 +51,17 @@ export default function HeaderDashboard() {
                     </div>
 
                     {/* Breadcrumb Navigation */}
-                    {/*<div className="hidden md:flex items-center space-x-2 text-muted-foreground">*/}
-                    {/*    <Link href="#" className="hover:text-foreground">*/}
-                    {/*        Projets*/}
-                    {/*    </Link>*/}
-                    {/*    <ChevronRight className="h-4 w-4"/>*/}
-                    {/*    <Link href="#" className="hover:text-foreground">*/}
-                    {/*        Web Dev*/}
-                    {/*    </Link>*/}
-                    {/*    <ChevronRight className="h-4 w-4"/>*/}
-                    {/*    <span className="text-foreground">Évaluation</span>*/}
-                    {/*</div>*/}
+                    <div className="hidden md:flex items-center space-x-2 text-muted-foreground">
+                        <Link href="#" className="hover:text-foreground">
+                            Projets
+                        </Link>
+                        <ChevronRight className="h-4 w-4"/>
+                        <Link href="#" className="hover:text-foreground">
+                            Web Dev
+                        </Link>
+                        <ChevronRight className="h-4 w-4"/>
+                        <span className="text-foreground">Évaluation</span>
+                    </div>
 
                     {/* Search */}
                     <div className="ml-auto flex-1 md:flex-initial md:w-80 lg:w-96 px-4">
@@ -81,30 +86,29 @@ export default function HeaderDashboard() {
                 3
               </span>
                         </Button>
-                        <Button variant="ghost" size="icon">
-                            <Settings className="h-5 w-5"/>
-                        </Button>
+                        <ModeToggle/>
+                        <LanguageSwitcher/>
 
                         {/* User Profile */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User"/>
-                                        <AvatarFallback>PR</AvatarFallback>
+                                    <Avatar className="h-8 w-8 cursor-pointer">
+                                        <AvatarImage src={user?.image ?? ""} alt="User"/>
+                                        <AvatarFallback>{user?.email[0]}{user?.email[1]}</AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end" forceMount>
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">Prof. Martin</p>
-                                        <p className="text-xs leading-none text-muted-foreground">martin@codegrade.edu</p>
+                                        <p className="text-sm font-medium leading-none">{user?.name}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator/>
                                 <DropdownMenuItem>
-                                    <User className="mr-2 h-4 w-4"/>
+                                    <User2 className="mr-2 h-4 w-4"/>
                                     <span>Profil</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>

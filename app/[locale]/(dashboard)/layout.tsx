@@ -1,18 +1,20 @@
-'use client';
 
 import { ReactNode } from 'react';
-import HeaderDashboard from "@/components/dashboard/header/header-dashboard";
+
+import Header from "@/components/dashboard/header/header";
 
 
 interface LayoutProps {
     children: ReactNode;
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default  function Layout({ children }: LayoutProps) {
+
+
     return (
         <div className="flex flex-col min-h-screen">
             {/* Navbar */}
-           <HeaderDashboard/>
+           <Header/>
 
             {/* Main content */}
             <main className="flex-1 container mx-auto p-4">
