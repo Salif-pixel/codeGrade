@@ -1,9 +1,9 @@
 "use client"
-import { Input } from "@src/components/ui/input"
-import { Label } from "@src/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@src/components/ui/select"
-import { Textarea } from "@src/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@src/components/ui/radio-group"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface TeacherInfoFormProps {
   data: {

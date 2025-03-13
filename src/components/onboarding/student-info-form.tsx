@@ -1,9 +1,9 @@
 "use client"
 
-import { Input } from "@src/components/ui/input"
-import { Label } from "@src/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@src/components/ui/select"
-import { Checkbox } from "@src/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface StudentInfoFormProps {
   data: {

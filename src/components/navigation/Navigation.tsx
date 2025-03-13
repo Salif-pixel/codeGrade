@@ -1,8 +1,8 @@
 "use client"
 
-import { navigationConfig } from "@src/lib/nav-config";
-import { cn } from "@src/lib/utils";
-import { Link } from "@src/i18n/navigation";
+import { navigationConfig } from "@/lib/nav-config";
+import { cn } from "@/lib/utils";
+import { Link } from "@/i18n/navigation";
 import { Role } from "@prisma/client";
 import { Badge } from "../ui/badge";
 import { usePathname } from "next/navigation";

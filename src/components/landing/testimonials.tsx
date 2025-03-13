@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger"
-import { Card, CardContent } from "@src/components/ui/card"
-import { Button } from "@src/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react"
 import { useTranslations } from "next-intl"
 

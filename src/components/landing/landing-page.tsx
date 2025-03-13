@@ -4,19 +4,19 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Terminal, CheckCircle, Code2, Brain, BookOpen, Clock, Award, Menu, X } from "lucide-react"
 import { FloatingElement } from "./floating-element"
-import { FeatureCard } from "@src/components/landing/feature-card"
-import { StatCard } from "@src/components/landing/sat-card"
-import { WorkflowSection } from "@src/components/landing/workflow-section"
-import { ModeToggle } from "@src/components/theme/button-theme"
-import { Button } from "@src/components/ui/button"
-import { WorkflowGrade } from "@src/components/landing/workflow-grade"
-import {Link} from '@src/i18n/navigation';
-import Hero from "@src/components/landing/hero"
-import ForTeachers from "@src/components/landing/for-teacher"
-import ForStudents from "@src/components/landing/for-student"
-import Testimonials from "@src/components/landing/testimonials"
+import { FeatureCard } from "@/components/landing/feature-card"
+import { StatCard } from "@/components/landing/sat-card"
+import { WorkflowSection } from "@/components/landing/workflow-section"
+import { ModeToggle } from "@/components/theme/button-theme"
+import { Button } from "@/components/ui/button"
+import { WorkflowGrade } from "@/components/landing/workflow-grade"
+import {Link} from '@/i18n/navigation';
+import Hero from "@/components/landing/hero"
+import ForTeachers from "@/components/landing/for-teacher"
+import ForStudents from "@/components/landing/for-student"
+import Testimonials from "@/components/landing/testimonials"
 import {useTranslations} from 'next-intl';
-import LanguageSwitcher from "@src/components/internalization/language-switcher";
+import LanguageSwitcher from "@/components/internalization/language-switcher";
 export default function LandingPage() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const  t  = useTranslations('LandingPage')

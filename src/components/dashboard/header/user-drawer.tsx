@@ -2,18 +2,18 @@
 
 import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar"
-import { Button } from "@src/components/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@src/components/ui/sheet"
-import { Separator } from "@src/components/ui/separator"
-import { Badge } from "@src/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@src/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import {
   Bell,
   ChevronRight,
@@ -31,10 +31,10 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import type { User } from "@prisma/client"
-import { cn } from "@src/lib/utils"
-import { SignOut } from "@src/actions/signOutactions"
-import {ModeToggle} from "@src/components/theme/button-theme";
-import LanguageSwitcher from "@src/components/internalization/language-switcher";
+import { cn } from "@/lib/utils"
+import { SignOut } from "@/actions/signOutactions"
+import {ModeToggle} from "@/components/theme/button-theme";
+import LanguageSwitcher from "@/components/internalization/language-switcher";
 
 
 interface NavItem {

@@ -1,9 +1,9 @@
 "use client"
 
 import { School, GraduationCap } from "lucide-react"
-import { Card, CardContent } from "@src/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@src/components/ui/radio-group"
-import { Label } from "@src/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 
 interface UserTypeSelectionProps {
   selectedType: "teacher" | "student" | null

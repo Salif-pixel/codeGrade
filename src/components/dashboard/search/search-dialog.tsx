@@ -1,8 +1,8 @@
 'use client';
 
 import {Terminal, Loader} from "lucide-react";
-import {Dialog, DialogContent, DialogTitle} from "@src/components/ui/dialog";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@src/components/ui/command";
+import {Dialog, DialogContent, DialogTitle} from "@/components/ui/dialog";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 import {useState, useCallback} from "react";
 
 interface SearchDialogProps {

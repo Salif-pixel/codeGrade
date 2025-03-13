@@ -5,10 +5,10 @@ import { useState, useEffect, useRef } from "react"
 import type { User } from "@prisma/client"
 import HeaderDashboard from "./header-dashboard"
 import SidebarDashboard from "./sidebar-dashboard"
-import { Button } from "@src/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { LayoutDashboard, PanelLeft } from "lucide-react"
 import { gsap } from "gsap"
-import { cn } from "@src/lib/utils"
+import { cn } from "@/lib/utils"
 
 type LayoutType = "header" | "sidebar"
 

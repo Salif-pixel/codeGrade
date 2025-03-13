@@ -3,14 +3,14 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react"
-import { Button } from "@src/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@src/components/ui/card"
-import { Progress } from "@src/components/ui/progress"
-import UserTypeSelection from "@src/components/onboarding/user-type-selection"
-import VerificationStep from "@src/components/onboarding/verification-step"
-import TeacherInfoForm from "@src/components/onboarding/teacher-info-form"
-import StudentInfoForm from "@src/components/onboarding/student-info-form"
-import CompletionStep from "@src/components/onboarding/completion-step"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import UserTypeSelection from "@/components/onboarding/user-type-selection"
+import VerificationStep from "@/components/onboarding/verification-step"
+import TeacherInfoForm from "@/components/onboarding/teacher-info-form"
+import StudentInfoForm from "@/components/onboarding/student-info-form"
+import CompletionStep from "@/components/onboarding/completion-step"
 
 export default function OnboardingPage() {
   const router = useRouter()

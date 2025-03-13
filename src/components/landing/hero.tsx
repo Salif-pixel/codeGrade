@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 import gsap from "gsap"
-import { Button } from "@src/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import {useTranslations} from "next-intl";
 
