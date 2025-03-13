@@ -349,6 +349,7 @@
   "dropdown-user": {
     "profile": "Profil",
     "settings": "Paramètres",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "search":"Rechercher"
   }
 }

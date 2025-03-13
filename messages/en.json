@@ -347,7 +347,8 @@
   "dropdown-user": {
     "profile": "Profile",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "search": "Search"
   }
 
 

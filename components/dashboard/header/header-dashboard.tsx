@@ -135,7 +135,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                             >
                                 <div className="flex items-center gap-3">
                                     <Search className="h-4 w-4" />
-                                    <span className="flex-1 text-left hidden sm:inline">Recherche...</span>
+                                    <span className="flex-1 text-left hidden sm:inline">{t("search")}</span>
                                 </div>
                                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                                     <span className="text-xs">⌘</span>K
