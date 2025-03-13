@@ -29,6 +29,7 @@ model User {
   id            String       @id
   email         String       @unique
   name          String?
+  profileCompleted Boolean  @default(false)
   emailVerified Boolean
   image         String?
   background    String?

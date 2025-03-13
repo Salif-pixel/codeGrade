@@ -1,6 +1,6 @@
 "use client";
 
-import {Loader2, LockIcon, Terminal} from "lucide-react";
+import { Loader2, LockIcon, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -18,24 +18,26 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RiGithubFill, RiGoogleFill } from "react-icons/ri";
-import {useLocale, useTranslations} from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import LanguageSwitcher from "@/components/internalization/language-switcher";
-import {authClient} from "@/lib/auth-client";
-import {useState} from "react";
+import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
 import { useCustomToast } from "@/components/alert/alert";
 
-// Schéma de validation pour la connexion
 
-export function SignInView  ()  {
+
+export function SignInView() {
     const t = useTranslations('authentication');
     const { showToast } = useCustomToast();
+
+    // Schéma de validation pour la connexion
     const LoginSchema = z.object({
         email: z.string().email(t("invalid-email")),
         password: z.string().min(6, t("password-min-length")),
     });
     const locale = useLocale();
 
-// Schéma de validation pour l'inscription
+    // Schéma de validation pour l'inscription
     const SignupSchema = z.object({
         name: z.string().min(1, t("name-required")),
         email: z.string().email(t("invalid-email")),
@@ -68,51 +70,50 @@ export function SignInView  ()  {
 
 
         await authClient.signIn.email(
-                {
-                    email: email,
-                    password: password,
-                    callbackURL: `/${locale}/dashboard`,
+            {
+                email: email,
+                password: password,
+                callbackURL: `/${locale}/dashboard`,
+            },
+            {
+                onRequest: () => {
+                    showToast(
+                        t('login-auth.pending'),
+                        t('login-auth.pendingDescription'),
+                        "info"
+                    );
                 },
-                {
-                    onRequest: () => {
-                        showToast(
-                            t('login-auth.pending'),
-                            t('login-auth.pendingDescription'),
-                            "info"
-                        );
-                    },
-                    onSuccess: () => {
-                        loginForm.reset();
-                        showToast(
-                            t('login-auth.success'),
-                            t('login-auth.successDescription'),
-                            "success"
-                        );
-                    },
-                    onError: (ctx) => {
-                        const errorMap = {
-                            "Invalid email or password": t("login-auth.invalidCredentials"),
-                            "Server error": t("login-auth.error"),
-                            "Network request failed": t("login-auth.networkError"),
-                        };
-                        console.log(errorMap, ctx.error.message)
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-expect-error
-                        const errorMessage = errorMap[ctx.error.message] || t("login-auth.unknownError");
-                        showToast(
-                            t('login-auth.error'),
-                            errorMessage || t('login-auth.unknownError'),
-                            "error"
-                        );
-                    },
-                }
-            );
+                onSuccess: () => {
+                    loginForm.reset();
+                    showToast(
+                        t('login-auth.success'),
+                        t('login-auth.successDescription'),
+                        "success"
+                    );
+                },
+                onError: (ctx) => {
+                    const errorMap = {
+                        "Invalid email or password": t("login-auth.invalidCredentials"),
+                        "Server error": t("login-auth.error"),
+                        "Network request failed": t("login-auth.networkError"),
+                    };
+                    console.log(errorMap, ctx.error.message)
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    const errorMessage = errorMap[ctx.error.message] || t("login-auth.unknownError");
+                    showToast(
+                        t('login-auth.error'),
+                        errorMessage || t('login-auth.unknownError'),
+                        "error"
+                    );
+                },
+            }
+        );
 
 
         setIsPending(false);
     };
 
-    // Soumission du formulaire d'inscription
     const onSignupSubmit = async (values: z.infer<typeof SignupSchema>) => {
         setIsPending(true);
         const { name, email, password } = values;
@@ -173,11 +174,18 @@ export function SignInView  ()  {
         setIsPending(false);
     };
 
+    const signInProvider = async (provider: 'google' | 'github') => {
+        const data = await authClient.signIn.social({
+            provider,
+            callbackURL: `/${locale}/dashboard`,
+        })
+    }
+
     return (
         <div className="h-screen relative flex items-center justify-center">
             <div className="w-full h-full grid lg:grid-cols-2 p-4 relative">
                 <ModeToggle className={"absolute top-6 right-6 cursor-pointer z-999"} />
-                <LanguageSwitcher className={"absolute top-6 right-26 cursor-pointer z-999"}/>
+                <LanguageSwitcher className={"absolute top-6 right-26 cursor-pointer z-999"} />
                 <div className="h-full flex flex-col justify-center items-center lg:items-start">
                     <div className="max-w-xs m-auto w-full flex flex-col items-center px-3">
                         <div className={"flex flex-row gap-2"}>
@@ -266,18 +274,20 @@ export function SignInView  ()  {
                                     </Form>
                                     <div className="flex flex-col gap-2 w-full space-y-2 mt-4">
                                         <Button
+                                            onClick={() => signInProvider('google')}
                                             className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/90 cursor-pointer">
-                      <span className="pointer-events-none me-2 flex-1">
-                        <RiGoogleFill className="opacity-60" size={16} aria-hidden="true"/>
-                      </span>
+                                            <span className="pointer-events-none me-2 flex-1">
+                                                <RiGoogleFill className="opacity-60" size={16} aria-hidden="true" />
+                                            </span>
                                             {t("login-with-google")}
                                         </Button>
 
                                         <Button
+                                            onClick={() => signInProvider('github')}
                                             className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/90 cursor-pointer">
-                      <span className="pointer-events-none me-2 flex-1">
-                        <RiGithubFill className="opacity-60" size={16} aria-hidden="true"/>
-                      </span>
+                                            <span className="pointer-events-none me-2 flex-1">
+                                                <RiGithubFill className="opacity-60" size={16} aria-hidden="true" />
+                                            </span>
                                             {t("login-with-github")}
                                         </Button>
 
@@ -378,17 +388,21 @@ export function SignInView  ()  {
                                         </form>
                                     </Form>
                                     <div className="flex flex-col gap-2 w-full space-y-2 mt-4">
-                                        <Button className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/90 cursor-pointer">
-                      <span className="pointer-events-none me-2 flex-1">
-                        <RiGoogleFill className="opacity-60" size={16} aria-hidden="true" />
-                      </span>
+                                        <Button
+                                            onClick={() => signInProvider('google')}
+                                            className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/90 cursor-pointer">
+                                            <span className="pointer-events-none me-2 flex-1">
+                                                <RiGoogleFill className="opacity-60" size={16} aria-hidden="true" />
+                                            </span>
                                             {t("signup-with-google")}
                                         </Button>
 
-                                        <Button className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/90 cursor-pointer">
-                      <span className="pointer-events-none me-2 flex-1">
-                        <RiGithubFill className="opacity-60" size={16} aria-hidden="true" />
-                      </span>
+                                        <Button
+                                            onClick={() => signInProvider('github')}
+                                            className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/90 cursor-pointer">
+                                            <span className="pointer-events-none me-2 flex-1">
+                                                <RiGithubFill className="opacity-60" size={16} aria-hidden="true" />
+                                            </span>
                                             {t("signup-with-github")}
                                         </Button>
                                     </div>
@@ -398,7 +412,7 @@ export function SignInView  ()  {
                     </div>
                 </div>
                 <div
-                    className=" bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:20px_20px] relative hidden h-full flex-col bg-zinc-800 dark:bg-zinc-900 p-10 rounded-md text-white relative dark:border-r lg:flex"
+                    className=" bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:20px_20px] relative hidden h-full flex-col bg-zinc-800 dark:bg-zinc-900 p-10 rounded-md text-white dark:border-r lg:flex"
                 >
                     <div className="relative z-20 flex flex-row items-center text-lg w-fit font-medium">
                         <Terminal className="text-primary" />

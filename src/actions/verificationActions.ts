@@ -6,7 +6,7 @@ export async function updateUserVerification(userId: string) {
   try {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { emailVerified: true }
+      data: { profileCompleted: true }
     })
     return { success: true, user: updatedUser }
   } catch (error) {
