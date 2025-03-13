@@ -1,9 +1,9 @@
 
 import { ReactNode } from 'react';
 import {headers} from "next/headers";
-import {auth} from "@/lib/auth";
-import {get_user} from "@/lib/data";
-import NavigationLayout from "@/components/dashboard/header/navigationlayout";
+import {auth} from "@src/lib/auth";
+import {get_user} from "@src/lib/data";
+import NavigationLayout from "@src/components/dashboard/header/navigationlayout";
 
 
 interface LayoutProps {
