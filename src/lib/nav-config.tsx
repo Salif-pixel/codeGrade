@@ -35,21 +35,21 @@ export const navigationConfig = () => {
   {
     id: "create-exam",
     title: t("create_exam"),
-    href: "/teacher/exams/create",
+    href: "/exams/create",
     icon: <Plus className="w-5 h-5" />,
     roles: [Role.TEACHER, Role.SUPERADMIN],
   },
   {
     id: "my-exams",
     title: t("my_exams"),
-    href: "/teacher/exams",
+    href: "/my-exams",
     icon: <Book className="w-5 h-5" />,
     roles: [Role.TEACHER, Role.SUPERADMIN],
   },
   {
     id: "stats",
     title: t("stats"),
-    href: "/teacher/stats",
+    href: "/stats",
     icon: <BarChart className="w-5 h-5" />,
     roles: [Role.TEACHER, Role.SUPERADMIN],
     badge: 3, // Exemple de badge pour des notifications
@@ -59,14 +59,14 @@ export const navigationConfig = () => {
   {
     id: "available-exams",
     title: t("available_exams"),
-    href: "/student/exams",
+    href: "/available-exams",
     icon: <FileText className="w-5 h-5" />,
     roles: [Role.STUDENT, Role.SUPERADMIN],
   },
   {
     id: "results",
     title: t("results"),
-    href: "/student/results",
+    href: "/results",
     icon: <ClipboardList className="w-5 h-5" />,
     roles: [Role.STUDENT, Role.SUPERADMIN],
   },

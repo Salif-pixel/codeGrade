@@ -164,7 +164,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                 <div className="border-b dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] hidden md:block">
                     <nav className="flex w-full">
                         <div className="w-full flex justify-center item-center max-w-screen-xl mx-auto px-4">
-                            <Navigation userRole={Role.TEACHER}/>
+                            <Navigation userRole={Role.STUDENT}/>
                         </div>
                     </nav>
                 </div>
