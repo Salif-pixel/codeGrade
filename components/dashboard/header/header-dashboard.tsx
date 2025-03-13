@@ -34,17 +34,9 @@ import { ModeToggle } from "@/components/theme/button-theme"
 import LanguageSwitcher from "@/components/internalization/language-switcher"
 import UserDrawer from "./user-drawer"
 import { useTranslations } from "next-intl"
-
-interface NavItem {
-    id: string
-    title: string
-    href: string
-    icon: React.ReactNode
-    badge?: number
-}
+import Navigation from "@/components/navigation/Navigation"
 
 export default function HeaderDashboard({ user }: { user: User }) {
-    const [activeTab, setActiveTab] = useState("dashboard")
     const [searchOpen, setSearchOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
 
@@ -71,40 +63,6 @@ export default function HeaderDashboard({ user }: { user: User }) {
     }, [])
 
     const t = useTranslations("dropdown-user")
-
-    const navItems: NavItem[] = [
-        {
-            id: "dashboard",
-            title: "Tableau de bord",
-            href: "#",
-            icon: <LayoutDashboard className="h-4 w-4" />,
-        },
-        {
-            id: "assignments",
-            title: "Devoirs",
-            href: "#",
-            icon: <ClipboardCheck className="h-4 w-4" />,
-            badge: 3,
-        },
-        {
-            id: "submissions",
-            title: "Soumissions",
-            href: "#",
-            icon: <FileDown className="h-4 w-4" />,
-        },
-        {
-            id: "analytics",
-            title: "Statistiques",
-            href: "#",
-            icon: <BarChart3 className="h-4 w-4" />,
-        },
-        {
-            id: "settings",
-            title: "Paramètres",
-            href: "#",
-            icon: <Settings className="h-4 w-4" />,
-        },
-    ]
 
     return (
         <>
@@ -206,37 +164,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                 <div className="border-b dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] hidden md:block">
                     <nav className="flex w-full">
                         <div className="w-full max-w-screen-xl mx-auto px-4">
-                            <div className="flex flex-col md:flex-row -mb-px">
-                                {navItems.map((item) => (
-                                    <Link key={item.id} className="cursor-pointer" href={item.href}>
-                                        <button
-                                            onClick={() => setActiveTab(item.id)}
-                                            className={cn(
-                                                "relative text-sm py-3 px-4 flex items-center gap-2 border-b-2 font-medium transition-all",
-                                                activeTab === item.id
-                                                    ? "border-primary text-primary"
-                                                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/20",
-                                            )}
-                                        >
-                                            {item.icon}
-                                            <span>{item.title}</span>
-                                            {item.badge && (
-                                                <Badge
-                                                    variant={activeTab === item.id ? "default" : "secondary"}
-                                                    className="ml-1 h-5 min-w-5 px-1 flex items-center justify-center"
-                                                >
-                                                    {item.badge}
-                                                </Badge>
-                                            )}
-
-                                            {/* Active indicator dot */}
-                                            {activeTab === item.id && (
-                                                <span className="absolute -bottom-[1.5px] left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary" />
-                                            )}
-                                        </button>
-                                    </Link>
-                                ))}
-                            </div>
+                            <Navigation userRole="SUPERADMIN"/>
                         </div>
                     </nav>
                 </div>
