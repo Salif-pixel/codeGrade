@@ -345,5 +345,10 @@
       "passwordWeak": "Le mot de passe est trop faible. Veuillez choisir un mot de passe plus sécurisé.",
       "passwordTooShort": "Le mot de passe est trop court. Veuillez choisir un mot de passe d'au moins 6 caractères."
     }
+  },
+  "dropdown-user": {
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
   }
 }

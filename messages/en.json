@@ -342,7 +342,14 @@
       "passwordWeak": "Password is too weak. Please use a stronger password.",
       "passwordTooShort": "Password is too short. Please use at least 6 characters."
     }
+  },
+
+  "dropdown-user": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out"
   }
+
 
 
 }

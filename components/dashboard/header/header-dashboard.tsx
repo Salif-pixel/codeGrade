@@ -14,15 +14,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { Link } from "@/src/i18n/navigation";
 import SearchDialog from "../search/search-dialog";
-import {
-    Sheet,
-    SheetContent,
-    SheetTrigger,
-} from "@/components/ui/sheet";
+
 import { User } from "@prisma/client";
 import { ModeToggle } from "@/components/theme/button-theme";
 import LanguageSwitcher from "@/components/internalization/language-switcher";
 import UserDrawer from "./user-drawer";
+import {useTranslations} from "next-intl";
 
 
 
@@ -40,10 +37,11 @@ export default function HeaderDashboard({ user }: { user: User }) {
         document.addEventListener('keydown', down);
         return () => document.removeEventListener('keydown', down);
     }, []);
+    const t = useTranslations('dropdown-user');
     return (
         <>
             <div className="border-b">
-                <div className="flex h-16 items-center px-4 md:px-6">
+                <div className="flex h-16 bg-[radial-gradient(rgba(0,0,0,0.20)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:22px_22px] items-center px-4 md:px-6">
                     {/* Logo and Platform Name */}
                     <div className="flex items-center mr-4">
                         <Terminal className="h-6 w-6 text-primary mr-2" />
@@ -77,7 +75,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                                 3
                             </span>
                         </Button>
-                        <ModeToggle />
+                        <ModeToggle className={"bg-background"} />
                         <LanguageSwitcher />
 
                         {/* User Profile */}
@@ -100,16 +98,16 @@ export default function HeaderDashboard({ user }: { user: User }) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
                                     <User2 className="mr-2 h-4 w-4" />
-                                    <span>Profil</span>
+                                    <span>{t('profile')}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
-                                    <span>Paramètres</span>
+                                    <span>{t('settings')}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
                                     <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Se déconnecter</span>
+                                    <span>{t('logout')}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -118,7 +116,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
             </div>
 
             {/* Tabs Navigation - Now at the top */}
-            <div className="border-b bg-background hidden md:block">
+            <div className="border-b bg-muted/30 dark:bg-zinc-900 hidden md:block">
                 <nav className="flex w-full">
                     <div className="w-full max-w-screen-xl mx-auto px-4">
                         <div className="flex flex-col md:flex-row -mb-px">

@@ -1,7 +1,7 @@
 'use client';
 
 import {Terminal, Loader} from "lucide-react";
-import {Dialog, DialogContent} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogTitle} from "@/components/ui/dialog";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 import {useState, useCallback} from "react";
 
@@ -25,6 +25,9 @@ export default function SearchDialog({open, onOpenChange}: SearchDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="overflow-hidden p-0 shadow-lg">
+                <DialogTitle>
+                  
+                </DialogTitle>
                 <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
                     <CommandInput
                         placeholder="Rechercher..."
@@ -51,7 +54,7 @@ export default function SearchDialog({open, onOpenChange}: SearchDialogProps) {
                             <CommandGroup heading="Résultats">
                                 <CommandItem>
                                     <Terminal className="mr-2 h-4 w-4" />
-                                    <span>Résultats pour "{searchQuery}"</span>
+                                    <span>Résultats pour {searchQuery}</span>
                                 </CommandItem>
                             </CommandGroup>
                         )}
