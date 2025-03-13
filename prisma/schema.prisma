@@ -13,17 +13,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  TEACHER
+  STUDENT
+  SUPERADMIN
+}
+
+enum ExamType {
+  DOCUMENT
+  QCM
+  CODE
+}
+
 model User {
-  id            String    @id
-  email         String    @unique
+  id            String       @id
+  email         String       @unique
   name          String?
   emailVerified Boolean
   image         String?
   background    String?
+  role          Role         @default(STUDENT)
   createdAt     DateTime
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  exams         Exam[]       @relation("ExamsCreated")
+  answers       Answer[]
+  grades        Grade[]
+  Correction    Correction[]
 
   @@map("user")
 }
@@ -71,4 +88,85 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Exam {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  filePath    String
+  format      String
+  type        ExamType
+  maxAttempts Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deadline    DateTime?
+
+  questions   Question[]
+  createdBy   User       @relation("ExamsCreated", fields: [createdById], references: [id])
+  createdById String
+  answers     Answer[]
+  grades      Grade[]
+}
+
+model Question {
+  id           String @id @default(uuid())
+  text         String
+  correctionAi String
+  maxPoints    Float
+  exam         Exam   @relation(fields: [examId], references: [id])
+  examId       String
+
+  @@index([examId])
+}
+
+model Answer {
+  id            String   @id @default(uuid())
+  filePath      String
+  attemptNumber Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId String
+  exam      Exam   @relation(fields: [examId], references: [id])
+  examId    String
+
+  corrections Correction[]
+  grade       Grade?       @relation(fields: [gradeId], references: [id])
+  gradeId     String?
+
+  @@unique([studentId, examId, attemptNumber])
+}
+
+model Correction {
+  id            String   @id @default(uuid())
+  aiFeedback    String
+  autoScore     Float
+  manualScore   Float?
+  improvement   String?
+  correctedBy   User?    @relation(fields: [correctedById], references: [id])
+  correctedById String?
+  createdAt     DateTime @default(now())
+
+  answer   Answer  @relation(fields: [answerId], references: [id])
+  answerId String
+  grades   Grade[]
+}
+
+model Grade {
+  id         String  @id @default(uuid())
+  finalScore Float
+  isRevised  Boolean @default(false)
+  comments   String?
+
+  student      User       @relation(fields: [studentId], references: [id])
+  studentId    String
+  exam         Exam       @relation(fields: [examId], references: [id])
+  examId       String
+  correction   Correction @relation(fields: [correctionId], references: [id])
+  correctionId String
+  Answer       Answer[]
+
+  @@unique([studentId, examId])
 }
