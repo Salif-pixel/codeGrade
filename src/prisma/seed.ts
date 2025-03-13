@@ -7,7 +7,7 @@ async function main() {
     const users = [
         {
             id: uuidv4(),
-            email: 'user1@example.com',
+            email: 'bouki@gmail.com',
             name: 'User One',
             emailVerified: false,
             image: null,
@@ -17,7 +17,7 @@ async function main() {
         },
         {
             id: uuidv4(),
-            email: 'user2@example.com',
+            email: 'babadi@gmail.com',
             name: 'User Two',
             emailVerified: true,
             image: null,
@@ -27,7 +27,7 @@ async function main() {
         },
         {
             id: uuidv4(),
-            email: 'user3@example.com',
+            email: 'goat@gmail.com',
             name: 'User Three',
             emailVerified: false,
             image: null,
@@ -37,7 +37,7 @@ async function main() {
         },
         {
             id: uuidv4(),
-            email: 'user4@example.com',
+            email: 'motomoto@gmail.com',
             name: 'User Four',
             emailVerified: true,
             image: null,
@@ -47,7 +47,7 @@ async function main() {
         },
         {
             id: uuidv4(),
-            email: 'user5@example.com',
+            email: 'ben@gmail.com',
             name: 'User Five',
             emailVerified: false,
             image: null,

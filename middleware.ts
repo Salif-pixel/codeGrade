@@ -3,7 +3,7 @@ import { routing } from "./src/i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 import { navigationConfig, navigationConfigForMiddleware } from "./src/lib/nav-config";
-import { Role } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 
 // Middleware pour gérer l'authentification et l'internationalisation
 export default async function middleware(request: NextRequest) {
@@ -32,8 +32,8 @@ export default async function middleware(request: NextRequest) {
             const existingSession = await response.json();
             
             // Vérifier si l'utilisateur a vérifié son email
-            const user = existingSession.session?.user;
-            if (user && !user.emailVerified) {
+            const user = existingSession.session?.user as User;
+            if (user && !user.profileCompleted) {
                 const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
                 // Si l'utilisateur n'est pas sur la page onboarding, le rediriger
                 if (pathnameWithoutLocale !== '/onboarding') {
@@ -84,9 +84,9 @@ export default async function middleware(request: NextRequest) {
         const response = await fetch(`${request.nextUrl.origin}/api/session?token=${session.split(".")[0]}`);
         if (response.ok) {
             const existingSession = await response.json();
-            const user = existingSession.session?.user;
+            const user = existingSession.session?.user as User;
             
-            if (user?.emailVerified) {
+            if (user?.profileCompleted) {
                 const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
                 return NextResponse.redirect(new URL(`${locale}/dashboard`, request.url));
             }
