@@ -2,7 +2,8 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./src/i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { log } from "console";
+import { navigationConfig, navigationConfigForMiddleware } from "./src/lib/nav-config";
+import { Role } from "@prisma/client";
 
 // Middleware pour gérer l'authentification et l'internationalisation
 export default async function middleware(request: NextRequest) {
@@ -26,7 +27,6 @@ export default async function middleware(request: NextRequest) {
     const session = getSessionCookie(request);
    
     if (session) {
-        console.log("session",session);
         const response = await fetch(`${request.nextUrl.origin}/api/session?token=${session.split(".")[0]}`);
         if (response.ok) {
             const existingSession = await response.json();
@@ -40,13 +40,26 @@ export default async function middleware(request: NextRequest) {
                     return NextResponse.redirect(new URL(`${locale}/onboarding`, request.url));
                 }
             }
+
+            // Vérifier les permissions basées sur le rôle
+            if (user && user.role) {
+                const navItems = navigationConfigForMiddleware();
+                const currentPath = pathnameWithoutLocale.split('/')[1]; // Get the first segment of the path
+                const matchingRoute = navItems.find(item => {
+                    const routeFirstSegment = item.href.split('/')[1];
+                    return routeFirstSegment === currentPath;
+                });
+
+                if (matchingRoute && !matchingRoute.roles.includes(user.role as Role)) {
+                    const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
+                    return NextResponse.redirect(new URL(`${locale}/not-found`, request.url));
+                }
+            }
         }
     }
 
- 
-
     // Définir les routes publiques
-    const publicRoutes = ['/login', '/404', '/onboarding'];
+    const publicRoutes = ['/login', '/404', '/'];
     const isPublicRoute = publicRoutes.some(route => pathnameWithoutLocale === route);
 
     // Si l'utilisateur est sur la page de login mais est déjà connecté, rediriger vers le dashboard
@@ -59,6 +72,25 @@ export default async function middleware(request: NextRequest) {
     if (!isPublicRoute && !session) {
         const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
         return NextResponse.redirect(new URL(`${locale}/login`, request.url));
+    }
+
+    // Protection de la route onboarding
+    if (pathnameWithoutLocale === '/onboarding') {
+        if (!session) {
+            const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
+            return NextResponse.redirect(new URL(`${locale}/login`, request.url));
+        }
+
+        const response = await fetch(`${request.nextUrl.origin}/api/session?token=${session.split(".")[0]}`);
+        if (response.ok) {
+            const existingSession = await response.json();
+            const user = existingSession.session?.user;
+            
+            if (user?.emailVerified) {
+                const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
+                return NextResponse.redirect(new URL(`${locale}/dashboard`, request.url));
+            }
+        }
     }
 
     // Gestion de l'internationalisation pour les autres routes

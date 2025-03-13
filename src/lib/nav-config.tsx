@@ -51,7 +51,7 @@ export const navigationConfig = () => {
     title: t("stats"),
     href: "/stats",
     icon: <BarChart className="w-5 h-5" />,
-    roles: [Role.TEACHER, Role.SUPERADMIN],
+    roles: [Role.TEACHER,Role.STUDENT, Role.SUPERADMIN],
     badge: 3, // Exemple de badge pour des notifications
   },
 
@@ -66,6 +66,69 @@ export const navigationConfig = () => {
   {
     id: "results",
     title: t("results"),
+    href: "/results",
+    icon: <ClipboardList className="w-5 h-5" />,
+    roles: [Role.STUDENT, Role.SUPERADMIN],
+  },
+];
+
+  return config;
+};
+
+
+export const navigationConfigForMiddleware = () => {
+  const config: NavItem[] = [
+  // Pages communes
+  {
+    id: "exit",
+    title: "Exit",
+    href: "/",
+    icon: <DoorClosed className="w-5 h-5" />,
+    roles: [Role.TEACHER, Role.STUDENT, Role.SUPERADMIN],
+  },
+  {
+    id: "settings",
+    title: "Settings",
+    href: "/settings",
+    icon: <Settings2 className="w-5 h-5" />,
+    roles: [Role.TEACHER, Role.STUDENT, Role.SUPERADMIN],
+  },
+
+  // Pages pour les professeurs
+  {
+    id: "create-exam",
+    title: "Create Exam",
+    href: "/exams/create",
+    icon: <Plus className="w-5 h-5" />,
+    roles: [Role.TEACHER, Role.SUPERADMIN],
+  },
+  {
+    id: "my-exams",
+    title: "My Exams",
+    href: "/my-exams",
+    icon: <Book className="w-5 h-5" />,
+    roles: [Role.TEACHER, Role.SUPERADMIN],
+  },
+  {
+    id: "stats",
+    title: "Statistics",
+    href: "/stats",
+    icon: <BarChart className="w-5 h-5" />,
+    roles: [Role.TEACHER,Role.STUDENT, Role.SUPERADMIN],
+    badge: 3, // Exemple de badge pour des notifications
+  },
+
+  // Pages pour les étudiants
+  {
+    id: "available-exams",
+    title: "Available Exams",
+    href: "/available-exams",
+    icon: <FileText className="w-5 h-5" />,
+    roles: [Role.STUDENT, Role.SUPERADMIN],
+  },
+  {
+    id: "results",
+    title: "Results",
     href: "/results",
     icon: <ClipboardList className="w-5 h-5" />,
     roles: [Role.STUDENT, Role.SUPERADMIN],
