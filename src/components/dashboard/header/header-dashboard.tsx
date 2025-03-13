@@ -14,7 +14,7 @@ import {
     FileDown,
     BarChart3,
 } from "lucide-react"
-import { Button } from "@src/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,19 +22,19 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@src/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar"
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from "react"
-import { Link } from "@/src/i18n/navigation"
+import { Link } from "@/i18n/navigation"
 import SearchDialog from "../search/search-dialog"
-import { Badge } from "@src/components/ui/badge"
-import { cn } from "@src/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 import { Role, type User } from "@prisma/client"
-import { ModeToggle } from "@src/components/theme/button-theme"
-import LanguageSwitcher from "@src/components/internalization/language-switcher"
+import { ModeToggle } from "@/components/theme/button-theme"
+import LanguageSwitcher from "@/components/internalization/language-switcher"
 import UserDrawer from "./user-drawer"
 import { useTranslations } from "next-intl"
-import Navigation from "@src/components/navigation/Navigation"
+import Navigation from "@/components/navigation/Navigation"
 
 export default function HeaderDashboard({ user }: { user: User }) {
     const [searchOpen, setSearchOpen] = useState(false)

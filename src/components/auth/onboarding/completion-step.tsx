@@ -1,11 +1,11 @@
 "use client"
 
 import { Sparkles, BookOpen, Rocket, CheckCircle, ArrowRight, GraduationCap, Award } from "lucide-react"
-import { Button, buttonVariants } from "@src/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@src/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { useTranslations } from "next-intl"
-import {Link} from "@src/i18n/navigation";
+import {Link} from "@/i18n/navigation";
 
 interface CompletionStepProps {
   userType: "TEACHER" | "STUDENT" | null

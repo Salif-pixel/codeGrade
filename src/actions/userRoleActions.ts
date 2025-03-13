@@ -1,6 +1,6 @@
 "use server"
 
-import { prisma } from "@src/lib/prisma"
+import { prisma } from "@/lib/prisma"
 
 export async function updateUserRole(userId: string, role: "TEACHER" | "STUDENT") {
   try {

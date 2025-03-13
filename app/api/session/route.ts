@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@src/lib/prisma"; // Assurez-vous que le chemin est correct
+import { prisma } from "@/lib/prisma"; // Assurez-vous que le chemin est correct
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

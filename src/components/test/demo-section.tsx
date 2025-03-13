@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from 'react'
-import { Button } from '@src/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@src/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FileText, Code, CheckSquare } from 'lucide-react'
 
 export default function DemoSection() {

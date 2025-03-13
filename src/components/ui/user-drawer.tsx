@@ -1,17 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar"
-import { Button } from "@src/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@src/components/ui/sheet"
-import { Separator } from "@src/components/ui/separator"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@src/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import {
   Bell,
   CreditCard,

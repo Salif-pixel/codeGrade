@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle, Code, GraduationCap, Sparkles } from 'lucide-react'
-import { Button } from '@src/components/ui/button'
+import { Button } from '@/components/ui/button'
 import FeatureCard from './feature-card'
 import DemoSection from './demo-section'
 import Testimonials from './testimonials'

@@ -1,6 +1,6 @@
 "use server";
 import { redirect } from "next/navigation";
-import { auth } from "@src/lib/auth";
+import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { cookies } from "next/headers";
 

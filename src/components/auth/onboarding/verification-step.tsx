@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Shield, CheckCircle, Info, AlertTriangle } from "lucide-react"
-import { Card, CardContent } from "@src/components/ui/card"
-import { Button } from "@src/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@src/components/ui/tabs"
-import { Input } from "@src/components/ui/input"
-import { Label } from "@src/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { motion } from "framer-motion"
 import { useTranslations } from "next-intl"
 

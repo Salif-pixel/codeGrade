@@ -7,10 +7,10 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@src/components/ui/dropdown-menu";
-import { Button } from "@src/components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { ChevronDown } from 'lucide-react';
-import {cn} from "@src/lib/utils";
+import {cn} from "@/lib/utils";
 import { FrFlag, UsFlag } from '../flags';
 
 const LanguageSwitcher = ({className }: { className?: string }) => {

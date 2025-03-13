@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import React, {useEffect, useState} from "react";
-import { cn } from "@src/lib/utils";
+import { cn } from "@/lib/utils";
 import { GoCopilot } from "react-icons/go";
 
 export function CardDemo() {

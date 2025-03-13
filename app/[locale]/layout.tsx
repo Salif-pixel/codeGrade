@@ -2,12 +2,12 @@ import "./globals.css";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';
-import {routing} from '@/src/i18n/routing';
+import {routing} from '@/i18n/routing';
 import {Geist, Geist_Mono} from "next/font/google";
 import {Metadata} from "next";
-import {ThemeProvider} from "@src/components/theme-provider";
-import {Locale} from "@/src/i18n/routing";
-import {Toaster} from "@src/components/ui/sonner";
+import {ThemeProvider} from "@/components/theme-provider";
+import {Locale} from "@/i18n/routing";
+import {Toaster} from "@/components/ui/sonner";
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],

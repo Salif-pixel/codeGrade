@@ -80,7 +80,7 @@ export function WorkflowSection() {
                     </div>
 
                     <motion.div
-                        className="relative w-[48rem] max-w-none rounded-xl "
+                        className="relative w-[40rem] max-w-none rounded-xl "
                         initial={{ opacity: 0, x: 50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}

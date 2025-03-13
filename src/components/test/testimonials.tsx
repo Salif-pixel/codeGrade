@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react'
-import { Button } from '@src/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 const testimonials = [
   {

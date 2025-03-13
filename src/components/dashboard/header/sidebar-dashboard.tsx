@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import type { User } from "@prisma/client"
-import { cn } from "@src/lib/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar"
-import { Button } from "@src/components/ui/button"
-import { ModeToggle } from "@src/components/theme/button-theme"
-import LanguageSwitcher from "@src/components/internalization/language-switcher"
+import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/theme/button-theme"
+import LanguageSwitcher from "@/components/internalization/language-switcher"
 import { usePathname } from "next/navigation"
-import { Link } from "@/src/i18n/navigation"
+import { Link } from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
 import {
     Bell,
@@ -23,8 +23,8 @@ import {
     BarChart3,
     ChevronLeft,
 } from "lucide-react"
-import { Badge } from "@src/components/ui/badge"
-import { SignOut } from "@/src/actions/signOutactions"
+import { Badge } from "@/components/ui/badge"
+import { SignOut } from "@/actions/signOutactions"
 import SearchDialog from "../search/search-dialog"
 
 export default function SidebarDashboard({ user }: { user: User }) {
