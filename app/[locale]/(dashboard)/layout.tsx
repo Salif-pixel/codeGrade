@@ -1,7 +1,5 @@
 
 import { ReactNode } from 'react';
-
-import Header from "@/components/dashboard/header/header";
 import {headers} from "next/headers";
 import {auth} from "@/lib/auth";
 import {get_user} from "@/lib/data";
