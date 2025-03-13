@@ -5,9 +5,9 @@ import {notFound} from 'next/navigation';
 import {routing} from '@/src/i18n/routing';
 import {Geist, Geist_Mono} from "next/font/google";
 import {Metadata} from "next";
-import {ThemeProvider} from "@/components/theme-provider";
+import {ThemeProvider} from "@src/components/theme-provider";
 import {Locale} from "@/src/i18n/routing";
-import {Toaster} from "@/components/ui/sonner";
+import {Toaster} from "@src/components/ui/sonner";
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],

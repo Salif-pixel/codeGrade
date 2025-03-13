@@ -1,7 +1,7 @@
 "use client";
 
 import {Loader2, LockIcon, Terminal} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@src/components/ui/button";
 import {
     Form,
     FormControl,
@@ -9,20 +9,20 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ModeToggle } from "@/components/theme/button-theme";
+} from "@src/components/ui/form";
+import { Input } from "@src/components/ui/input";
+import { Separator } from "@src/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@src/components/ui/tabs";
+import { ModeToggle } from "@src/components/theme/button-theme";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RiGithubFill, RiGoogleFill } from "react-icons/ri";
 import {useLocale, useTranslations} from "next-intl";
-import LanguageSwitcher from "@/components/internalization/language-switcher";
-import {authClient} from "@/lib/auth-client";
+import LanguageSwitcher from "@src/components/internalization/language-switcher";
+import {authClient} from "@src/lib/auth-client";
 import {useState} from "react";
-import { useCustomToast } from "@/components/alert/alert";
+import { useCustomToast } from "@src/components/alert/alert";
 
 // Schéma de validation pour la connexion
 
