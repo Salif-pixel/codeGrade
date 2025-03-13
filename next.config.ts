@@ -4,8 +4,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 const nextConfig: NextConfig = {
     experimental: {
         viewTransition: true,
+        nodeMiddleware: true,
     },
-    dir: './src',
 };
 
 const withNextIntl = createNextIntlPlugin(

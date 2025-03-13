@@ -358,6 +358,207 @@
     "settings": "Settings",
     "logout": "Log out",
     "search": "Search"
+  },
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "required": "Required",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact our support"
+  },
+  "steps": {
+    "welcome": "Welcome",
+    "userType": "User Type",
+    "verification": "Verification",
+    "profile": "Profile",
+    "completion": "Completed",
+    "step":"Step {current} of {total}"
+  },
+  "welcome": {
+    "title": "Welcome to AI Grading Platform",
+    "subtitle": "Our AI-powered grading platform revolutionizes education by providing accurate assessments, personalized feedback, and detailed analytics.",
+    "features": {
+      "intelligentGrading": {
+        "title": "Intelligent Grading",
+        "description": "Our AI deeply analyzes student work to provide accurate and consistent assessments."
+      },
+      "personalizedFeedback": {
+        "title": "Personalized Feedback",
+        "description": "Receive detailed feedback that identifies strengths and areas for improvement."
+      },
+      "advancedAnalytics": {
+        "title": "Advanced Analytics",
+        "description": "Visualize progress and identify trends with our intuitive analytical dashboards."
+      }
+    },
+    "onboardingProcess": "How the onboarding process works",
+    "onboardingSteps": {
+      "step1": "Choose your role - Indicate whether you're a teacher or student.",
+      "step2": "Verify your identity - A simple verification to ensure security.",
+      "step3": "Set up your profile - Add your personal information.",
+      "step4": "Start using the platform - Access all the features of our AI grading solution."
+    }
+  },
+  "userType": {
+    "title": "I am a...",
+    "subtitle": "Select your role to customize your experience",
+    "teacher": {
+      "title": "Teacher",
+      "description": "Create assignments, grade work, and track student progress",
+      "features": [
+        "Automatic grading of assignments",
+        "Personalized feedback generation",
+        "Detailed performance analytics"
+      ]
+    },
+    "student": {
+      "title": "Student",
+      "description": "Submit your work, receive feedback, and improve your skills",
+      "features": [
+        "Immediate feedback on your work",
+        "Targeted improvement suggestions",
+        "Personalized progress tracking"
+      ]
+    },
+    "whyWeAsk": {
+      "title": "Why we ask this?",
+      "description": "Your role determines the features and tools you'll have access to. Teachers can create and grade assignments, while students can submit work and receive feedback.",
+      "canChange": "Can I change my role later?",
+      "changeAnswer": "Yes, you can modify your role in your account settings, but some role-specific data will need to be reconfigured."
+    },
+    "error": "Please select a user type"
+  },
+  "verification": {
+    "title": "Verify Your Account",
+    "subtitle": "We need to verify that you're a real person before continuing",
+    "succes": "Account verified successfully",
+    "methods": {
+      "connect-the-dot":"Connect the dots",
+      "reset":"Refresh CAPTCHA",
+      "captcha": "reCAPTCHA",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    
+    "captcha": {
+      "reset":"Refresh CAPTCHA",
+      "title": "Human Verification",
+      "description": "This verification helps us prevent automated accounts and protect our platform",
+      "instruction": "Check the 'I'm not a robot' box",
+      "verify": "Verify Now"
+    },
+    "email": {
+      "title": "Email Verification",
+      "description": "We'll send a verification code to your email address",
+      "emailLabel": "Email Address",
+      "codeLabel": "Verification Code",
+      "sendCode": "Send Code",
+      "verifyCode": "Verify Code",
+      "resend": "Resend code",
+      "resendTimer": "Resend ({seconds}s)",
+      "demoNote": "For demo purposes, use code: 123456"
+    },
+    "success": {
+      "title": "Verification Successful",
+      "description": "Thank you for verifying your account. You can now continue with the onboarding process.",
+      "status": "Account successfully verified"
+    },
+    "whyNeeded": {
+      "title": "Why verification is necessary?",
+      "description": "Verification helps us protect our platform against automated accounts and ensures that only real people can access our services. Your data is secure and will never be shared with third parties."
+    },
+    "error": "Please complete the verification"
+  },
+  "profile": {
+    "title": "Personal Profile",
+    "subtitle": "Tell us about yourself",
+    "profilePicture": {
+      "title": "Profile Picture",
+      "description": "Add a photo to personalize your profile"
+    },
+    "name": {
+      "label": "Full Name",
+      "placeholder": "Enter your full name",
+      "error": "Name is required"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "your@email.com",
+      "error": "Email is required",
+      "invalidError": "Please enter a valid email address"
+    },
+    "background": {
+      "label": "Background",
+      "placeholder": "Tell us about your background",
+      "counter": "{length}/500 characters"
+    },
+    "privacy": {
+      "title": "Privacy Information",
+      "description": "Your personal information is protected according to our privacy policy. Fields marked with an asterisk (*) are required for account creation."
+    }
+  },
+  "completion": {
+    "title": "Congratulations!",
+    "subtitle": "Your profile is complete and you're ready to start using our AI grading platform. We're excited to welcome you to our community.",
+    "nextSteps": {
+      "title": "Next Steps",
+      "teacher": [
+        "Create your first exam",
+        "Set up questions",
+        "Invite your students",
+        "Explore the AI grading features",
+        "Check the performance analytics"
+      ],
+      "student": [
+        "Join your classes",
+        "Check available exams",
+        "Submit your answers",
+        "Receive personalized AI feedback",
+        "Track your academic progress"
+      ],
+      "button": {
+        "teacher": "Create an Exam",
+        "student": "View Exams"
+      }
+    },
+    "platformBenefits": {
+      "title": "Platform Benefits",
+      "benefits": [
+        {
+          "title": "Accurate AI Grading",
+          "description": "Consistent and objective assessments based on pedagogical criteria"
+        },
+        {
+          "title": "Personalized Feedback",
+          "description": "Detailed comments tailored to each student's level"
+        },
+        {
+          "title": "Advanced Analytics",
+          "description": "Visualize trends and track progress over time"
+        },
+        {
+          "title": "Time Saving",
+          "description": "Automate repetitive tasks to focus on teaching"
+        }
+      ]
+    },
+    "resourceCenter": {
+      "teacher": {
+        "title": "Teacher Resource Center",
+        "description": "We've prepared guides and tutorials to help you get the most out of our AI grading platform."
+      },
+      "student": {
+        "title": "Student Help Center",
+        "description": "We've prepared resources to help you succeed and get the most out of our platform."
+      },
+      "buttons": ["User Guides", "Video Tutorials", "FAQ", "Contact Support"]
+    }
+  },
+  "error": {
+    "title": "An error occurred",
+    "description": "We're sorry, but an error occurred while processing your request. Please try again later.",
+    "tryAgain": "Try Again"
   }
 
 

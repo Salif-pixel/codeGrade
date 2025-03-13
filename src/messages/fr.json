@@ -360,5 +360,205 @@
     "settings": "Paramètres",
     "logout": "Se déconnecter",
     "search":"Rechercher"
+  },
+  "common": {
+    "next": "Suivant",
+    "back": "Retour",
+    "finish": "Terminer",
+    "required": "Requis",
+    "needHelp": "Besoin d'aide ?",
+    "contactSupport": "Contactez notre support"
+  },
+  "steps": {
+    "welcome": "Bienvenue",
+    "userType": "Type d'utilisateur",
+    "verification": "Vérification",
+    "profile": "Profil",
+    "completion": "Finalisation",
+    "step": "Étape {current} sur {total}"
+  },
+  "welcome": {
+    "title": "Bienvenue sur la Plateforme de Notation IA",
+    "subtitle": "Notre plateforme de notation alimentée par l'IA révolutionne l'éducation en offrant des évaluations précises, des retours personnalisés et des analyses détaillées.",
+    "features": {
+      "intelligentGrading": {
+        "title": "Notation Intelligente",
+        "description": "Notre IA analyse en profondeur les travaux des étudiants pour fournir des évaluations précises et cohérentes."
+      },
+      "personalizedFeedback": {
+        "title": "Feedback Personnalisé",
+        "description": "Recevez des commentaires détaillés et adaptés qui identifient les points forts et les axes d'amélioration."
+      },
+      "advancedAnalytics": {
+        "title": "Analyses Avancées",
+        "description": "Visualisez les progrès et identifiez les tendances grâce à nos tableaux de bord analytiques intuitifs."
+      }
+    },
+    "onboardingProcess": "Comment fonctionne le processus d'intégration",
+    "onboardingSteps": {
+      "step1": "Choisissez votre rôle - Indiquez si vous êtes un enseignant ou un étudiant.",
+      "step2": "Vérifiez votre identité - Une simple vérification pour assurer la sécurité.",
+      "step3": "Configurez votre profil - Ajoutez vos informations personnelles.",
+      "step4": "Commencez à utiliser la plateforme - Accédez à toutes les fonctionnalités de notre solution de notation IA."
+    }
+  },
+  "userType": {
+    "title": "Je suis un...",
+    "subtitle": "Sélectionnez votre rôle pour personnaliser votre expérience",
+    "teacher": {
+      "title": "Enseignant",
+      "description": "Créez des examens, notez les travaux et suivez les progrès des étudiants",
+      "features": [
+        "Notation automatique des travaux",
+        "Génération de feedback personnalisé",
+        "Analyses détaillées des performances"
+      ]
+    },
+    "student": {
+      "title": "Étudiant",
+      "description": "Soumettez vos réponses, recevez des retours et améliorez vos compétences",
+      "features": [
+        "Feedback immédiat sur vos travaux",
+        "Suggestions d'amélioration ciblées",
+        "Suivi de progression personnalisé"
+      ]
+    },
+    "whyWeAsk": {
+      "title": "Pourquoi nous demandons cela ?",
+      "description": "Votre rôle détermine les fonctionnalités et les outils auxquels vous aurez accès. Les enseignants peuvent créer et noter des examens, tandis que les étudiants peuvent soumettre des réponses et recevoir des retours.",
+      "canChange": "Puis-je changer de rôle plus tard ?",
+      "changeAnswer": "Oui, vous pourrez modifier votre rôle dans les paramètres de votre compte, mais certaines données spécifiques au rôle devront être reconfigurées."
+    },
+    "error": "Veuillez sélectionner un type d'utilisateur"
+  },
+  "verification": {
+    "title": "Vérifiez Votre Compte",
+    "subtitle": "Nous devons vérifier que vous êtes une personne réelle avant de continuer",
+    "succes": "Vérification réussie!",
+    "methods": {
+      "connect-the-dot":"Relier les points",
+      "reset":"Réinitialiser le captcha", 
+      "captcha": "reCAPTCHA",
+      "email": "Email",
+      "phone": "Téléphone"
+    },
+   
+    "captcha": {
+      "title": "Vérification Humaine",
+      "description": "Cette vérification nous aide à prévenir les comptes automatisés et à protéger notre plateforme",
+      "instruction": "Cochez la case 'Je ne suis pas un robot'",
+      "verify": "Vérifier Maintenant"
+    },
+    "email": {
+      "title": "Vérification par Email",
+      "description": "Nous vous enverrons un code de vérification à votre adresse email",
+      "emailLabel": "Adresse Email",
+      "codeLabel": "Code de Vérification",
+      "sendCode": "Envoyer le Code",
+      "verifyCode": "Vérifier le Code",
+      "resend": "Renvoyer le code",
+      "resendTimer": "Renvoyer ({seconds}s)",
+      "demoNote": "Pour les besoins de la démo, utilisez le code: 123456"
+    },
+    "success": {
+      "title": "Vérification Réussie",
+      "description": "Merci d'avoir vérifié votre compte. Vous pouvez maintenant continuer avec le processus d'intégration.",
+      "status": "Compte vérifié avec succès"
+    },
+    "whyNeeded": {
+      "title": "Pourquoi la vérification est-elle nécessaire ?",
+      "description": "La vérification nous aide à protéger notre plateforme contre les comptes automatisés et à garantir que seules des personnes réelles peuvent accéder à nos services. Vos données sont sécurisées et ne seront jamais partagées avec des tiers."
+    },
+    "error": "Veuillez compléter la vérification"
+  },
+  "profile": {
+    "title": "Profil Personnel",
+    "subtitle": "Parlez-nous de vous",
+    "profilePicture": {
+      "title": "Photo de Profil",
+      "description": "Ajoutez une photo pour personnaliser votre profil"
+    },
+    "name": {
+      "label": "Nom Complet",
+      "placeholder": "Entrez votre nom complet",
+      "error": "Le nom est requis"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "votre@email.com",
+      "error": "L'email est requis",
+      "invalidError": "Veuillez entrer une adresse email valide"
+    },
+    "background": {
+      "label": "Contexte",
+      "placeholder": "Parlez-nous de votre parcours",
+      "counter": "{length}/500 caractères"
+    },
+    "privacy": {
+      "title": "Informations sur la confidentialité",
+      "description": "Vos informations personnelles sont protégées conformément à notre politique de confidentialité. Les champs marqués d'un astérisque (*) sont obligatoires pour la création de votre compte."
+    }
+  },
+  "completion": {
+    "title": "Félicitations !",
+    "subtitle": "Votre profil est complet et vous êtes prêt à commencer à utiliser notre plateforme de notation IA. Nous sommes ravis de vous accueillir dans notre communauté.",
+    "nextSteps": {
+      "title": "Prochaines Étapes",
+      "teacher": [
+        "Créez votre premier examen",
+        "Configurez les questions",
+        "Invitez vos étudiants",
+        "Explorez les fonctionnalités de notation IA",
+        "Consultez les analyses de performance"
+      ],
+      "student": [
+        "Rejoignez vos classes",
+        "Consultez les examens disponibles",
+        "Soumettez vos réponses",
+        "Recevez des retours personnalisés par IA",
+        "Suivez votre progression académique"
+      ],
+      "button": {
+        "teacher": "Créer un Examen",
+        "student": "Voir les Examens"
+      }
+    },
+    "platformBenefits": {
+      "title": "Avantages de la Plateforme",
+      "benefits": [
+        {
+          "title": "Notation IA Précise",
+          "description": "Évaluations cohérentes et objectives basées sur des critères pédagogiques"
+        },
+        {
+          "title": "Feedback Personnalisé",
+          "description": "Commentaires détaillés et adaptés au niveau de chaque étudiant"
+        },
+        {
+          "title": "Analyses Avancées",
+          "description": "Visualisez les tendances et suivez la progression au fil du temps"
+        },
+        {
+          "title": "Gain de Temps",
+          "description": "Automatisez les tâches répétitives pour vous concentrer sur l'enseignement"
+        }
+      ]
+    },
+    "resourceCenter": {
+      "teacher": {
+        "title": "Centre de Ressources pour Enseignants",
+        "description": "Nous avons préparé des guides et tutoriels pour vous aider à tirer le meilleur parti de notre plateforme de notation IA."
+      },
+      "student": {
+        "title": "Centre d'Aide pour Étudiants",
+        "description": "Nous avons préparé des ressources pour vous aider à réussir et à tirer le meilleur parti de notre plateforme."
+      },
+      "buttons": ["Guides d'Utilisation", "Tutoriels Vidéo", "FAQ", "Contacter le Support"]
+    }
+  },
+  "error":{
+    "title":"Une erreur s'est produite",
+    "description":"Nous sommes désolés, une erreur s'est produite lors du chargement de la page. Veuillez réessayer plus tard.",
+    "tryAgain":"Réessayer"
   }
 }

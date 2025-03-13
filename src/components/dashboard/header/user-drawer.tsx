@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname } from "@/src/i18n/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar"
 import { Button } from "@src/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@src/components/ui/sheet"
@@ -33,8 +33,8 @@ import Link from "next/link"
 import type { User } from "@prisma/client"
 import { cn } from "@src/lib/utils"
 import { SignOut } from "@/src/actions/signOutactions"
-import {ModeToggle} from "@src/components/theme/button-theme";
-import LanguageSwitcher from "@src/components/internalization/language-switcher";
+import {ModeToggle} from "@src/components/theme/button-theme"
+import LanguageSwitcher from "@src/components/internalization/language-switcher"
 
 
 interface NavItem {

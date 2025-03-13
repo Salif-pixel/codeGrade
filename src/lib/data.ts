@@ -19,3 +19,12 @@ export const get_users = async ()=>{
     });
     return users;
 };
+
+export const getExistingSession = async (token: string) => {
+    const session = await prisma.session.findFirst({
+        where: {
+            token: token ?? "",
+        },
+    });
+    return session;
+};
