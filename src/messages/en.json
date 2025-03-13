@@ -95,8 +95,8 @@
     "headline": "Plan. Assess. Automate",
     "description": "Create, distribute, and automatically grade programming assessments with quizzes, integrated code editors, or PDF submissions, all analyzed by AI.",
     "cta": {
-      "learnMore": "Learn More",
-      "tryFree": "Try for Free"
+      "learnMore": "login",
+      "tryFree": "get started"
     },
     "features": [
       "Reliable for over 500 schools",

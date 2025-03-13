@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import {useState } from "react"
 import { useTranslations } from "next-intl"
 
-
 export function WorkflowGrade() {
     const t = useTranslations('workflow-grade')
     const assignmentTypes = [
@@ -80,14 +79,14 @@ export function WorkflowGrade() {
     }
 
     return (
-        <section className="overflow-hidden z-2 bg-gray-50 dark:bg-background py-24 sm:py-32">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-                    {/* Section du cadre (maintenant à gauche) */}
+        <section className="overflow-hidden flex justify-center z-2 bg-gray-50 dark:bg-background py-24 sm:py-32">
+            <div className="w-full px-4 lg:px-6">
+                <div className="flex flex-col lg:flex-row items-center justify-center lg:gap-16">
+                    {/* Preview section */}
                     <motion.div
-                        className="relative w-[48rem] max-w-none rounded-xl shadow-2xl"
-                        initial={{ opacity: 0, x: 0 }}
-                        whileInView={{ opacity: 1, x: -180 }}
+                        className="w-full lg:w-1/2 max-w-2xl rounded-xl shadow-2xl order-2 lg:order-1"
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
                         <div className="bg-white dark:bg-background p-6 rounded-xl border border-gray-200 dark:border-muted h-full">
@@ -109,22 +108,22 @@ export function WorkflowGrade() {
                         </div>
                     </motion.div>
 
-                    {/* Section des boutons (maintenant à droite) */}
-                    <div className="lg:pt-4 lg:pl-8">
-                        <div className="lg:max-w-lg">
+                    {/* Controls section */}
+                    <div className="w-full lg:w-fit px-8 order-1 lg:order-2">
+                        <div className="max-w-lg mx-auto lg:mx-0">
                             <motion.h2 className="text-base/7 font-semibold text-primary">
                                 {t('title')}
                             </motion.h2>
 
-                            <motion.p className="mt-2 text-4xl font-semibold tracking-tight text-pretty text-gray-900 dark:text-white sm:text-5xl">
+                            <motion.p className="mt-2 text-3xl lg:text-4xl font-semibold tracking-tight text-pretty text-gray-900 dark:text-white">
                                 {t('heading')}
                             </motion.p>
 
-                            <motion.p className="mt-6 text-lg/8 text-gray-600 dark:text-gray-400">
+                            <motion.p className="mt-6 text-base lg:text-lg text-gray-600 dark:text-gray-400">
                                 {t('description')}
                             </motion.p>
 
-                            <div className="mt-10 space-y-6">
+                            <div className="mt-10 space-y-4">
                                 {assignmentTypes.map((type) => (
                                     <motion.div
                                         key={type.id}

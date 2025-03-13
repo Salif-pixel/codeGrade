@@ -84,7 +84,7 @@ export default function Testimonials() {
                                             <div className="flex items-center">
                                                 <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
                                                     <img
-                                                        src={testimonial.image || "/assets/placeholder.svg"}
+                                                        src={testimonial.image || "/assets/placeholder-dark.svg"}
                                                         alt={testimonial.author}
                                                         className="w-full h-full object-cover"
                                                     />

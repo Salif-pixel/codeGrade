@@ -2,11 +2,12 @@ import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, CheckCircle } from "lucide-react"
-import {useTranslations} from "next-intl";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 
 export default function Hero() {
-    const  t  = useTranslations("hero-section")
+    const t = useTranslations("hero-section")
     const heroRef = useRef<HTMLDivElement>(null)
     const titleRef = useRef<HTMLHeadingElement>(null)
     const subtitleRef = useRef<HTMLParagraphElement>(null)
@@ -26,10 +27,10 @@ export default function Hero() {
     }, [])
 
     return (
-        <div ref={heroRef} className="bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] relative min-h-screen p-10 flex items-center bg-background overflow-hidden">
+        <div ref={heroRef} className="bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] relative p-10 flex items-center bg-background overflow-hidden">
             <div className="absolute inset-0 bg-grid-slate-200/50 dark:bg-grid-slate-800/30 bg-[length:30px_30px] z-0"></div>
 
-            <div className="container mx-auto px-4 py-20 md:py-32 z-10">
+            <div className="container mx-auto px-8 py-6 z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8">
                         <div
@@ -48,26 +49,30 @@ export default function Hero() {
                         </p>
 
                         <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 pt-4">
-                            <Button size="lg" className="group">
-                                {t('cta.learnMore')}
-                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"/>
-                            </Button>
-                            <Button size="lg" variant="outline">
-                                {t('cta.tryFree')}
-                            </Button>
+                            <Link href={'/login'}>
+                                <Button size="lg" className="group cursor-pointer">
+                                    {t('cta.learnMore')}
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Button>
+                            </Link>
+                            <Link href={'/login'}>
+                                <Button size="lg" variant="outline" className="cursor-pointer">
+                                    {t('cta.tryFree')}
+                                </Button>
+                            </Link>
                         </div>
 
                         <div className="flex items-center gap-6 pt-4">
                             <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                                <CheckCircle className="mr-2 h-4 w-4 text-primary"/>
+                                <CheckCircle className="mr-2 h-4 w-4 text-primary" />
                                 {t('features.0')}
                             </div>
                             <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                                <CheckCircle className="mr-2 h-4 w-4 text-primary"/>
+                                <CheckCircle className="mr-2 h-4 w-4 text-primary" />
                                 {t('features.1')}
                             </div>
                             <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                                <CheckCircle className="mr-2 h-4 w-4 text-primary"/>
+                                <CheckCircle className="mr-2 h-4 w-4 text-primary" />
                                 {t('features.2')}
                             </div>
                         </div>
@@ -78,13 +83,13 @@ export default function Hero() {
                         <div className="relative rounded-xl overflow-hidden shadow-2xl">
                             <div
                                 className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent z-10"></div>
-                            <img src="/assets/placeholder.svg?height=600&width=800" alt="AI Grading Platform Dashboard"
-                                 className="w-full h-auto"/>
+                            <img src="/assets/placeholder-dark.svg?height=480&width=620" alt="AI Grading Platform Dashboard"
+                                className="w-full h-auto aspect-video" />
                         </div>
 
                         <div
                             className="absolute -bottom-6 -left-6 bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-lg z-20 max-w-[200px]">
-                        <div className="text-sm font-medium">{t('instantFeedback.title')}</div>
+                            <div className="text-sm font-medium">{t('instantFeedback.title')}</div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">
                                 {t('instantFeedback.description')}
                             </div>

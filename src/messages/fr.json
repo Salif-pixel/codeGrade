@@ -92,11 +92,11 @@
   },
   "hero-section": {
     "tagline": "Révolutionnons l'éducation",
-    "headline": "Planifiez. Évaluez.Automatisez",
+    "headline": "Planifiez. Évaluez. Automatisez",
     "description": "Créez, distribuez et corrigez automatiquement des évaluations de programmation avec QCM, éditeur de code intégré ou soumission de PDF, le tout analysé par IA.",
     "cta": {
-      "learnMore": "En savoir plus",
-      "tryFree": "Essayer gratuitement"
+      "learnMore": "Se connecter",
+      "tryFree": "Commencer"
     },
     "features": [
       "Fiable pour plus de 500 écoles",

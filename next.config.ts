@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
     experimental: {
         viewTransition: true,
     },
-    dir: './src',
 };
 
 const withNextIntl = createNextIntlPlugin(
