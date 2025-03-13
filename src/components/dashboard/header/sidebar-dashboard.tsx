@@ -8,7 +8,7 @@ import { Button } from "@src/components/ui/button"
 import { ModeToggle } from "@src/components/theme/button-theme"
 import LanguageSwitcher from "@src/components/internalization/language-switcher"
 import { usePathname } from "next/navigation"
-import { Link } from "@/src/i18n/navigation"
+import { Link } from "@src/i18n/navigation"
 import { useTranslations } from "next-intl"
 import {
     Bell,
@@ -24,7 +24,7 @@ import {
     ChevronLeft,
 } from "lucide-react"
 import { Badge } from "@src/components/ui/badge"
-import { SignOut } from "@/src/actions/signOutactions"
+import { SignOut } from "@src/actions/signOutactions"
 import SearchDialog from "../search/search-dialog"
 
 export default function SidebarDashboard({ user }: { user: User }) {

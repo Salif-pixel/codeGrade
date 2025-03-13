@@ -32,7 +32,7 @@ import {
 import Link from "next/link"
 import type { User } from "@prisma/client"
 import { cn } from "@src/lib/utils"
-import { SignOut } from "@/src/actions/signOutactions"
+import { SignOut } from "@src/actions/signOutactions"
 import {ModeToggle} from "@src/components/theme/button-theme";
 import LanguageSwitcher from "@src/components/internalization/language-switcher";
 

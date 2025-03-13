@@ -10,7 +10,7 @@ import { WorkflowSection } from "@src/components/landing/workflow-section"
 import { ModeToggle } from "@src/components/theme/button-theme"
 import { Button } from "@src/components/ui/button"
 import { WorkflowGrade } from "@src/components/landing/workflow-grade"
-import {Link} from '@/src/i18n/navigation';
+import {Link} from '@src/i18n/navigation';
 import Hero from "@src/components/landing/hero"
 import ForTeachers from "@src/components/landing/for-teacher"
 import ForStudents from "@src/components/landing/for-student"
