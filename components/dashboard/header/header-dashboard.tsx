@@ -27,7 +27,6 @@ import LanguageSwitcher from "@/components/internalization/language-switcher";
 
 export default function HeaderDashboard({ user }: { user: User }) {
     const [activeTab, setActiveTab] = useState("dashboard");
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
