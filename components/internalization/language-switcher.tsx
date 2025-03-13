@@ -11,14 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from 'lucide-react';
 import {cn} from "@/lib/utils";
+import { FrFlag, UsFlag } from '../flags';
 
 const LanguageSwitcher = ({className }: { className?: string }) => {
     const pathname = usePathname();
 
     // Langues disponibles avec leurs drapeaux et noms
     const locales = [
-        { code: 'fr', flag: '🇫🇷', name: 'Français' },
-        { code: 'en', flag: '🇺🇸', name: 'English' },
+        { code: 'fr', flag: <FrFlag />, name: 'Français' },
+        { code: 'en', flag: <UsFlag />, name: 'English' },
     ];
 
     // Détermine la langue actuelle à partir de l'URL
@@ -29,8 +30,8 @@ const LanguageSwitcher = ({className }: { className?: string }) => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" className={cn(" cursor-pointer flex items-center gap-2",className)}>
-                    <span>{currentLanguage?.flag}</span>
-                    <span>{currentLanguage?.name}</span>
+                    <span>{currentLanguage && currentLanguage.flag}</span>
+                    {/* <span>{currentLanguage?.name}</span> */}
                     <ChevronDown size={16} />
                 </Button>
             </DropdownMenuTrigger>
