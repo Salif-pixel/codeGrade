@@ -61,5 +61,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
     "typescript": "^5"
+  },
+  "prisma": {
+    "schema": "./src/prisma/schema.prisma"
   }
 }
