@@ -1,8 +1,8 @@
-import {useTranslations} from 'next-intl';
-
-export default function HomePage() {
-    const t = useTranslations('HomePage');
-    return <h1>{t('title')}</h1>;
-}
-
-
+export default function DashboardPage() {
+    return (
+      <div className="container mx-auto p-8">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+        <p className="text-muted-foreground">Dashboard page content will be implemented here.</p>
+      </div>
+    )
+  }
