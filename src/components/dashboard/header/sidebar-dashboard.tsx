@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { User } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,6 +26,8 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { SignOut } from "@/actions/signOutactions"
 import SearchDialog from "../search/search-dialog"
+import { navigationConfig } from "@/lib/nav-config"
+import type { Role } from "@prisma/client"
 
 export default function SidebarDashboard({ user }: { user: User }) {
     const [collapsed, setCollapsed] = useState(false)
@@ -33,61 +35,43 @@ export default function SidebarDashboard({ user }: { user: User }) {
     const pathname = usePathname()
     const t = useTranslations("dropdown-user")
 
-    const navItems = [
-        {
-            title: "Tableau de bord",
-            href: "/dashboard",
-            icon: LayoutDashboard,
-            isActive: pathname === "/dashboard",
-        },
-        {
-            title: "Devoirs",
-            href: "/assignments",
-            icon: ClipboardCheck,
-            badge: 3,
-            isActive: pathname === "/assignments",
-        },
-        {
-            title: "Soumissions",
-            href: "/submissions",
-            icon: FileDown,
-            isActive: pathname === "/submissions",
-        },
-        {
-            title: "Statistiques",
-            href: "/statistics",
-            icon: BarChart3,
-            isActive: pathname === "/statistics",
-        },
-        {
-            title: "Paramètres",
-            href: "/settings",
-            icon: Settings,
-            isActive: pathname === "/settings",
-        },
-    ]
+    useEffect(() => {
+        const down = (e: KeyboardEvent) => {
+            if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault()
+                setSearchOpen(true)
+            }
+        }
+
+        document.addEventListener("keydown", down)
+        return () => document.removeEventListener("keydown", down)
+    }, [])
+
+    const filteredNavigation = navigationConfig().filter((item) =>
+        item.roles.includes(user.role)
+    )
 
     return (
         <>
             <div
                 className={cn(
-                    "h-screen border-r bg-background flex flex-col transition-all duration-300",
+                    "h-screen border-r bg-background  dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] flex flex-col transition-all duration-300",
                     collapsed ? "w-[70px]" : "w-[280px]",
                 )}
             >
                 {/* Header with logo */}
-                <div className="flex h-16 items-center border-b px-4">
+                <div className="flex h-16 items-center  px-4">
                     <div className="flex items-center">
                         <Terminal className="h-6 w-6 text-primary" />
                         {!collapsed && <span className="ml-2 text-xl font-bold">CodeGrade</span>}
                     </div>
-                    <Button variant="ghost" size="icon" className="ml-auto h-8 w-8" onClick={() => setCollapsed(!collapsed)}>
-                        {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                    <Button variant="ghost" size="icon" className="ml-auto  cursor-pointer h-5 w-5" onClick={() => setCollapsed(!collapsed)}>
+                        {collapsed ? <ChevronRight className="h-4 w-4 " /> : <ChevronLeft className="h-4 w-4" />}
                     </Button>
                 </div>
 
                 {/* User profile */}
-                <div className="p-4 border-b">
+                <div className="p-4 ">
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border">
                             <AvatarImage src={user?.image || "/placeholder.svg?height=40&width=40"} alt={user?.name || "User"} />
@@ -97,46 +81,51 @@ export default function SidebarDashboard({ user }: { user: User }) {
                             <div className="flex flex-col">
                                 <span className="text-sm font-medium">{user?.name || "Guest User"}</span>
                                 <span className="text-xs text-muted-foreground truncate max-w-[160px]">
-                  {user?.email || "No email"}
-                </span>
+                                    {user?.email || "No email"}
+                                </span>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Search button */}
-                <div className="p-4 border-b">
-                    <Button
-                        variant="outline"
-                        className={cn("w-full justify-start gap-2", collapsed && "px-0 justify-center")}
-                        onClick={() => setSearchOpen(true)}
-                    >
-                        <Search className="h-4 w-4" />
-                        {!collapsed && <span>Recherche...</span>}
-                    </Button>
+                <div className=" flex-1 md:flex-initial px-4 p-2  border-b">
+                            <button
+                                onClick={() => setSearchOpen(true)}
+                                className="w-full flex justify-between items-center gap-2 px-3 py-2 text-sm text-muted-foreground rounded-md border border-input bg-background/50 hover:bg-accent hover:text-accent-foreground transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Search className="h-4 w-4" />
+                                    {!collapsed &&<span className="flex-1 text-left hidden sm:inline">{t("search")}</span>}
+                                </div>
+                                {!collapsed &&
+                                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                                 <span className="text-xs">⌘</span>K 
+                                </kbd>}
+                            </button>
                 </div>
 
                 {/* Main navigation */}
                 <div className="flex-1 overflow-auto py-2">
                     <nav className="space-y-1 px-2">
-                        {navItems.map((item, index) => (
+                        {filteredNavigation.map((item) => (
                             <Link
-                                key={index}
+                                key={item.id}
                                 href={item.href}
                                 className={cn(
                                     "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                                    item.isActive
+                                    pathname.endsWith(item.href)
                                         ? "bg-primary/10 text-primary"
                                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                                     collapsed && "px-2 justify-center",
                                 )}
                             >
                                 <div className="flex items-center gap-3">
-                                    <item.icon className={cn("h-5 w-5", item.isActive ? "text-primary" : "text-muted-foreground")} />
+                                    {item.icon}
                                     {!collapsed && <span>{item.title}</span>}
                                 </div>
                                 {!collapsed && item.badge && (
-                                    <Badge variant="secondary" className="ml-auto h-5 min-w-5 px-1 flex items-center justify-center">
+                                    <Badge variant={pathname.endsWith(item.href) ? "default" : "secondary"} className="ml-auto h-5 min-w-5 px-1 flex items-center justify-center">
                                         {item.badge}
                                     </Badge>
                                 )}
@@ -151,14 +140,18 @@ export default function SidebarDashboard({ user }: { user: User }) {
                         <Button variant="ghost" size="icon" className="relative h-9 w-9">
                             <Bell className="h-5 w-5" />
                             <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                3
-              </span>
+                                3
+                            </span>
                         </Button>
                         {!collapsed && <span className="text-sm font-medium">Notifications</span>}
+                        <div className={cn("flex", collapsed ? "hidden flex-col items-center gap-3" : "items-center justify-between gap-3")}>
+                        <ModeToggle className="bg-background" />
+                        {!collapsed && <LanguageSwitcher />}
+                        </div>
                     </div>
 
                     {/* Theme and Language */}
-                    <div className={cn("flex", collapsed ? "flex-col items-center gap-3" : "items-center justify-between")}>
+                    <div className={cn("flex", collapsed ? "flex-col items-center gap-3" : "hidden items-center justify-between")}>
                         <ModeToggle className="bg-background" />
                         {!collapsed && <LanguageSwitcher />}
                     </div>

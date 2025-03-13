@@ -19,7 +19,13 @@ export default function NavigationLayout({
     user: User
     children: React.ReactNode
 }) {
-    const [layoutType, setLayoutType] = useState<LayoutType>("header")
+    const [layoutType, setLayoutType] = useState<LayoutType>('header')
+    useEffect(() => {
+        const savedLayout = localStorage.getItem('preferredLayout')
+        if (savedLayout) {
+            setLayoutType(savedLayout as LayoutType)
+        }
+    }, [])
     const [isAnimating, setIsAnimating] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const headerRef = useRef<HTMLDivElement>(null)
@@ -30,6 +36,9 @@ export default function NavigationLayout({
     const handleLayoutChange = (newLayout: LayoutType) => {
         if (isAnimating) return
         setIsAnimating(true)
+
+        // Save the layout preference
+        localStorage.setItem('preferredLayout', newLayout)
 
         const timeline = gsap.timeline({
             onComplete: () => {
