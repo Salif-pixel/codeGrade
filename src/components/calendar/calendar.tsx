@@ -80,7 +80,6 @@ export interface Assignment {
 }
 
 export default function CalendarView({
-  user,
   initialExams,
 }: { user: User; initialExams: (Exam & { questions: Question[] })[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -94,7 +93,7 @@ export default function CalendarView({
   const [dragStart, setDragStart] = useState<{ day: number; hour: number } | null>(null)
   const [dragEnd, setDragEnd] = useState<{ day: number; hour: number } | null>(null)
   const [blinkInterval, setBlinkInterval] = useState<NodeJS.Timeout | null>(null)
-  const [isButtonVisible, setIsButtonVisible] = useState(true)
+  const [, setIsButtonVisible] = useState(true)
   // État initial avec fallback au localStorage ou "week" par défaut
   const [view, setView] = useState<CalendarView>("week")
 
@@ -125,12 +124,12 @@ export default function CalendarView({
         endDate: exam.endDate,
         submissionType: exam.format,
         tests:
-          exam.questions?.map((q: any) => ({
+          exam.questions?.map((q) => ({
             name: q.text,
             description: q.correctionAi,
           })) || [],
       }))
-      setAssignments(formattedAssignments)
+      setAssignments(formattedAssignments as never)
     }
   }, [initialExams])
 
@@ -173,7 +172,7 @@ export default function CalendarView({
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("calendarView", view)
-      } catch (error) {
+      } catch  {
         // Ignorer les erreurs de localStorage
       }
     }
@@ -472,7 +471,7 @@ export default function CalendarView({
                         <CalendarClock className="h-5 w-5 text-primary" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Aujourd'hui</TooltipContent>
+                    <TooltipContent>Aujourd&apos;hui</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </div>
@@ -750,7 +749,7 @@ export default function CalendarView({
                         </Badge>
                       )}
                     </div>
-                    <SheetDescription className="mt-4 text-sm">
+                    <SheetDescription className="mt-4 text-sm" asChild>
                       {editMode ? (
                         <Textarea
                           value={selectedAssignment.description}
@@ -957,7 +956,7 @@ export default function CalendarView({
                                           type="text"
                                           value={test.name}
                                           onChange={(e) => {
-                                            const updatedTests = [...selectedAssignment.tests]
+                                            const updatedTests = [...selectedAssignment.tests ?? []]
                                             updatedTests[index] = { ...test, name: e.target.value }
                                             setSelectedAssignment({
                                               ...selectedAssignment,
@@ -971,7 +970,7 @@ export default function CalendarView({
                                           size="sm"
                                           className="h-7 w-7 p-0 rounded-full text-destructive hover:bg-destructive/10"
                                           onClick={() => {
-                                            const updatedTests = [...selectedAssignment.tests]
+                                            const updatedTests = [...selectedAssignment.tests ?? []]
                                             updatedTests.splice(index, 1)
                                             setSelectedAssignment({
                                               ...selectedAssignment,
@@ -985,7 +984,7 @@ export default function CalendarView({
                                       <Textarea
                                         value={test.description}
                                         onChange={(e) => {
-                                          const updatedTests = [...selectedAssignment.tests]
+                                          const updatedTests = [...selectedAssignment.tests ?? []]
                                           updatedTests[index] = { ...test, description: e.target.value }
                                           setSelectedAssignment({
                                             ...selectedAssignment,
@@ -1047,7 +1046,7 @@ export default function CalendarView({
                             }
 
                             // Update the exam
-                            const result = await updateExam(selectedAssignment.id, examData)
+                            const result = await updateExam(selectedAssignment.id, examData as never)
 
                             if (result.success) {
                               // Update local state with the updated assignment
