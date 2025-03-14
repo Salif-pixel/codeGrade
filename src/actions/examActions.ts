@@ -11,7 +11,8 @@ interface ExamData {
   filePath: string
   format: string
   maxAttempts?: number
-  deadline?: Date
+  enDate?: Date
+  startDate?: Date
   questions: {
     text: string
     correctionAi: string
@@ -42,12 +43,19 @@ export async function createExam(data: ExamData, userId: string) {
   }
 }
 
-export async function updateExam(examId: string, data: Partial<ExamData>) {
+export async function updateExam(examId: string, data: ExamData) {
   try {
     const exam = await prisma.exam.update({
       where: { id: examId },
       data: {
-        ...data,
+        title: data.title,
+        description: data.description,
+        type: data.type,
+        filePath: data.filePath,
+        format: data.format,
+        maxAttempts: data.maxAttempts,
+        endDate: data.enDate,
+        startDate:data.startDate,
         questions: data.questions ? {
           deleteMany: {},
           create: data.questions

@@ -5,17 +5,58 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { format, addDays, startOfWeek, isSameDay, addWeeks, subWeeks } from "date-fns"
 import { fr } from "date-fns/locale"
-import { Plus, Lock, Unlock, ChevronLeft, ChevronRight, Calendar, CalendarDays, CodeIcon } from "lucide-react"
+import {
+  Plus,
+  Lock,
+  Unlock,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  CalendarDays,
+  CodeIcon,
+  X,
+  Clock,
+  FileText,
+  AlertCircle,
+  BookOpen,
+  CheckCircle,
+  CalendarIcon,
+  MoreHorizontal,
+  Trash2,
+  Edit,
+  Play,
+  CalendarCheck,
+  CalendarClock,
+  Repeat,
+  Save,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import AssignmentModal from "./assignment-modal"
-import AssignmentDetailModal from "./assignment-detail-modal"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCustomToast } from "@/components/alert/alert"
-import { createExam, updateExam, deleteExam } from "@/actions/examActions"
-import {Exam, User,Question} from "@prisma/client"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { updateExam, deleteExam } from "@/actions/examActions"
+import type { Exam, User, Question } from "@prisma/client"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Link } from "@/i18n/navigation"
+
 type CalendarView = "day" | "week" | "month"
 
 // Types alignés avec le schéma Prisma
@@ -31,26 +72,30 @@ export interface Assignment {
   fileUrl?: string
   format: string
   maxAttempts: number
-  deadline?: Date | string
+  startDate?: Date | string
+  endDate?: Date | string
   submissionType?: string
   language?: string
   tests?: { name: string; description: string }[]
 }
 
-export default function CalendarView({user, initialExams}:{user:User, initialExams: (Exam & {questions: Question[]})[]}) {
+export default function CalendarView({
+  user,
+  initialExams,
+}: { user: User; initialExams: (Exam & { questions: Question[] })[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [weekDays, setWeekDays] = useState<Date[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [assignments, setAssignments] = useState<Assignment[]>([])
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null)
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null)
-  const [editMode, setEditMode] = useState(true)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [sheetSide, setSheetSide] = useState<"right" | "bottom">("right")
+  const [editMode, setEditMode] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState<{ day: number; hour: number } | null>(null)
   const [dragEnd, setDragEnd] = useState<{ day: number; hour: number } | null>(null)
   const [blinkInterval, setBlinkInterval] = useState<NodeJS.Timeout | null>(null)
   const [isButtonVisible, setIsButtonVisible] = useState(true)
+  // État initial avec fallback au localStorage ou "week" par défaut
   const [view, setView] = useState<CalendarView>("week")
 
   // Référence pour le conteneur du calendrier
@@ -62,44 +107,77 @@ export default function CalendarView({user, initialExams}:{user:User, initialExa
   const { showToast } = useCustomToast()
 
   // Heures de la journée (de 7h à 18h)
-  const hours = Array.from({ length: 12 }, (_, i) => i + 7)
-
-  // Effet pour charger les exams existants au démarrage
-  useEffect(() => {
-    // Ici, vous pourriez ajouter une fonction pour charger les examens existants
-    // Par exemple : fetchExams().then(data => setAssignments(data))
-  }, [])
+  const hours = Array.from({ length: 24 }, (_, i) => i )
 
   // Effect to initialize assignments with provided exams
   useEffect(() => {
     if (initialExams.length > 0) {
-      const formattedAssignments = initialExams.map(exam => ({
+      const formattedAssignments = initialExams.map((exam) => ({
         id: exam.id,
         title: exam.title,
         description: exam.description ?? "",
         type: exam.type,
-        date: new Date(exam.deadline || ""),
-        duration: 1, // Default duration
+        date: new Date(exam.startDate || ""),
+        duration:  1,
         maxAttempts: exam.maxAttempts,
         format: exam.format,
+        startDate: exam.startDate,
+        endDate: exam.endDate,
         submissionType: exam.format,
-        tests: exam.questions?.map((q: any) => ({
-          name: q.text,
-          description: q.correctionAi
-        })) || []
+        tests:
+          exam.questions?.map((q: any) => ({
+            name: q.text,
+            description: q.correctionAi,
+          })) || [],
       }))
       setAssignments(formattedAssignments)
     }
   }, [initialExams])
 
-  // Définir la vue par défaut en fonction de la taille de l'écran
+  // Determine sheet side based on screen size
   useEffect(() => {
-    if (!isTablet) {
-      setView("day")
-    } else if (!isDesktop) {
-      setView("week")
+    setSheetSide(isTablet ? "right" : "bottom")
+  }, [isTablet])
+
+  // Charger la vue depuis localStorage au démarrage et initialiser en fonction de la taille d'écran
+  useEffect(() => {
+    // Vérifier si on est côté client
+    if (typeof window !== "undefined") {
+      try {
+        // Récupérer la vue enregistrée
+        const savedView = localStorage.getItem("calendarView") as CalendarView | null
+
+        // Sur mobile, forcer la vue jour
+        if (!isTablet) {
+          setView("day")
+        } else if (savedView && (savedView === "day" || savedView === "week")) {
+          // Utiliser la vue sauvegardée si elle existe et est valide
+          setView(savedView)
+        } else if (!isDesktop) {
+          // Fallback pour tablette
+          setView("week")
+        }
+      } catch {
+        // En cas d'erreur d'accès au localStorage, utiliser les valeurs par défaut
+        if (!isTablet) {
+          setView("day")
+        } else if (!isDesktop) {
+          setView("week")
+        }
+      }
     }
   }, [isDesktop, isTablet])
+
+  // Sauvegarder la vue dans localStorage quand elle change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("calendarView", view)
+      } catch (error) {
+        // Ignorer les erreurs de localStorage
+      }
+    }
+  }, [view])
 
   // Générer les jours de la semaine
   useEffect(() => {
@@ -130,130 +208,18 @@ export default function CalendarView({user, initialExams}:{user:User, initialExa
     }
   }, [editMode])
 
-  // Fonction pour mapper le type d'examen au type de l'enum Prisma
-  const mapSubmissionTypeToExamType = (submissionType?: string): ExamType => {
-    switch (submissionType?.toLowerCase()) {
-      case 'qcm':
-        return "QCM"
-      case 'code':
-        return "CODE"
-      default:
-        return "DOCUMENT"
-    }
-  }
-
-  // Fonction pour ajouter un devoir
-  const addAssignment = async (assignment: Assignment) => {
-    try {
-      const examType = mapSubmissionTypeToExamType(assignment.submissionType)
-
-      const examData = {
-        title: assignment.title,
-        description: assignment.description,
-        type: examType,
-        filePath: assignment.fileUrl || "",
-        format: assignment.submissionType || "autre",
-        maxAttempts: assignment.maxAttempts || 1,
-        deadline: new Date(assignment.date),
-        questions: assignment.tests?.map(test => ({
-          text: test.name,
-          correctionAi: test.description,
-          maxPoints: 100
-        })) || []
-      }
-
-      const result = await createExam(examData,user.id)
-      if (result.success) {
-        setAssignments([...assignments, { ...assignment, id: result.data?.id || "" }])
-        setIsModalOpen(false)
-        showToast("Succès", "L'examen a été créé avec succès.", "success")
-      } else {
-        showToast("Erreur", "Impossible de créer l'examen.", "error")
-      }
-    } catch {
-      showToast("Erreur", "Une erreur est survenue lors de la création de l'examen.", "error")
-    }
-  }
-
-  // Fonction pour mettre à jour un devoir
-  const updateAssignment = async (updatedAssignment: Assignment) => {
-    try {
-      const examType = mapSubmissionTypeToExamType(updatedAssignment.submissionType)
-
-      const examData = {
-        title: updatedAssignment.title,
-        description: updatedAssignment.description,
-        type: examType,
-        filePath: updatedAssignment.fileUrl || "",
-        format: updatedAssignment.submissionType || "autre",
-        maxAttempts: updatedAssignment.maxAttempts || 1,
-        deadline: new Date(updatedAssignment.date),
-        questions: updatedAssignment.tests?.map(test => ({
-          text: test.name,
-          correctionAi: test.description,
-          maxPoints: 100
-        })) || []
-      }
-
-      const result = await updateExam(updatedAssignment.id, examData)
-      if (result.success) {
-        setAssignments(assignments.map(a => a.id === updatedAssignment.id ? updatedAssignment : a))
-        setIsDetailModalOpen(false)
-        showToast("Succès", "L'examen a été mis à jour avec succès.", "success")
-      } else {
-        showToast("Erreur", "Impossible de mettre à jour l'examen.", "error")
-      }
-    } catch {
-      showToast("Erreur", "Une erreur est survenue lors de la mise à jour de l'examen.", "error")
-    }
-  }
-
-  // Fonction pour supprimer un devoir
-  const deleteAssignment = async (id: string) => {
-    try {
-      const result = await deleteExam(id)
-      if (result.success) {
-        setAssignments(assignments.filter(a => a.id !== id))
-        setIsDetailModalOpen(false)
-        showToast("Succès", "L'examen a été supprimé avec succès.", "success")
-      } else {
-        showToast("Erreur", "Impossible de supprimer l'examen.", "error")
-      }
-    } catch {
-      showToast("Erreur", "Une erreur est survenue lors de la suppression de l'examen.", "error")
-    }
-  }
-
-  // Fonction pour ouvrir le modal avec le jour et l'heure sélectionnés
-  const openModalWithDayAndTime = (day: Date, startHour: number, endHour: number) => {
-    if (!editMode) return
-
-    const selectedDate = new Date(day)
-    selectedDate.setHours(startHour, 0, 0, 0)
-    setSelectedDay(selectedDate)
-
-    // Calculer la durée en heures
-    const duration = endHour - startHour
-
-    setIsModalOpen(true)
-    // La durée sera passée au modal
-    return { date: selectedDate, duration }
-  }
-
-  // Fonction pour ouvrir le modal de détail d'un devoir
-  const openDetailModal = (assignment: Assignment) => {
+  // Fonction pour ouvrir le sheet avec les détails de l'assignement
+  const openAssignmentDetails = (assignment: Assignment) => {
     setSelectedAssignment(assignment)
-    setIsDetailModalOpen(true)
+    setIsSheetOpen(true)
   }
 
   // Fonction pour vérifier si un devoir est à une heure donnée
   const getAssignmentsForHourAndDay = (hour: number, day: Date) => {
-    return assignments.filter(
-        (assignment) => {
-          const assignDate = new Date(assignment.date)
-          return isSameDay(assignDate, day) && assignDate.getHours() === hour
-        }
-    )
+    return assignments.filter((assignment) => {
+      const assignDate = new Date(assignment.date)
+      return isSameDay(assignDate, day) && assignDate.getHours() === hour
+    })
   }
 
   // Fonction pour calculer la hauteur d'un devoir en fonction de sa durée
@@ -316,18 +282,6 @@ export default function CalendarView({user, initialExams}:{user:User, initialExa
       return
     }
 
-    // Vérifier que le drag est sur le même jour
-    if (dragStart.day === dragEnd.day) {
-      const startHour = Math.min(dragStart.hour, dragEnd.hour)
-
-      const selectedDate = view === "day" ? currentDate : weekDays[dragStart.day]
-      const date = new Date(selectedDate)
-      date.setHours(startHour, 0, 0, 0)
-
-      setSelectedDay(date)
-      setIsModalOpen(true)
-    }
-
     setIsDragging(false)
     setDragStart(null)
     setDragEnd(null)
@@ -348,11 +302,6 @@ export default function CalendarView({user, initialExams}:{user:User, initialExa
     const endHour = Math.max(dragStart.hour, dragEnd.hour)
 
     return hour >= startHour && hour <= endHour
-  }
-
-  // Fonction pour basculer le mode édition
-  const toggleEditMode = () => {
-    setEditMode(!editMode)
   }
 
   // Fonction pour naviguer entre les jours
@@ -379,247 +328,808 @@ export default function CalendarView({user, initialExams}:{user:User, initialExa
 
   const visibleDays = getVisibleDays()
 
-  // Fonction pour gérer le clic sur une cellule vide
-  // Fonction pour gérer le clic sur une cellule vide
-  const handleCellClick = (day: Date, hour: number) => {
-    if (!editMode) return
+  // Fonction pour mettre à jour la vue si on n'est pas sur mobile
+  const handleViewChange = (newView: CalendarView) => {
+    // Sur mobile, on reste en vue jour quoi qu'il arrive
+    if (!isTablet && newView !== "day") {
+      return
+    }
 
-    // Créer une date avec l'heure spécifiée
-    const selectedDate = new Date(day)
-    selectedDate.setHours(hour, 0, 0, 0)
-
-    setSelectedDay(selectedDate)
-    setIsModalOpen(true)
+    setView(newView)
+    // La sauvegarde dans localStorage est gérée par l'effect
   }
-
 
   // Fonction pour obtenir la classe de couleur en fonction du type d'examen
   const getExamTypeColor = (examType: ExamType | undefined) => {
     switch (examType) {
-      case 'QCM':
-        return "bg-amber-100 text-amber-800 border-l-4 border-amber-500"
-      case 'CODE':
-        return "bg-indigo-100 text-indigo-800 border-l-4 border-indigo-500"
-      case 'DOCUMENT':
+      case "QCM":
+        return "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-100 border-l-4 border-amber-500 dark:border-amber-400 shadow-sm hover:shadow-md transition-shadow"
+      case "CODE":
+        return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-100 border-l-4 border-indigo-500 dark:border-indigo-400 shadow-sm hover:shadow-md transition-shadow"
+      case "DOCUMENT":
       default:
-        return "bg-blue-100 text-blue-800 border-l-4 border-blue-500"
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-100 border-l-4 border-blue-500 dark:border-blue-400 shadow-sm hover:shadow-md transition-shadow"
+    }
+  }
+
+  // Fonction pour obtenir le badge du type d'examen
+  const getExamTypeBadge = (examType: ExamType | undefined) => {
+    switch (examType) {
+      case "QCM":
+        return (
+          <Badge className="bg-amber-500 hover:bg-amber-600 text-white">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            QCM
+          </Badge>
+        )
+      case "CODE":
+        return (
+          <Badge className="bg-indigo-500 hover:bg-indigo-600 text-white">
+            <CodeIcon className="h-3 w-3 mr-1" />
+            Code
+          </Badge>
+        )
+      case "DOCUMENT":
+      default:
+        return (
+          <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
+            <FileText className="h-3 w-3 mr-1" />
+            Document
+          </Badge>
+        )
+    }
+  }
+
+  // Fonction pour obtenir l'icône du type d'examen
+  const getExamTypeIcon = (examType: ExamType | undefined) => {
+    switch (examType) {
+      case "QCM":
+        return <CheckCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+      case "CODE":
+        return <CodeIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+      case "DOCUMENT":
+      default:
+        return <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
     }
   }
 
   return (
-      <div className="flex flex-col">
-        {/* Header avec titre, navigation et contrôles */}
-        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* Titre et navigation */}
-          <div className="flex items-center">
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => navigateDate("prev")}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => navigateDate("next")}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            <h2 className="ml-3 text-lg font-semibold sm:text-xl">
-              {view === "day"
+    <Card className="bg-background shadow-md border-primary/10">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CalendarCheck className="h-5 w-5 text-primary" />
+            <span>Calendrier des évaluations</span>
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8 rounded-full transition-all",
+                    editMode ? "bg-primary text-primary-foreground animate-pulse" : "",
+                  )}
+                  onClick={() => setEditMode(!editMode)}
+                >
+                  {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{editMode ? "Désactiver le mode édition" : "Activer le mode édition"}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="p-4">
+          {/* Header avec titre, navigation et contrôles */}
+          <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* Titre et navigation */}
+            <div className="flex items-center">
+              <div className="flex items-center space-x-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 rounded-full"
+                        onClick={() => navigateDate("prev")}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Précédent</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 rounded-full"
+                        onClick={() => navigateDate("next")}
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Suivant</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 rounded-full"
+                        onClick={() => setCurrentDate(new Date())}
+                      >
+                        <CalendarClock className="h-5 w-5 text-primary" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Aujourd'hui</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <h2 className="ml-3 text-lg font-semibold sm:text-xl flex items-center">
+                <CalendarIcon className="h-5 w-5 mr-2 text-primary hidden sm:inline-block" />
+                {view === "day"
                   ? format(currentDate, "EEEE d MMMM yyyy", { locale: fr })
                   : format(weekDays[0] || new Date(), "MMMM yyyy", { locale: fr })}
-            </h2>
-          </div>
+              </h2>
+            </div>
 
-          {/* Contrôles */}
-          <div className="flex items-center justify-start md:justify-end">
-            <Tabs value={view} onValueChange={(v) => setView(v as CalendarView)} className="mr-2">
-              <TabsList className="h-8">
-                <TabsTrigger value="day" className="flex h-8 items-center px-2">
-                  <Calendar className="mr-1 h-4 w-4" />
-                  <span className="hidden sm:inline">Jour</span>
-                </TabsTrigger>
-                <TabsTrigger value="week" className="flex h-8 items-center px-2">
-                  <CalendarDays className="mr-1 h-4 w-4" />
-                  <span className="hidden sm:inline">Semaine</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            {/* Contrôles */}
+            <div className="flex items-center justify-start md:justify-end gap-2">
+              <Tabs value={view} onValueChange={(v) => handleViewChange(v as CalendarView)} className="mr-2">
+                <TabsList className="h-9 p-1 bg-muted/80">
+                  <TabsTrigger
+                    value="day"
+                    className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
+                  >
+                    <Calendar className="mr-1 h-4 w-4" />
+                    <span className="hidden sm:inline">Jour</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="week"
+                    className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
+                    disabled={!isTablet} // Désactiver le bouton semaine sur mobile
+                  >
+                    <CalendarDays className="mr-1 h-4 w-4" />
+                    <span className="hidden sm:inline">Semaine</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
 
-            <div className="flex space-x-2">
               {editMode && (
-                  <Button size="sm" className="h-8" onClick={() => setIsModalOpen(true)}>
-                    <Plus className="mr-1 h-4 w-4" />
-                    <span className="hidden sm:inline">Ajouter</span>
-                  </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button size="sm" className="h-9 bg-primary hover:bg-primary/90">
+                        <Plus className="h-4 w-4 mr-1" />
+                        <span className="hidden sm:inline">Ajouter</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Ajouter une évaluation</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
-              <Button
-                  variant={editMode ? "default" : "outline"}
-                  size="sm"
-                  className="relative h-8"
-                  onClick={toggleEditMode}
-              >
-                {editMode && (
-                    <div
-                        className={cn(
-                            "absolute right-1 top-1 h-2 w-2 rounded-full bg-yellow-400",
-                            !isButtonVisible && "opacity-0",
-                        )}
-                    />
-                )}
-                {editMode ? (
-                    <>
-                      <Unlock className="mr-1 h-4 w-4" />
-                      <span className="hidden sm:inline">Édition</span>
-                    </>
-                ) : (
-                    <>
-                      <Lock className="mr-1 h-4 w-4" />
-                      <span className="hidden sm:inline">Lecture</span>
-                    </>
-                )}
-              </Button>
             </div>
           </div>
-        </div>
 
-        {/* Calendrier */}
-        <div className="overflow-hidden rounded-lg border border-gray-200" ref={calendarRef}>
-          {/* En-tête des jours */}
-          <div
+          {/* Calendrier */}
+          <div className="overflow-hidden rounded-lg border border-border shadow-sm bg-card" ref={calendarRef}>
+            {/* En-tête des jours */}
+            <div
               className="grid border-b"
               style={{
                 gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
                 width: "100%",
               }}
-          >
-            <div className="border-r border-gray-200 p-2 text-center font-medium text-gray-500"></div>
-            {visibleDays.map((day, index) => {
-              const dayNumber = format(day, "d")
-              const dayName = format(day, "EEE", { locale: fr })
-              const isToday = isSameDay(day, new Date())
+            >
+              <div className="border-r border-border p-2 text-center font-medium text-muted-foreground bg-muted/30 dark:bg-zinc-900"></div>
+              {visibleDays.map((day, index) => {
+                const dayNumber = format(day, "d")
+                const dayName = format(day, "EEE", { locale: fr })
+                const isToday = isSameDay(day, new Date())
 
-              return (
+                return (
                   <div
-                      key={index}
-                      className={cn(
-                          "border-r border-gray-200 p-2 text-center last:border-r-0",
-                          isToday && "bg-purple-100",
-                          editMode && "cursor-pointer",
-                      )}
-                      onClick={() => editMode && openModalWithDayAndTime(day, 8, 9)}
+                    key={index}
+                    className={cn(
+                      "border-r border-border p-2 text-center last:border-r-0",
+                      isToday ? "bg-primary/10" : "bg-muted/30 dark:bg-zinc-900",
+                    )}
                   >
-                    <div className="font-medium">{dayName}</div>
+                    <div className="font-medium text-foreground/80">{dayName}</div>
                     <div
-                        className={cn(
-                            "mx-auto mt-1 flex h-8 w-8 items-center justify-center rounded-full",
-                            isToday && "bg-purple-600 text-white",
-                        )}
+                      className={cn(
+                        "mx-auto mt-1 flex h-8 w-8 items-center justify-center rounded-full",
+                        isToday && "bg-primary text-primary-foreground font-medium",
+                      )}
                     >
                       {dayNumber}
                     </div>
                   </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
 
-          {/* Grille des heures */}
-          <div className="relative overflow-x-auto">
-            {hours.map((hour) => (
+            {/* Grille des heures */}
+            <div className="relative overflow-x-auto">
+              {hours.map((hour) => (
                 <div
-                    key={hour}
-                    className="grid border-b border-gray-200 last:border-b-0"
-                    style={{
-                      gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
-                      width: "100%",
-                    }}
+                  key={hour}
+                  className="grid border-b border-border last:border-b-0"
+                  style={{
+                    gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
+                    width: "100%",
+                  }}
                 >
-                  <div className="border-r border-gray-200 p-2 text-right text-sm text-gray-500 min-w-[60px]">
-                    {hour}:00
+                  <div className="border-r border-border p-2 text-right text-sm text-muted-foreground min-w-[60px] bg-muted/20 dark:bg-zinc-900 flex items-center justify-end">
+                    <div className="flex items-center">
+                      <Clock className="h-3 w-3 mr-1 opacity-70" />
+                      {hour}:00
+                    </div>
                   </div>
                   {visibleDays.map((day, dayIndex) => {
+                    const isCurrentHour = new Date().getHours() === hour && isSameDay(day, new Date())
+
                     return (
-                        <div
-                            key={`${hour}-${dayIndex}`}
+                      <div
+                        key={`${hour}-${dayIndex}`}
+                        className={cn(
+                          "relative h-[100px] border-r border-border last:border-r-0",
+                          isInSelection(dayIndex, hour) && "bg-primary/10",
+                          isCurrentHour && "bg-primary/5",
+                        )}
+                        onMouseDown={(e) => handleMouseDown(dayIndex, hour, e)}
+                      >
+                        {isCurrentHour && (
+                          <div className="absolute left-0 right-0 border-t-2 border-primary z-10 top-0"></div>
+                        )}
+                        {getAssignmentsForHourAndDay(hour, day).map((assignment, idx) => (
+                          <div
+                            key={idx}
                             className={cn(
-                                "relative h-[100px] border-r border-gray-200 last:border-r-0",
-                                editMode && "cursor-pointer",
-                                isInSelection(dayIndex, hour) && "bg-blue-100",
+                              "assignment-item absolute left-0 right-0 z-10 m-1 overflow-hidden rounded-md p-2 text-sm cursor-pointer",
+                              getExamTypeColor(assignment.type as ExamType),
                             )}
-                            onMouseDown={(e) => handleMouseDown(dayIndex, hour, e)}
-                            onClick={() => handleCellClick(day, hour)}
-                        >
-                          {getAssignmentsForHourAndDay(hour, day).map((assignment, idx) => (
-                              <div
-                                  key={idx}
-                                  className={cn(
-                                      "assignment-item absolute left-0 right-0 z-10 m-1 overflow-hidden rounded p-2 text-sm cursor-pointer",
-                                      getExamTypeColor(assignment.type as ExamType)
-                                  )}
-                                  style={{
-                                    height: getAssignmentHeight(assignment.duration),
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    openDetailModal(assignment)
-                                  }}
-                              >
-                                <div className="font-medium">
-                                  {typeof assignment.date === 'string'
-                                      ? format(new Date(assignment.date), "HH:mm")
-                                      : format(assignment.date, "HH:mm")}
-                                </div>
-                                <div className="font-bold">{assignment.title}</div>
-                                <div className="text-xs">{assignment.description}</div>
-                                {assignment.fileUrl && (
-                                    <div className="mt-1 text-xs font-medium text-blue-600">Document joint</div>
-                                )}
-                                {assignment.submissionType === "code" && (
-                                    <div className="mt-1 flex items-center text-xs font-medium text-indigo-600">
-                                      <CodeIcon className="mr-1 h-3 w-3" />
-                                      {assignment.language?.toUpperCase()}
-                                    </div>
-                                )}
-                                {assignment.maxAttempts > 1 && (
-                                    <div className="mt-1 text-xs text-gray-600">
-                                      Max {assignment.maxAttempts} tentatives
-                                    </div>
-                                )}
-                                {assignment.deadline && (
-                                    <div className="mt-1 text-xs text-red-600">
-                                      Deadline: {typeof assignment.deadline === 'string'
-                                        ? format(new Date(assignment.deadline), "dd/MM/yyyy")
-                                        : format(assignment.deadline, "dd/MM/yyyy")}
-                                    </div>
-                                )}
+                            style={{
+                              height: getAssignmentHeight(assignment.duration),
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              openAssignmentDetails(assignment)
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium flex items-center">
+                                {getExamTypeIcon(assignment.type as ExamType)}
+                                <span className="ml-1">
+                                  {typeof assignment.date === "string"
+                                    ? format(new Date(assignment.date), "HH:mm")
+                                    : format(assignment.date, "HH:mm")}
+                                </span>
                               </div>
-                          ))}
-                        </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 rounded-full opacity-70 hover:opacity-100"
+                                  >
+                                    <MoreHorizontal className="h-3 w-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => openAssignmentDetails(assignment)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Détails
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem >
+                                    <Link href={"/exams"} className="flex flex-row">
+                                    <Play className="h-4 w-4 mr-2" />
+                                    Commencer
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  {editMode && (
+                                    <DropdownMenuItem className="text-destructive">
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Supprimer
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                            <div className="font-bold mt-1 line-clamp-1">{assignment.title}</div>
+                            <div className="text-xs line-clamp-1 opacity-80">{assignment.description}</div>
+                            {assignment.submissionType === "code" && (
+                              <div className="mt-1 flex items-center text-xs font-medium">
+                                <CodeIcon className="mr-1 h-3 w-3" />
+                                {assignment.language?.toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )
                   })}
                 </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {isModalOpen && (
-            <AssignmentModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onAdd={addAssignment}
-                selectedDate={selectedDay}
-                initialDuration={
-                  dragStart && dragEnd && dragStart.day === dragEnd.day ? Math.abs(dragEnd.hour - dragStart.hour) + 1 : 1
-                }
-            />
-        )}
+        {/* Sheet pour afficher les détails d'un devoir */}
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTitle>
+            
+          </SheetTitle>
+          <SheetContent side={sheetSide} className="sm:max-w-md p-0 border-l border-primary/10">
+            {selectedAssignment && (
+              <ScrollArea className="h-full">
+                <div className="p-6">
+                  <SheetHeader className="pr-8">
+                    <div className="flex justify-between items-center">
+                      {editMode ? (
+                        <Input
+                          type="text"
+                          value={selectedAssignment.title}
+                          onChange={(e) =>
+                            setSelectedAssignment({
+                              ...selectedAssignment,
+                              title: e.target.value,
+                            })
+                          }
+                          className="text-xl font-semibold w-full border-b border-primary/20 focus-visible:ring-primary"
+                        />
+                      ) : (
+                        <SheetTitle className="text-xl flex items-center gap-2">
+                          {getExamTypeIcon(selectedAssignment.type as ExamType)}
+                          {selectedAssignment.title}
+                        </SheetTitle>
+                      )}
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setEditMode(!editMode)}
+                          className={cn("rounded-full h-8 w-8", editMode && "text-primary")}
+                        >
+                          {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 mt-2">
+                      {editMode ? (
+                        <select
+                          value={selectedAssignment.type}
+                          onChange={(e) =>
+                            setSelectedAssignment({
+                              ...selectedAssignment,
+                              type: e.target.value as ExamType,
+                            })
+                          }
+                          className="py-1 px-2 text-xs rounded border border-input focus-visible:ring-primary"
+                        >
+                          <option value="QCM">QCM</option>
+                          <option value="CODE">Code</option>
+                          <option value="DOCUMENT">Document</option>
+                        </select>
+                      ) : (
+                        getExamTypeBadge(selectedAssignment.type as ExamType)
+                      )}
+                      {editMode ? (
+                        <Input
+                          type="datetime-local"
+                          value={
+                            typeof selectedAssignment.date === "string"
+                              ? new Date(selectedAssignment.date).toISOString().slice(0, 16)
+                              : selectedAssignment.date.toISOString().slice(0, 16)
+                          }
+                          onChange={(e) =>
+                            setSelectedAssignment({
+                              ...selectedAssignment,
+                              date: new Date(e.target.value),
+                            })
+                          }
+                          className="py-1 px-2 text-xs rounded border-input focus-visible:ring-primary"
+                        />
+                      ) : (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <CalendarClock className="h-3 w-3" />
+                          {typeof selectedAssignment.date === "string"
+                            ? format(new Date(selectedAssignment.date), "dd MMMM yyyy à HH:mm", { locale: fr })
+                            : format(selectedAssignment.date, "dd MMMM yyyy à HH:mm", { locale: fr })}
+                        </Badge>
+                      )}
+                    </div>
+                    <SheetDescription className="mt-4 text-sm">
+                      {editMode ? (
+                        <Textarea
+                          value={selectedAssignment.description}
+                          onChange={(e) =>
+                            setSelectedAssignment({
+                              ...selectedAssignment,
+                              description: e.target.value,
+                            })
+                          }
+                          className="w-full h-20 p-2 border rounded border-input focus-visible:ring-primary resize-none"
+                          placeholder="Description de l'évaluation"
+                        />
+                      ) : (
+                        <div className="bg-muted/30 p-3 rounded-md">
+                          {selectedAssignment.description || "Aucune description"}
+                        </div>
+                      )}
+                    </SheetDescription>
+                  </SheetHeader>
 
-        {isDetailModalOpen && selectedAssignment && (
-            <AssignmentDetailModal
-                isOpen={isDetailModalOpen}
-                onClose={() => setIsDetailModalOpen(false)}
-                assignment={selectedAssignment}
-                onUpdate={updateAssignment}
-                onDelete={deleteAssignment}
-                isEditMode={editMode}
-            />
-        )}
-      </div>
+                  <div className="py-6">
+                    <Separator className="my-4" />
+
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-primary" />
+                          Format de soumission
+                        </h3>
+                        {editMode ? (
+                          <Input
+                            type="text"
+                            value={selectedAssignment.format}
+                            onChange={(e) =>
+                              setSelectedAssignment({
+                                ...selectedAssignment,
+                                format: e.target.value,
+                              })
+                            }
+                            className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
+                          />
+                        ) : (
+                          <p className="text-sm bg-muted/30 p-2 rounded">
+                            {selectedAssignment.format || selectedAssignment.submissionType || "Non spécifié"}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+                          <Repeat className="h-4 w-4 text-primary" />
+                          Tentatives maximum
+                        </h3>
+                        {editMode ? (
+                          <Input
+                            type="number"
+                            min="1"
+                            value={selectedAssignment.maxAttempts}
+                            onChange={(e) =>
+                              setSelectedAssignment({
+                                ...selectedAssignment,
+                                maxAttempts: Number.parseInt(e.target.value),
+                              })
+                            }
+                            className="w-20 p-1 text-sm border rounded border-input focus-visible:ring-primary"
+                          />
+                        ) : (
+                          <Badge variant="secondary" className="text-sm">
+                            {selectedAssignment.maxAttempts || 1}
+                          </Badge>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2 text-destructive">
+                          <AlertCircle className="h-4 w-4" />
+                          Date de debut
+                        </h3>
+                        {editMode ? (
+                          <Input
+                            type="datetime-local"
+                            value={
+                              selectedAssignment.startDate
+                                ? typeof selectedAssignment.startDate === "string"
+                                  ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
+                                  : selectedAssignment.startDate.toISOString().slice(0, 16)
+                                : ""
+                            }
+                            onChange={(e) =>
+                              setSelectedAssignment({
+                                ...selectedAssignment,
+                                startDate: e.target.value ? new Date(e.target.value) : undefined,
+                              })
+                            }
+                            className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
+                          />
+                        ) : selectedAssignment.startDate ? (
+                          <Badge variant="destructive" className="text-sm">
+                            {typeof selectedAssignment.startDate === "string"
+                              ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", { locale: fr })
+                              : format(selectedAssignment.startDate, "dd MMMM yyyy à HH:mm", { locale: fr })}
+                          </Badge>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Date de debut</p>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2 text-destructive">
+                          <AlertCircle className="h-4 w-4" />
+                          Date limite
+                        </h3>
+                        {editMode ? (
+                          <Input
+                            type="datetime-local"
+                            value={
+                              selectedAssignment.endDate
+                                ? typeof selectedAssignment.endDate === "string"
+                                  ? new Date(selectedAssignment.endDate).toISOString().slice(0, 16)
+                                  : selectedAssignment.endDate.toISOString().slice(0, 16)
+                                : ""
+                            }
+                            onChange={(e) =>
+                              setSelectedAssignment({
+                                ...selectedAssignment,
+                                endDate: e.target.value ? new Date(e.target.value) : undefined,
+                              })
+                            }
+                            className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
+                          />
+                        ) : selectedAssignment.endDate ? (
+                          <Badge variant="destructive" className="text-sm">
+                            {typeof selectedAssignment.endDate === "string"
+                              ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", { locale: fr })
+                              : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", { locale: fr })}
+                          </Badge>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Aucune date limite</p>
+                        )}
+                      </div>
+
+                      {(selectedAssignment.type === "CODE" || editMode) && (
+                        <div>
+                          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+                            <CodeIcon className="h-4 w-4 text-primary" />
+                            Langage de programmation
+                          </h3>
+                          {editMode ? (
+                            <Input
+                              type="text"
+                              value={selectedAssignment.language || ""}
+                              onChange={(e) =>
+                                setSelectedAssignment({
+                                  ...selectedAssignment,
+                                  language: e.target.value,
+                                })
+                              }
+                              className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
+                              placeholder="javascript, python, etc."
+                            />
+                          ) : selectedAssignment.language ? (
+                            <Badge className="bg-indigo-500 text-white">
+                              {selectedAssignment.language.toUpperCase()}
+                            </Badge>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Non spécifié</p>
+                          )}
+                        </div>
+                      )}
+
+                      {selectedAssignment.tests && (
+                        <div>
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+                              <BookOpen className="h-4 w-4 text-primary" />
+                              Tests ({selectedAssignment.tests.length})
+                            </h3>
+                            {editMode && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs border-primary/50 text-primary hover:bg-primary/10"
+                                onClick={() => {
+                                  const newTests = [
+                                    ...(selectedAssignment.tests || []),
+                                    { name: "Nouveau test", description: "Description du test" },
+                                  ]
+                                  setSelectedAssignment({
+                                    ...selectedAssignment,
+                                    tests: newTests,
+                                  })
+                                }}
+                              >
+                                <Plus className="h-3 w-3 mr-1" /> Ajouter un test
+                              </Button>
+                            )}
+                          </div>
+                          <div className="space-y-2 mt-2">
+                            {selectedAssignment.tests.map((test, index) => (
+                              <Card key={index} className="border-border shadow-sm">
+                                <CardContent className="p-3">
+                                  {editMode ? (
+                                    <div className="space-y-2">
+                                      <div className="flex justify-between">
+                                        <Input
+                                          type="text"
+                                          value={test.name}
+                                          onChange={(e) => {
+                                            const updatedTests = [...selectedAssignment.tests]
+                                            updatedTests[index] = { ...test, name: e.target.value }
+                                            setSelectedAssignment({
+                                              ...selectedAssignment,
+                                              tests: updatedTests,
+                                            })
+                                          }}
+                                          className="text-sm font-medium w-full border-b border-input focus-visible:ring-primary"
+                                        />
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-7 w-7 p-0 rounded-full text-destructive hover:bg-destructive/10"
+                                          onClick={() => {
+                                            const updatedTests = [...selectedAssignment.tests]
+                                            updatedTests.splice(index, 1)
+                                            setSelectedAssignment({
+                                              ...selectedAssignment,
+                                              tests: updatedTests,
+                                            })
+                                          }}
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={test.description}
+                                        onChange={(e) => {
+                                          const updatedTests = [...selectedAssignment.tests]
+                                          updatedTests[index] = { ...test, description: e.target.value }
+                                          setSelectedAssignment({
+                                            ...selectedAssignment,
+                                            tests: updatedTests,
+                                          })
+                                        }}
+                                        className="text-xs mt-1 w-full p-1 border rounded border-input focus-visible:ring-primary resize-none"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <h4 className="text-sm font-medium flex items-center gap-2">
+                                        <Badge
+                                          variant="outline"
+                                          className="h-5 w-5 p-0 flex items-center justify-center rounded-full"
+                                        >
+                                          {index + 1}
+                                        </Badge>
+                                        {test.name}
+                                      </h4>
+                                      <p className="text-xs mt-2 text-muted-foreground bg-muted/30 p-2 rounded">
+                                        {test.description}
+                                      </p>
+                                    </>
+                                  )}
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <SheetFooter className="sm:justify-start gap-2 flex-wrap">
+                    {editMode ? (
+                      <>
+                        <Button
+                          variant="default"
+                          className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+                          onClick={async () => {
+                            // Format the assignment data for saving
+                            const examData = {
+                              title: selectedAssignment.title,
+                              description: selectedAssignment.description,
+                              type: selectedAssignment.type as ExamType,
+                              format: selectedAssignment.format,
+                              maxAttempts: selectedAssignment.maxAttempts,
+                              endDate: selectedAssignment.endDate,
+                              questions:
+                                selectedAssignment.tests?.map((test) => ({
+                                  text: test.name,
+                                  correctionAi: test.description,
+                                  maxPoints: 10, // Default value
+                                })) || [],
+                              data: {
+                                language: selectedAssignment.language,
+                              },
+                            }
+
+                            // Update the exam
+                            const result = await updateExam(selectedAssignment.id, examData)
+
+                            if (result.success) {
+                              // Update local state with the updated assignment
+                              setAssignments(
+                                assignments.map((a) =>
+                                  a.id === selectedAssignment.id
+                                    ? { ...selectedAssignment, date: selectedAssignment.date }
+                                    : a,
+                                ),
+                              )
+                              showToast("Succès", "L'évaluation a été mise à jour avec succès.", "success")
+                              setEditMode(false)
+                            } else {
+                              showToast(
+                                "Erreur",
+                                "Une erreur est survenue lors de la mise à jour de l'évaluation.",
+                                "error",
+                              )
+                            }
+                          }}
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          Enregistrer
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="w-full sm:w-auto"
+                          onClick={async () => {
+                            if (confirm("Êtes-vous sûr de vouloir supprimer cette évaluation ?")) {
+                              const result = await deleteExam(selectedAssignment.id)
+
+                              if (result.success) {
+                                // Remove from local state
+                                setAssignments(assignments.filter((a) => a.id !== selectedAssignment.id))
+                                showToast("Succès", "L'évaluation a été supprimée avec succès.", "success")
+                                setIsSheetOpen(false)
+                              } else {
+                                showToast(
+                                  "Erreur",
+                                  "Une erreur est survenue lors de la suppression de l'évaluation.",
+                                  "error",
+                                )
+                              }
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Supprimer
+                        </Button>
+                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(false)}>
+                          <X className="h-4 w-4 mr-2" />
+                          Annuler
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href={`/exams/${selectedAssignment.id}`}>
+                          <Button variant="default" className="w-full sm:w-auto bg-primary hover:bg-primary/90">
+                            <Play className="h-4 w-4 mr-2" />
+                            Commencer le devoir
+                          </Button>
+                        </Link>
+                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(true)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Modifier
+                        </Button>
+                        <SheetClose asChild>
+                          <Button variant="outline" className="w-full sm:w-auto">
+                            <X className="h-4 w-4 mr-2" />
+                            Fermer
+                          </Button>
+                        </SheetClose>
+                      </>
+                    )}
+                  </SheetFooter>
+                </div>
+              </ScrollArea>
+            )}
+          </SheetContent>
+        </Sheet>
+      </CardContent>
+    </Card>
   )
 }
+

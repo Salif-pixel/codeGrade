@@ -90,6 +90,28 @@
       "copyright": "© {year} CodeGrade. All rights reserved."
     }
   },
+  "exam": {
+    "create": {
+      "title": "Create New Exam"
+    },
+    "form": {
+      "title": "Title",
+      "description": "Description",
+      "format": "Format",
+      "select_format": "Select a format",
+      "max_attempts": "Maximum Attempts",
+      "deadline": "Deadline",
+      "submit": "Create Exam"
+    },
+    "validation": {
+      "title_required": "Title is required",
+      "description_required": "Description is required",
+      "format_required": "Please select a format",
+      "max_attempts_required": "Maximum attempts must be at least 1",
+      "deadline_required": "Deadline is required",
+      "deadline_invalid": "Please enter a valid deadline"
+    }
+  },
   "hero-section": {
     "tagline": "Revolutionizing Education",
     "headline": "Plan. Assess. Automate",
@@ -559,8 +581,70 @@
     "title": "An error occurred",
     "description": "We're sorry, but an error occurred while processing your request. Please try again later.",
     "tryAgain": "Try Again"
+  },
+  "exams": {
+    "createNew": "Create New Exam",
+    "createDescription": "Create a new exam, assignment, or project for your students.",
+    "basicInfo": "Basic Information",
+    "formatSettings": "Format Settings",
+    "questions": "Questions",
+    "review": "Review & Submit",
+    "title": "Title",
+    "titlePlaceholder": "Enter a title for your exam",
+    "description": "Description",
+    "descriptionPlaceholder": "Provide details about this exam",
+    "type": "Type",
+    "selectType": "Select exam type",
+    "typeExam": "Exam",
+    "typeAssignment": "Assignment",
+    "typeProject": "Project",
+    "deadline": "Deadline",
+    "format": "Format",
+    "qcm": "Multiple Choice",
+    "qcmDescription": "Create multiple choice questions",
+    "pdf": "PDF Upload",
+    "pdfDescription": "Students upload PDF files",
+    "code": "Code Submission",
+    "codeDescription": "Students submit code files",
+    "maxAttempts": "Maximum Attempts",
+    "maxAttemptsDescription": "Number of times students can attempt this exam",
+    "uploadFile": "Upload Exam Document",
+    "chooseFile": "Choose file",
+    "fileAdded": "File successfully added",
+    "addQuestion": "Add Question",
+    "question": "Question",
+    "remove": "Remove",
+    "questionText": "Question Text",
+    "questionTextPlaceholder": "Enter your question here",
+    "correctionAi": "AI Correction Guide",
+    "correctionAiPlaceholder": "Enter guidance for AI correction",
+    "maxPoints": "Maximum Points",
+    "attachedFile": "Attached File",
+    "questionCount": "Question Count",
+    "finalConfirmation": "Please review all information before creating the exam. Once created, you can still edit it later.",
+    "saveExam": "Save Exam",
+    "next": "Next",
+    "back": "Back",
+    "step1": "Basic Info",
+    "step2": "Format",
+    "step3": "Questions",
+    "step4": "Review",
+    "warning": "Warning",
+    "needOneQuestion": "You need at least one question",
+    "error": "Error",
+    "titleRequired": "Title is required",
+    "fileRequired": "File upload is required",
+    "questionsIncomplete": "All questions must have text",
+    "createFailed": "Failed to create exam",
+    "unknownError": "An unknown error occurred",
+    "success": "Success",
+    "examCreated": "Exam created successfully",
+    "required":"Required",
+    "deadlineHelp": "The deadline determines when students will no longer be able to submit their answers",
+    "selectFormat": "Please select an exam format",
+    "formatDescription": "Choose the format that best suits your assessment needs",
+    "selected": "Format selected successfully"
   }
-
 
 
 }
