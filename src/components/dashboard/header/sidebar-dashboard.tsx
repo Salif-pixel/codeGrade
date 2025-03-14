@@ -15,19 +15,13 @@ import {
     ChevronRight,
     LogOut,
     Search,
-    Settings,
     Terminal,
-    LayoutDashboard,
-    ClipboardCheck,
-    FileDown,
-    BarChart3,
     ChevronLeft,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { SignOut } from "@/actions/signOutactions"
 import SearchDialog from "../search/search-dialog"
 import { navigationConfig } from "@/lib/nav-config"
-import type { Role } from "@prisma/client"
 
 export default function SidebarDashboard({ user }: { user: User }) {
     const [collapsed, setCollapsed] = useState(false)

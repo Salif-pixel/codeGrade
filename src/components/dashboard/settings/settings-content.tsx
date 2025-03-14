@@ -12,31 +12,30 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { useThemeStore, useThemeValue } from "@/hooks/use-theme-store"
 import { useLayoutStore, useLayoutValue } from "@/hooks/use-layout-store"
+import Image from "next/image"
 
 export default function PreferencesPage() {
 
     const [notifications, setNotifications] = React.useState({
         email: true,
-        push: false,
-        social: true,
         security: true,
         promotional: false,
     })
 
     const setColorTheme = useThemeStore((state) => state.setTheme)
-    const colorTheme: string = useThemeValue((state) => state.theme) as string
+    const colorTheme: string = useThemeValue((state) => state.theme) as string //for color theme
 
-    const { setTheme, theme } = useTheme();
+    const { setTheme, theme } = useTheme(); //for dark & light
 
     const setLayout = useLayoutStore((state) => state.setLayout)
-    const layout = useLayoutValue((state) => state.layout) as string
+    const layout = useLayoutValue((state) => state.layout) as string //for layout
 
     return (
-        <div className="container px-10 md:px-16 lg:px-24 xl:px-32 space-y-8 py-10">
-            <Card>
+        <div className="dark:bg-zinc-950 px-6 md:px-8 lg:px-8 xl:px-12 space-y-8 py-10">
+            <Card className="dark:bg-zinc-900 bg-zinc-100">
                 <CardHeader>
                     <CardTitle>Appearance</CardTitle>
-                    <CardDescription>Customize how the application looks and feels. "{colorTheme}"</CardDescription>
+                    <CardDescription>Customize how the application looks and feels.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-4">
@@ -87,10 +86,10 @@ export default function PreferencesPage() {
                                     <RadioGroupItem value="forest" id="forest" className="peer sr-only" />
                                     <Label
                                         htmlFor="forest"
-                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white hover:bg-zinc-50 dark:bg-black/50 p-4 dark:hover:bg-black/20 hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                     >
-                                        <div className="mb-3 h-16 w-16 rounded-full bg-[hsl(142.1,76.2%,36.3%)]" />
-                                        <div className="font-medium">Forest</div>
+                                        <Image width={600} height={600} src={"/theme/jade.png"} className={"w-16 h-16"} alt={"jade"} />
+                                        <div className="font-medium">Jade</div>
                                     </Label>
                                 </div>
 
@@ -98,9 +97,9 @@ export default function PreferencesPage() {
                                     <RadioGroupItem value="obsidian" id="obsidian" className="peer sr-only" />
                                     <Label
                                         htmlFor="obsidian"
-                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white hover:bg-zinc-50 dark:bg-black/50 p-4 dark:hover:bg-black/20 hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                     >
-                                        <div className="mb-3 h-16 w-16 rounded-full bg-[hsl(262.1,83.3%,57.8%)]" />
+                                        <Image width={600} height={600} src={"/theme/obsidian.png"} className={"w-16 h-16"} alt={"obsidian"} />
                                         <div className="font-medium">Obsidian</div>
                                     </Label>
                                 </div>
@@ -109,9 +108,9 @@ export default function PreferencesPage() {
                                     <RadioGroupItem value="amber" id="amber" className="peer sr-only" />
                                     <Label
                                         htmlFor="amber"
-                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white hover:bg-zinc-50 dark:bg-black/50 p-4 dark:hover:bg-black/20 hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                     >
-                                        <div className="mb-3 h-16 w-16 rounded-full bg-[hsl(38,92.7%,50.2%)]" />
+                                        <Image width={600} height={600} src={"/theme/amber.png"} className={"w-16 h-16"} alt={"amber"} />
                                         <div className="font-medium">Amber</div>
                                     </Label>
                                 </div>
@@ -121,7 +120,7 @@ export default function PreferencesPage() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="dark:bg-zinc-900 bg-zinc-100">
                 <CardHeader>
                     <CardTitle>Notifications</CardTitle>
                     <CardDescription>Configure how you receive notifications.</CardDescription>
@@ -136,34 +135,6 @@ export default function PreferencesPage() {
                             id="email-notifications"
                             checked={notifications.email}
                             onCheckedChange={(checked: boolean) => setNotifications({ ...notifications, email: checked })}
-                        />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between space-x-2">
-                        <Label htmlFor="push-notifications" className="flex flex-col space-y-1 items-start">
-                            <span>Push notifications</span>
-                            <span className="font-normal text-sm text-muted-foreground">
-                                Receive push notifications on your device
-                            </span>
-                        </Label>
-                        <Switch
-                            id="push-notifications"
-                            checked={notifications.push}
-                            onCheckedChange={(checked) => setNotifications({ ...notifications, push: checked })}
-                        />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between space-x-2">
-                        <Label htmlFor="social-notifications" className="flex flex-col space-y-1 items-start">
-                            <span>Social notifications</span>
-                            <span className="font-normal text-sm text-muted-foreground">
-                                Receive notifications about social activity
-                            </span>
-                        </Label>
-                        <Switch
-                            id="social-notifications"
-                            checked={notifications.social}
-                            onCheckedChange={(checked) => setNotifications({ ...notifications, social: checked })}
                         />
                     </div>
                     <Separator />
@@ -197,7 +168,7 @@ export default function PreferencesPage() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="dark:bg-zinc-900 bg-zinc-100">
                 <CardHeader>
                     <CardTitle>Layout</CardTitle>
                     <CardDescription>Choose how you want the application to be displayed.</CardDescription>
@@ -213,7 +184,7 @@ export default function PreferencesPage() {
                             <RadioGroupItem value="side" id="sidebar" className="peer sr-only" />
                             <Label
                                 htmlFor="sidebar"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white hover:bg-zinc-50 dark:bg-black/50 p-4 dark:hover:bg-black/20 hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                                 <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-md border-2 border-muted p-2">
                                     <PanelLeft className="h-10 w-10" />
@@ -226,7 +197,7 @@ export default function PreferencesPage() {
                             <RadioGroupItem value="top" id="topnav" className="peer sr-only" />
                             <Label
                                 htmlFor="topnav"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white hover:bg-zinc-50 dark:bg-black/50 p-4 dark:hover:bg-black/20 hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                                 <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-md border-2 border-muted p-2">
                                     <PanelTop className="h-10 w-10" />

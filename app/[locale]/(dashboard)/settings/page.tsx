@@ -1,12 +1,18 @@
-import PreferencesPage from "@/components/dashboard/settings/settings-content";
+"use server"
 
-export default function SettingsPage() {
+import { SimpleHeaderTitle } from "@/components/dashboard/header/header-title";
+import PreferencesPage from "@/components/dashboard/settings/settings-content";
+import { Cog } from "lucide-react";
+
+export default async function SettingsPage() {
   return (
     <>
-      <div className="border-b bg-zinc-100 dark:bg-black/90 py-6 flex items-center">
-        <h1 className="text-2xl font-bold ml-4 md:ml-12 lg:ml-16">Settings</h1>
+      <div className="px-0 md:px-4 lg:px-8 xl:px-12 pt-10 pb-4 dark:bg-zinc-950">
+
+        <SimpleHeaderTitle title={"Preferences"} icon={Cog}/>
+
+        <PreferencesPage />
       </div>
-      <PreferencesPage />
     </>
   )
-}
+} 

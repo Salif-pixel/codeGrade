@@ -25,11 +25,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from "react"
-import { Link } from "@/i18n/navigation"
 import SearchDialog from "../search/search-dialog"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { Role, type User } from "@prisma/client"
+import { type User } from "@prisma/client"
 import { ModeToggle } from "@/components/theme/button-theme"
 import LanguageSwitcher from "@/components/internalization/language-switcher"
 import UserDrawer from "./user-drawer"
@@ -72,8 +71,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                     scrolled && "shadow-sm bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
                 )}
             >
-                {/* Top Navigation Bar */}
-                <div className=" dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px]">
+                <div className="dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px]">
                     <div className="flex h-16 items-center px-4 md:px-6">
                         {/* Logo and Platform Name */}
                         <div className="flex items-center mr-4">
@@ -160,8 +158,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                     </div>
                 </div>
 
-                {/* Tabs Navigation */}
-                <div className="border-b dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] hidden md:block">
+                <div className="border-b dark:border-zinc-700 dark:bg-zinc-900 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px] hidden md:block">
                     <nav className="flex w-full">
                         <div className="w-full flex justify-center item-center max-w-screen-xl mx-auto px-4">
                             <Navigation userRole={user.role}/>
