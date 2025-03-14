@@ -91,7 +91,7 @@ export default function NavigationLayout({
                         ref={mainRef}
                         className={cn(
                             "flex-1 transition-all duration-200",
-                            "py-6",
+                            "pb-4",
                             "bg-background/50 backdrop-blur-sm",
                         )}
                     >
