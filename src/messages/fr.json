@@ -427,7 +427,7 @@
       "title": "Pourquoi nous demandons cela ?",
       "description": "Votre rôle détermine les fonctionnalités et les outils auxquels vous aurez accès. Les enseignants peuvent créer et noter des examens, tandis que les étudiants peuvent soumettre des réponses et recevoir des retours.",
       "canChange": "Puis-je changer de rôle plus tard ?",
-      "changeAnswer": "Oui, vous pourrez modifier votre rôle dans les paramètres de votre compte, mais certaines données spécifiques au rôle devront être reconfigurées."
+      "changeAnswer": "Non, le type d'utilisateur ne peut pas être modifié une fois configuré. Veuillez choisir avec soin."
     },
     "error": "Veuillez sélectionner un type d'utilisateur"
   },
@@ -438,7 +438,7 @@
     "methods": {
       "connect-the-dot":"Relier les points",
       "reset":"Réinitialiser le captcha", 
-      "captcha": "reCAPTCHA",
+      "captcha": "Complète le minijeu pour continuer",
       "email": "Email",
       "phone": "Téléphone"
     },
