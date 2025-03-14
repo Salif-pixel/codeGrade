@@ -425,7 +425,7 @@
       "title": "Why we ask this?",
       "description": "Your role determines the features and tools you'll have access to. Teachers can create and grade assignments, while students can submit work and receive feedback.",
       "canChange": "Can I change my role later?",
-      "changeAnswer": "Yes, you can modify your role in your account settings, but some role-specific data will need to be reconfigured."
+      "changeAnswer": "No, user type cannot be modified once configured. Please choose carefully."
     },
     "error": "Please select a user type"
   },
@@ -436,7 +436,7 @@
     "methods": {
       "connect-the-dot":"Connect the dots",
       "reset":"Refresh CAPTCHA",
-      "captcha": "reCAPTCHA",
+      "captcha": "Complete the minigame to verify you're human",
       "email": "Email",
       "phone": "Phone"
     },

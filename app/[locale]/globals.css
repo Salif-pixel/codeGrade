@@ -4,8 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* amber
-:root {
+.theme-obsidian.light {
   --background: oklch(1 0 0); 
   --foreground: oklch(0.1788 0.0245 258.19);
   --card: oklch(1 0 0); 
@@ -33,7 +32,7 @@
   --chart-5: oklch(0.7349 0.1940 58.04);
 }
 
-.dark {
+.theme-obsidian.dark {
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
   --card: oklch(0.1788 0.0245 258.19); 
@@ -59,12 +58,12 @@
   --chart-4: oklch(0.5785 0.2057 308.03);
   --chart-5: oklch(0.5868 0.2160 0.44); 
 }
-*/
+
 
 
 /* Forest */
 
-:root {
+.light, :root {
   --background: oklch(1 0 0); /* 0 0% 100% */
   --foreground: oklch(0.1548 0.0037 262.78); /* 240 10% 3.9% */
   --card: oklch(1 0 0); /* 0 0% 100% */
@@ -95,7 +94,7 @@
 .dark {
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.2276 0.0094 52.24); /* 24 9.8% 10% */
+  --card: oklch(0.147 0.004 49.25);
   --card-foreground: oklch(0.9387 0 0); /* 0 0% 95% */
   --popover: oklch(0.2179 0 0); /* 0 0% 9% */
   --popover-foreground: oklch(0.9387 0 0); /* 0 0% 95% */
@@ -119,8 +118,8 @@
   --chart-5: oklch(0.5868 0.2160 0.44); /* 340 75% 55% */
 }
 
-/* amber
-:root {
+
+.theme-amber.light {
   --background: oklch(1 0 0);
   --foreground: oklch(0.147 0.004 49.25);
   --card: oklch(1 0 0);
@@ -148,7 +147,7 @@
   --radius: 0.625rem;
 }
 
-.dark {
+.theme-amber.dark {
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
   --card: oklch(0.147 0.004 49.25);
@@ -174,8 +173,6 @@
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
 }
-
-*/
 
 @theme inline {
   --color-background: var(--background);

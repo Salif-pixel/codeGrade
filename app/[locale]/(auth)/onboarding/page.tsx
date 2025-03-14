@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Link } from "@/i18n/navigation"
 import { ChevronRight, ChevronLeft, CheckCircle2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,188 +20,334 @@ import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { ModeToggle } from "@/components/theme/button-theme"
 
-// Custom Connect-the-Dots CAPTCHA Component
 const DotsCaptcha = ({ onVerify, isVerified }: { onVerify: (verified: boolean) => void, isVerified: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [dots, setDots] = useState<Array<{x: number, y: number, id: number}>>([]);
-  const [sequence, setSequence] = useState<number[]>([]);
-  const [currentSequence, setCurrentSequence] = useState<number[]>([]);
+  const [dots, setDots] = useState<Array<{ x: number, y: number, id: number }>>([]);
+  const [connections, setConnections] = useState<number[][]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [currentDot, setCurrentDot] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-
+  // Generate random dots on component mount
   useEffect(() => {
     if (canvasRef.current) {
       generateRandomDots();
     }
   }, [canvasRef]);
 
+  useEffect(() => {
+    // Check if we've connected all dots (5 connections for 6 dots)
+    if (connections.length === dots.length - 1 && !loading && !success) {
+      validateConnections();
+    }
+  }, [connections, dots.length, loading, success]);
+
   const generateRandomDots = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    const newDots: Array<{x: number, y: number, id: number}> = [];
+
+    const newDots: Array<{ x: number, y: number, id: number }> = [];
     // Generate 6 random dots
     for (let i = 0; i < 6; i++) {
       const x = 30 + Math.random() * (canvas.width - 60);
       const y = 30 + Math.random() * (canvas.height - 60);
       newDots.push({ x, y, id: i });
     }
-    
+
     setDots(newDots);
-    
-    // Create a sequence following natural order (1 to 6)
-    const orderedSequence = newDots.map(d => d.id);
-    setSequence(orderedSequence);
-    
+    setConnections([]);
+    setCurrentDot(null);
+    drawCanvas();
+  };
+
+  // Draw the canvas with dots and connections
+  const drawCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw connections
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#3b82f6";
+
+    connections.forEach(([from, to]) => {
+      const fromDot = dots.find((d) => d.id === from);
+      const toDot = dots.find((d) => d.id === to);
+
+      if (fromDot && toDot) {
+        ctx.beginPath();
+        ctx.moveTo(fromDot.x, fromDot.y);
+        ctx.lineTo(toDot.x, toDot.y);
+        ctx.stroke();
+      }
+    });
+
+    // Draw active connection line if dragging
+    if (isDragging && currentDot !== null) {
+      const dot = dots.find((d) => d.id === currentDot);
+      if (dot) {
+        ctx.beginPath();
+        ctx.moveTo(dot.x, dot.y);
+        ctx.lineTo(mousePos.x, mousePos.y);
+        ctx.stroke();
+      }
+    }
+
     // Draw the dots
-    ctx.fillStyle = "#6b7280";
-    newDots.forEach((dot, i) => {
+    dots.forEach((dot, i) => {
+      const isConnected = connections.some(conn => conn.includes(dot.id));
+
+      // Draw circle
       ctx.beginPath();
       ctx.arc(dot.x, dot.y, 15, 0, Math.PI * 2);
+
+      // Fill based on connection status
+      ctx.fillStyle = isConnected ? "#bfdbfe" : "#ffffff";
       ctx.fill();
-      
+
+      // Draw border
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#3b82f6";
+      ctx.stroke();
+
       // Add number labels to the dots
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#1e40af";
       ctx.font = "bold 14px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText((i + 1).toString(), dot.x, dot.y);
-      ctx.fillStyle = "#6b7280";
     });
   };
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Re-draw the canvas whenever relevant state changes
+  useEffect(() => {
+    drawCanvas();
+  }, [dots, connections, isDragging, currentDot, mousePos]);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (success || loading) return;
-    
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
-    // Check if click is on any dot
-    for (const dot of dots) {
-      const dx = dot.x - x;
-      const dy = dot.y - y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      if (distance < 15) {
-        // Add this dot to current sequence
-        const newSequence = [...currentSequence, dot.id];
-        setCurrentSequence(newSequence);
-        
-        // Draw line connecting dots
-        drawConnections(newSequence);
-        
-        // Check if complete sequence has been entered
-        if (newSequence.length === sequence.length) {
-          validateSequence(newSequence);
-        }
-        
-        break;
-      }
+
+    // Find if we clicked on a dot
+    const clickedDot = dots.find((dot) => {
+      const distance = Math.sqrt(Math.pow(dot.x - x, 2) + Math.pow(dot.y - y, 2));
+      return distance <= 15;
+    });
+
+    if (clickedDot) {
+      setIsDragging(true);
+      setCurrentDot(clickedDot.id);
+      setMousePos({ x, y });
     }
   };
 
-  const drawConnections = (dotSequence: number[]) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    // Clear and redraw dots
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw the dots
-    ctx.fillStyle = "#6b7280";
-    dots.forEach((dot, i) => {
-      ctx.beginPath();
-      ctx.arc(dot.x, dot.y, 15, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Add number labels to the dots
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 14px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText((i + 1).toString(), dot.x, dot.y);
-      ctx.fillStyle = "#6b7280";
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setMousePos({ x, y });
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging || currentDot === null) {
+      setIsDragging(false);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Find if we released on a dot
+    const releasedDot = dots.find((dot) => {
+      const distance = Math.sqrt(Math.pow(dot.x - x, 2) + Math.pow(dot.y - y, 2));
+      return distance <= 15 && dot.id !== currentDot;
     });
-    
-    // Draw connections between selected dots
-    if (dotSequence.length > 1) {
-      ctx.strokeStyle = "#3b82f6";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      
-      for (let i = 0; i < dotSequence.length; i++) {
-        const dotId = dotSequence[i];
-        const dot = dots.find(d => d.id === dotId);
-        
-        if (dot) {
-          if (i === 0) {
-            ctx.moveTo(dot.x, dot.y);
-          } else {
-            ctx.lineTo(dot.x, dot.y);
-          }
-        }
+
+    if (releasedDot) {
+      // Check if this is the next number in sequence
+      if (releasedDot.id === currentDot + 1) {
+        const newConnections = [...connections, [currentDot, releasedDot.id]];
+        setConnections(newConnections);
+        setCurrentDot(releasedDot.id);
+
+        // Check if we've connected all dots (5 connections for 6 dots)
+        // if (newConnections.length === dots.length - 1) {
+        //   validateConnections();
+        // }
+      } else {
+        // Reset if wrong connection
+        setCurrentDot(null);
+        setError("Connect dots in sequential order");
+        setTimeout(() => setError(""), 2000);
       }
-      
-      ctx.stroke();
+    } else {
+      setCurrentDot(null);
+    }
+
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (success || loading) return;
+    e.preventDefault();
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    // Find if we touched on a dot
+    const touchedDot = dots.find((dot) => {
+      const distance = Math.sqrt(Math.pow(dot.x - x, 2) + Math.pow(dot.y - y, 2));
+      return distance <= 15;
+    });
+
+    if (touchedDot) {
+      setIsDragging(true);
+      setCurrentDot(touchedDot.id);
+      setMousePos({ x, y });
     }
   };
 
-  const validateSequence = (inputSequence: number[]) => {
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDragging) return;
+    e.preventDefault();
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    setMousePos({ x, y });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDragging || currentDot === null) {
+      setIsDragging(false);
+      return;
+    }
+    e.preventDefault();
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = mousePos.x;
+    const y = mousePos.y;
+
+    // Find if we released on a dot
+    const releasedDot = dots.find((dot) => {
+      const distance = Math.sqrt(Math.pow(dot.x - x, 2) + Math.pow(dot.y - y, 2));
+      return distance <= 15 && dot.id !== currentDot;
+    });
+
+    if (releasedDot) {
+      // Check if this is the next number in sequence
+      if (releasedDot.id === currentDot + 1) {
+        const newConnections = [...connections, [currentDot, releasedDot.id]];
+        setConnections(newConnections);
+        setCurrentDot(releasedDot.id);
+
+        // Check if we've connected all dots
+        // if (newConnections.length === dots.length - 1) {
+        //   validateConnections();
+        // }
+      } else {
+        // Reset if wrong connection
+        setCurrentDot(null);
+        setError("Connect dots in sequential order");
+        setTimeout(() => setError(""), 2000);
+      }
+    } else {
+      setCurrentDot(null);
+    }
+
+    setIsDragging(false);
+  };
+
+  const validateConnections = () => {
     setLoading(true);
     setError("");
-    
-    
-    // Simulate verification delay
+
     setTimeout(() => {
-      // Compare arrays properly by checking each element
-      const isCorrect = inputSequence.length === sequence.length &&
-        inputSequence.every((value, index) => value === sequence[index]);
-      
+      const isCorrect = connections.length == dots.length - 1 &&
+        connections.every((conn, index) => {
+          return conn[0] === index && conn[1] === index + 1;
+        });
+
       if (isCorrect) {
         setSuccess(true);
         onVerify(true);
       } else {
         setError("Sequence incorrect, please try again");
-        setCurrentSequence([]);
+        setConnections([]);
         generateRandomDots();
       }
-      
+
       setLoading(false);
-    }, 1000);
+    }, 300);
   };
 
   const resetCaptcha = () => {
-    setCurrentSequence([]);
+
+    if(success)
+      return
+    setConnections([]);
+    setCurrentDot(null);
     setSuccess(false);
     setError("");
     generateRandomDots();
   };
+
   const t = useTranslations();
+
   return (
-    <div className="space-y-4 bg-background dark:bg-zinc-800">
+    <div className="space-y-4 bg-black rounded-lg border border-primary p-4 py-8">
       <div className="flex flex-col items-center">
-        <Label className="mb-2 font-medium text-lg">{t("verification.methods.connect-the-dot")}</Label>
-        <div className="relative border rounded-lg overflow-hidden bg-white">
-          <canvas 
-            ref={canvasRef} 
-            width={300} 
-            height={200} 
-            onClick={handleCanvasClick}
-            className="cursor-pointer"
+        <Label className="mb-2 font-medium text-lg text-primary">{t("verification.methods.connect-the-dot")}</Label>
+        <div className="relative border border-muted rounded-lg overflow-hidden bg-black">
+          <canvas
+            ref={canvasRef}
+            width={300}
+            height={200}
+            className="touch-none"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={() => setIsDragging(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           />
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70">
@@ -215,16 +360,16 @@ const DotsCaptcha = ({ onVerify, isVerified }: { onVerify: (verified: boolean) =
             </div>
           )}
         </div>
-        
+
         {error && <p className="text-destructive text-sm mt-2">{error}</p>}
-        
+
         <div className="mt-4 flex space-x-4">
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             size="sm"
             onClick={resetCaptcha}
-            disabled={loading}
+            disabled={loading || success}
           >
             {t("verification.methods.reset")}
           </Button>
@@ -235,19 +380,19 @@ const DotsCaptcha = ({ onVerify, isVerified }: { onVerify: (verified: boolean) =
 };
 
 // Simplified Verification Step
-const VerificationStep = ({ 
-  isVerified, 
-  onVerify, 
+const VerificationStep = ({
+  isVerified,
+  onVerify,
   error,
   userId
-}: { 
-  isVerified: boolean, 
-  onVerify: (verified: boolean) => void, 
+}: {
+  isVerified: boolean,
+  onVerify: (verified: boolean) => void,
   error?: string,
   userId: string
 }) => {
   const t = useTranslations();
-  
+
   const handleVerification = async (verified: boolean) => {
     if (verified) {
       try {
@@ -264,17 +409,16 @@ const VerificationStep = ({
       }
     }
   };
-  
+
   return (
     <div className="space-y-8">
-      {/* CAPTCHA Verification Section */}
-      <div className="space-y-4 bg-muted/30 dark:bg-zinc-800 p-6 rounded-lg">
-        <h3 className="text-lg font-medium">{t("verification.methods.captcha")}</h3>
-        <DotsCaptcha onVerify={handleVerification} isVerified={isVerified} />
-      </div>
-      
+      {/* <div className="space-y-4 bg-muted/30 dark:bg-zinc-800 p-6 rounded-lg">
+        <h3 className="text-lg text-center font-medium">{t("verification.methods.captcha")}</h3>
+      </div> */}
+      <DotsCaptcha onVerify={handleVerification} isVerified={isVerified} />
+
       {error && <p className="text-destructive text-sm">{error}</p>}
-      
+
       {isVerified && (
         <div className="bg-green-50 border border-green-200 text-green-800 rounded-md p-3 flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -291,7 +435,7 @@ export default function OnboardingPage() {
   const [userType, setUserType] = useState<"TEACHER" | "STUDENT" | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const { data:session} = authClient.useSession() 
+  const { data: session } = authClient.useSession()
   const userid = session?.user.id || "";
   const local = useLocale();
   const { showToast } = useCustomToast();
@@ -317,14 +461,6 @@ export default function OnboardingPage() {
     }
   };
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    image: null as File | null,
-    background: "",
-  });
-
-  // Define all steps
   const steps = [
     { id: "welcome", label: t("steps.welcome") },
     { id: "user-type", label: t("steps.userType") },
@@ -360,7 +496,9 @@ export default function OnboardingPage() {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-const router = useRouter();
+
+  const router = useRouter();
+
   const handleNext = () => {
     if (validateCurrentStep()) {
       if (step < totalSteps - 1) {
@@ -379,17 +517,12 @@ const router = useRouter();
   };
 
   const handleBack = () => {
+    if(isVerified)
+      return;
     if (step > 0) {
       setStep(step - 1);
       window.scrollTo(0, 0);
     }
-  };
-
-  const updateFormData = (data: Partial<typeof formData>) => {
-    setFormData({
-      ...formData,
-      ...data,
-    });
   };
 
   const goToStep = (index: number) => {
@@ -400,21 +533,21 @@ const router = useRouter();
   };
 
   return (
-    <div className="min-h-screen w-screen bg-background bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px]  flex flex-col items-center justify-center p-4 py-10">
-      <div className="w-full max-w-4xl mb-8 ">
+    <div className="min-h-screen w-full box-border bg-background bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:20px_20px]  flex flex-col items-center justify-center p-4 py-10">
+      <div className="w-full max-w-4xl mb-8">
         <div className="absolute top-4 right-4 z-10">
           <LanguageSwitcher />
-         
+
         </div>
         <div className="absolute top-4 right-30 z-10">
-          <ModeToggle/>
+          <ModeToggle />
         </div>
 
         {/* Improved stepper with better spacing and transitions */}
         <div className="hidden md:block mb-12 mt-4 relative px-8">
           {/* Background track */}
           <div className="absolute h-1 bg-muted top-6 left-12 right-12 z-0"></div>
-          
+
           {/* Progress indicator */}
           <div
             className="absolute h-1 bg-primary top-6 left-12 z-0 transition-all duration-500 ease-in-out"
@@ -434,12 +567,11 @@ const router = useRouter();
                     >
                       <motion.div
                         className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300
-                          ${
-                            i < step
-                              ? "bg-primary text-primary-foreground shadow-md"
-                              : i === step
-                                ? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-lg scale-110"
-                                : "bg-muted text-muted-foreground"
+                          ${i < step
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : i === step
+                              ? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-lg scale-110"
+                              : "bg-muted text-muted-foreground"
                           }`}
                         onClick={() => goToStep(i)}
                         whileHover={{ scale: 1.1 }}
@@ -512,7 +644,7 @@ const router = useRouter();
 
               {step === 2 && (
                 <VerificationStep
-                 userId={userid}
+                  userId={userid}
                   isVerified={isVerified}
                   onVerify={(verified) => {
                     setIsVerified(verified);
@@ -528,18 +660,18 @@ const router = useRouter();
         </CardContent>
 
         <CardFooter className="flex justify-between border-t p-6">
-          <Button 
-            variant="outline" 
-            onClick={handleBack} 
-            disabled={step === 0} 
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            disabled={step === 0 || isVerified}
             className="gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
             {t("common.back")}
           </Button>
 
-          <Button 
-            onClick={handleNext} 
+          <Button
+            onClick={handleNext}
             disabled={(step === 2 && !isVerified) || (step === 1 && !userType)}
             className="gap-2"
           >
