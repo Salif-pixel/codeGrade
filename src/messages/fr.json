@@ -8,11 +8,11 @@
     "footer": "Plateforme d'organisation de devoirs pour professeurs"
   },
   "nav-items": {
-    "exit": "Retour à l'accueil",
+    "exit": "Retour",
     "settings": "Préférences",
     "create_exam": "Créer une évaluation",
     "my_exams": "Mes évaluations",
-    "stats": "Analytique",
+    "stats": "Dashboard",
     "available_exams": "Évaluations actives",
     "results": "Rapport de performance"
   },

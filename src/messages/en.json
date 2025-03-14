@@ -8,11 +8,11 @@
     "footer": "Homework organization platform for teachers"
   },
   "nav-items": {
-    "exit": "Return to Home",
+    "exit": "Back",
     "settings": "Preferences",
     "create_exam": "Design Assessment",
     "my_exams": "My Assessments",
-    "stats": "Analytics",
+    "stats": "Dashboard",
     "available_exams": "Active Assessments",
     "results": "Performance Report"
   },

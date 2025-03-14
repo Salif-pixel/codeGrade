@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { FC } from "react";
+import { Link } from "@/i18n/navigation";
 
 interface SimpleHeaderTitleProps {
   title: string;
