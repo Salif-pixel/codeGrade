@@ -13,8 +13,11 @@ import { Switch } from "@/components/ui/switch"
 import { useThemeStore, useThemeValue } from "@/hooks/use-theme-store"
 import { useLayoutStore, useLayoutValue } from "@/hooks/use-layout-store"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 export default function PreferencesPage() {
+
+    const t = useTranslations("settings");
 
     const [notifications, setNotifications] = React.useState({
         email: true,
@@ -34,13 +37,13 @@ export default function PreferencesPage() {
         <div className="dark:bg-zinc-950 px-6 md:px-8 lg:px-8 xl:px-12 space-y-8 py-10">
             <Card className="dark:bg-zinc-900 bg-zinc-100">
                 <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
-                    <CardDescription>Customize how the application looks and feels.</CardDescription>
+                    <CardTitle>{t("appearance.title")}</CardTitle>
+                    <CardDescription>{t("appearance.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-4">
                         <div>
-                            <h3 className="mb-3 text-lg font-medium">Theme</h3>
+                            <h3 className="mb-3 text-lg font-medium">{t("appearance.theme.title")}</h3>
                             <div className="flex items-center space-x-2">
                                 <Button
                                     variant="outline"
@@ -49,7 +52,7 @@ export default function PreferencesPage() {
                                     className={theme === "light" ? "border-primary" : ""}
                                 >
                                     <Sun className="h-5 w-5" />
-                                    <span className="sr-only">Light</span>
+                                    <span className="sr-only">{t("appearance.theme.light")}</span>
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -75,7 +78,7 @@ export default function PreferencesPage() {
                         <Separator />
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Color Theme</h3>
+                            <h3 className="text-lg font-medium">{t("appearance.colorTheme.title")}</h3>
                             <RadioGroup
                                 defaultValue={colorTheme}
                                 value={colorTheme}
@@ -122,14 +125,16 @@ export default function PreferencesPage() {
 
             <Card className="dark:bg-zinc-900 bg-zinc-100">
                 <CardHeader>
-                    <CardTitle>Notifications</CardTitle>
-                    <CardDescription>Configure how you receive notifications.</CardDescription>
+                    <CardTitle>{t("notifications.title")}</CardTitle>
+                    <CardDescription>{t("notifications.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between space-x-2">
                         <Label htmlFor="email-notifications" className="flex flex-col space-y-1 items-start">
-                            <span>Email notifications</span>
-                            <span className="font-normal text-sm text-muted-foreground">Receive notifications via email</span>
+                            <span>{t("notifications.email.title")}</span>
+                            <span className="font-normal text-sm text-muted-foreground">
+                                {t("notifications.email.description")}
+                            </span>
                         </Label>
                         <Switch
                             id="email-notifications"
@@ -140,9 +145,9 @@ export default function PreferencesPage() {
                     <Separator />
                     <div className="flex items-center justify-between space-x-2">
                         <Label htmlFor="security-notifications" className="flex flex-col space-y-1 items-start">
-                            <span>Security notifications</span>
+                            <span>{t("notifications.security.title")}</span>
                             <span className="font-normal text-sm text-muted-foreground">
-                                Receive notifications about security alerts
+                                {t("notifications.security.description")}
                             </span>
                         </Label>
                         <Switch
@@ -154,9 +159,9 @@ export default function PreferencesPage() {
                     <Separator />
                     <div className="flex items-center justify-between space-x-2">
                         <Label htmlFor="promotional-notifications" className="flex flex-col space-y-1 items-start">
-                            <span>Promotional notifications</span>
+                            <span>{t("notifications.promotional.title")}</span>
                             <span className="font-normal text-sm text-muted-foreground">
-                                Receive notifications about promotions and updates
+                                {t("notifications.promotional.description")}
                             </span>
                         </Label>
                         <Switch
@@ -170,8 +175,8 @@ export default function PreferencesPage() {
 
             <Card className="dark:bg-zinc-900 bg-zinc-100">
                 <CardHeader>
-                    <CardTitle>Layout</CardTitle>
-                    <CardDescription>Choose how you want the application to be displayed.</CardDescription>
+                    <CardTitle>{t("layout.title")}</CardTitle>
+                    <CardDescription>{t("layout.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <RadioGroup
@@ -189,7 +194,7 @@ export default function PreferencesPage() {
                                 <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-md border-2 border-muted p-2">
                                     <PanelLeft className="h-10 w-10" />
                                 </div>
-                                <div className="font-medium">Sidebar Navigation</div>
+                                <div className="font-medium">{t("layout.sidebar")}</div>
                             </Label>
                         </div>
 
@@ -202,7 +207,7 @@ export default function PreferencesPage() {
                                 <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-md border-2 border-muted p-2">
                                     <PanelTop className="h-10 w-10" />
                                 </div>
-                                <div className="font-medium">Top Navigation</div>
+                                <div className="font-medium">{t("layout.topnav")}</div>
                             </Label>
                         </div>
                     </RadioGroup>

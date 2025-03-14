@@ -103,7 +103,6 @@
       "99.8% Accuracy",
       "24/7 Support"
     ],
-
     "instantFeedback": {
       "title": "Instant Feedback",
       "description": "Students receive feedback in under 5 minutes."
@@ -158,7 +157,7 @@
         ]
       },
       "tests": {
-        "testResult":"Results of tests",
+        "testResult": "Results of tests",
         "result": "2/4 tests passed",
         "test1": {
           "name": "Test #1: Base Case",
@@ -187,7 +186,6 @@
         "hint": "Hint: For n > 0, factorial(n) = n * factorial(n-1)",
         "hintDescription": "You handled the base case (n=0) well, but you need to complete the function for the general case."
       }
-
     },
     "progress": {
       "title": "Progression of the exercise",
@@ -210,7 +208,12 @@
         "status": "Answered",
         "question": "Question 1/5",
         "prompt": "Which HTTP method is used to create a resource?",
-        "options": ["GET", "POST", "PUT", "DELETE"]
+        "options": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ]
       },
       "pdf": {
         "title": "Document Submission",
@@ -352,7 +355,6 @@
       "passwordTooShort": "Password is too short. Please use at least 6 characters."
     }
   },
-
   "dropdown-user": {
     "profile": "Profile",
     "settings": "Settings",
@@ -373,7 +375,7 @@
     "verification": "Verification",
     "profile": "Profile",
     "completion": "Completed",
-    "step":"Step {current} of {total}"
+    "step": "Step {current} of {total}"
   },
   "welcome": {
     "title": "Welcome to AI Grading Platform",
@@ -434,15 +436,14 @@
     "subtitle": "We need to verify that you're a real person before continuing",
     "succes": "Account verified successfully",
     "methods": {
-      "connect-the-dot":"Connect the dots",
-      "reset":"Refresh CAPTCHA",
+      "connect-the-dot": "Connect the dots",
+      "reset": "Refresh CAPTCHA",
       "captcha": "Complete the minigame to verify you're human",
       "email": "Email",
       "phone": "Phone"
     },
-    
     "captcha": {
-      "reset":"Refresh CAPTCHA",
+      "reset": "Refresh CAPTCHA",
       "title": "Human Verification",
       "description": "This verification helps us prevent automated accounts and protect our platform",
       "instruction": "Check the 'I'm not a robot' box",
@@ -552,15 +553,58 @@
         "title": "Student Help Center",
         "description": "We've prepared resources to help you succeed and get the most out of our platform."
       },
-      "buttons": ["User Guides", "Video Tutorials", "FAQ", "Contact Support"]
+      "buttons": [
+        "User Guides",
+        "Video Tutorials",
+        "FAQ",
+        "Contact Support"
+      ]
     }
   },
   "error": {
     "title": "An error occurred",
     "description": "We're sorry, but an error occurred while processing your request. Please try again later.",
     "tryAgain": "Try Again"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how the application looks and feels",
+      "theme": {
+        "title": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "colorTheme": {
+        "title": "Color Theme",
+        "jade": "Jade",
+        "obsidian": "Obsidian",
+        "amber": "Amber"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Configure how you receive notifications",
+      "email": {
+        "title": "Email notifications",
+        "description": "Receive notifications via email"
+      },
+      "security": {
+        "title": "Security notifications",
+        "description": "Receive notifications about security alerts"
+      },
+      "promotional": {
+        "title": "Promotional notifications",
+        "description": "Receive notifications about promotions and updates"
+      }
+    },
+    "layout": {
+      "title": "Layout",
+      "description": "Choose how you want the application to be displayed",
+      "sidebar": "Sidebar Navigation",
+      "topnav": "Top Navigation"
+    }
   }
-
-
-
 }

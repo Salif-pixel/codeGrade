@@ -12,7 +12,7 @@
     "settings": "Préférences",
     "create_exam": "Créer une évaluation",
     "my_exams": "Mes évaluations",
-    "stats": "Dashboard",
+    "stats": "Tableau de bord",
     "available_exams": "Évaluations actives",
     "results": "Rapport de performance"
   },
@@ -157,7 +157,7 @@
         ]
       },
       "tests": {
-        "testResult":"Résultats des tests",
+        "testResult": "Résultats des tests",
         "result": "2/4 tests réussis",
         "test1": {
           "name": "Test #1: Cas de base",
@@ -176,18 +176,16 @@
           "description": "Erreur: Expected factorial(10) to be 3628800, but got undefined"
         }
       },
-
-        "aiFeedback": {
-            "title": "Suggestions de l'IA",
-            "content": {
-              "first": "Vous avez bien géré le cas de base (n=0), mais vous devez compléter la fonction pour le cas général.",
-              "second": "Pensez à utiliser la récursivité ou une boucle pour calculer le produit de tous les nombres de 1 à n.",
-              "third": "Indice: Pour n > 0, factorial(n) = n * factorial(n-1)"
-            },
-
-          "hint": "Hint: For n > 0, factorial(n) = n * factorial(n-1)",
-          "hintDescription": "Tu as bien géré le cas de base (n=0), mais tu dois compléter la fonction pour le cas général. Pense à utiliser la récursivité ou une boucle pour calculer le produit de tous les nombres de 1 à n."
-        }
+      "aiFeedback": {
+        "title": "Suggestions de l'IA",
+        "content": {
+          "first": "Vous avez bien géré le cas de base (n=0), mais vous devez compléter la fonction pour le cas général.",
+          "second": "Pensez à utiliser la récursivité ou une boucle pour calculer le produit de tous les nombres de 1 à n.",
+          "third": "Indice: Pour n > 0, factorial(n) = n * factorial(n-1)"
+        },
+        "hint": "Hint: For n > 0, factorial(n) = n * factorial(n-1)",
+        "hintDescription": "Tu as bien géré le cas de base (n=0), mais tu dois compléter la fonction pour le cas général. Pense à utiliser la récursivité ou une boucle pour calculer le produit de tous les nombres de 1 à n."
+      }
     },
     "progress": {
       "title": "Progression of the exercise",
@@ -210,7 +208,12 @@
         "status": "✓ Répondu",
         "question": "Question 1/5",
         "prompt": "Quelle méthode HTTP utilise-t-on pour créer une ressource ?",
-        "options": ["GET", "POST", "PUT", "DELETE"]
+        "options": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ]
       },
       "pdf": {
         "title": "Dépôt de documents",
@@ -247,9 +250,7 @@
         "value": "100x plus rapide"
       }
     }
-
-},
-
+  },
   "for-students": {
     "badge": "Pour les Élèves",
     "title": "Accélérez Votre Apprentissage avec des Feedbacks Instantanés",
@@ -275,7 +276,6 @@
       }
     }
   },
-
   "testimonials": {
     "title": "Ce que disent les enseignants et les élèves",
     "description": "Notre plateforme de correction par IA fait une réelle différence dans les classes à travers le monde.",
@@ -314,34 +314,34 @@
     "go-to-testimonial": "Aller au témoignage {index}"
   },
   "authentication": {
-      "login": "Connexion",
-      "signup": "Inscription",
-      "email": "Email",
-      "email-placeholder": "Entrez votre email",
-      "password": "Mot de passe",
-      "password-placeholder": "Entrez votre mot de passe",
-      "name": "Nom",
-      "name-placeholder": "Entrez votre nom",
-      "or": "OU",
-      "login-with-google": "Se connecter avec Google",
-      "login-with-github": "Se connecter avec GitHub",
-      "signup-with-google": "S'inscrire avec Google",
-      "signup-with-github": "S'inscrire avec GitHub",
-      "auth-message": "Connectez-vous pour accéder à votre compte.",
-      "auth-image-alt": "Illustration d'authentification",
-      "invalid-email": "Email invalide",
-      "password-min-length": "Le mot de passe doit contenir au moins 6 caractères",
-      "name-required": "Le nom est requis",
-      "login-auth": {
-        "pending": "Connexion en cours...",
-        "pendingDescription": "Veuillez patienter pendant que nous vous connectons à votre compte.",
-        "success": "Connexion réussie ! 🎉",
-        "successDescription": "Vous êtes maintenant connecté à votre compte.",
-        "error": "Erreur de connexion",
-        "invalidCredentials": "Vos identifiants sont incorrects. Veuillez réessayer.",
-        "unknownError": "Une erreur s'est produite lors de la connexion.",
-        "networkError": "Une erreur réseau s'est produite. Veuillez vérifier votre connexion Internet."
-      },
+    "login": "Connexion",
+    "signup": "Inscription",
+    "email": "Email",
+    "email-placeholder": "Entrez votre email",
+    "password": "Mot de passe",
+    "password-placeholder": "Entrez votre mot de passe",
+    "name": "Nom",
+    "name-placeholder": "Entrez votre nom",
+    "or": "OU",
+    "login-with-google": "Se connecter avec Google",
+    "login-with-github": "Se connecter avec GitHub",
+    "signup-with-google": "S'inscrire avec Google",
+    "signup-with-github": "S'inscrire avec GitHub",
+    "auth-message": "Connectez-vous pour accéder à votre compte.",
+    "auth-image-alt": "Illustration d'authentification",
+    "invalid-email": "Email invalide",
+    "password-min-length": "Le mot de passe doit contenir au moins 6 caractères",
+    "name-required": "Le nom est requis",
+    "login-auth": {
+      "pending": "Connexion en cours...",
+      "pendingDescription": "Veuillez patienter pendant que nous vous connectons à votre compte.",
+      "success": "Connexion réussie ! 🎉",
+      "successDescription": "Vous êtes maintenant connecté à votre compte.",
+      "error": "Erreur de connexion",
+      "invalidCredentials": "Vos identifiants sont incorrects. Veuillez réessayer.",
+      "unknownError": "Une erreur s'est produite lors de la connexion.",
+      "networkError": "Une erreur réseau s'est produite. Veuillez vérifier votre connexion Internet."
+    },
     "signup-auth": {
       "pending": "Création de compte",
       "pendingDescription": "Veuillez patienter pendant que nous créons votre compte...",
@@ -359,7 +359,7 @@
     "profile": "Profil",
     "settings": "Paramètres",
     "logout": "Se déconnecter",
-    "search":"Rechercher"
+    "search": "Rechercher"
   },
   "common": {
     "next": "Suivant",
@@ -436,13 +436,12 @@
     "subtitle": "Nous devons vérifier que vous êtes une personne réelle avant de continuer",
     "succes": "Vérification réussie!",
     "methods": {
-      "connect-the-dot":"Relier les points",
-      "reset":"Réinitialiser le captcha", 
+      "connect-the-dot": "Relier les points",
+      "reset": "Réinitialiser le captcha",
       "captcha": "Complète le minijeu pour continuer",
       "email": "Email",
       "phone": "Téléphone"
     },
-   
     "captcha": {
       "title": "Vérification Humaine",
       "description": "Cette vérification nous aide à prévenir les comptes automatisés et à protéger notre plateforme",
@@ -553,12 +552,58 @@
         "title": "Centre d'Aide pour Étudiants",
         "description": "Nous avons préparé des ressources pour vous aider à réussir et à tirer le meilleur parti de notre plateforme."
       },
-      "buttons": ["Guides d'Utilisation", "Tutoriels Vidéo", "FAQ", "Contacter le Support"]
+      "buttons": [
+        "Guides d'Utilisation",
+        "Tutoriels Vidéo",
+        "FAQ",
+        "Contacter le Support"
+      ]
     }
   },
-  "error":{
-    "title":"Une erreur s'est produite",
-    "description":"Nous sommes désolés, une erreur s'est produite lors du chargement de la page. Veuillez réessayer plus tard.",
-    "tryAgain":"Réessayer"
+  "error": {
+    "title": "Une erreur s'est produite",
+    "description": "Nous sommes désolés, une erreur s'est produite lors du chargement de la page. Veuillez réessayer plus tard.",
+    "tryAgain": "Réessayer"
+  },
+  "settings": {
+    "title": "Préférences",
+    "appearance": {
+      "title": "Apparence",
+      "description": "Personnalisez l'apparence de l'application",
+      "theme": {
+        "title": "Thème",
+        "light": "Clair",
+        "dark": "Sombre",
+        "system": "Système"
+      },
+      "colorTheme": {
+        "title": "Thème de couleur",
+        "jade": "Jade",
+        "obsidian": "Obsidienne",
+        "amber": "Ambre"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Configurez la réception des notifications",
+      "email": {
+        "title": "Notifications par email",
+        "description": "Recevoir les notifications par email"
+      },
+      "security": {
+        "title": "Notifications de sécurité",
+        "description": "Recevoir les alertes de sécurité"
+      },
+      "promotional": {
+        "title": "Notifications promotionnelles",
+        "description": "Recevoir les promotions et mises à jour"
+      }
+    },
+    "layout": {
+      "title": "Disposition",
+      "description": "Choisissez comment afficher l'application",
+      "sidebar": "Navigation latérale",
+      "topnav": "Navigation supérieure"
+    }
   }
 }
