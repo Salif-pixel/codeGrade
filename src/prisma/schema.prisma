@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -101,13 +98,14 @@ model Exam {
   maxAttempts Int       @default(1)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deadline    DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
 
-  questions   Question[]
+  questions   Question[]  @relation("ExamQuestions")
   createdBy   User       @relation("ExamsCreated", fields: [createdById], references: [id])
   createdById String
-  answers     Answer[]
-  grades      Grade[]
+  answers     Answer[]   @relation("ExamAnswers")
+  grades      Grade[]    @relation("ExamGrades")
 }
 
 model Question {
@@ -115,7 +113,7 @@ model Question {
   text         String
   correctionAi String
   maxPoints    Float
-  exam         Exam   @relation(fields: [examId], references: [id])
+  exam         Exam   @relation("ExamQuestions", fields: [examId], references: [id], onDelete: Cascade)
   examId       String
 
   @@index([examId])
@@ -130,12 +128,11 @@ model Answer {
 
   student   User   @relation(fields: [studentId], references: [id])
   studentId String
-  exam      Exam   @relation(fields: [examId], references: [id])
+  exam      Exam   @relation("ExamAnswers", fields: [examId], references: [id], onDelete: Cascade)
   examId    String
 
-  corrections Correction[]
-  grade       Grade?       @relation(fields: [gradeId], references: [id])
-  gradeId     String?
+  corrections Correction[] @relation("AnswerCorrections")
+  grade      Grade?      // Relation inverse, pas besoin de champs supplémentaires
 
   @@unique([studentId, examId, attemptNumber])
 }
@@ -150,7 +147,7 @@ model Correction {
   correctedById String?
   createdAt     DateTime @default(now())
 
-  answer   Answer  @relation(fields: [answerId], references: [id])
+  answer   Answer  @relation("AnswerCorrections", fields: [answerId], references: [id], onDelete: Cascade)
   answerId String
   grades   Grade[]
 }
@@ -163,11 +160,12 @@ model Grade {
 
   student      User       @relation(fields: [studentId], references: [id])
   studentId    String
-  exam         Exam       @relation(fields: [examId], references: [id])
+  exam         Exam       @relation("ExamGrades", fields: [examId], references: [id], onDelete: Cascade)
   examId       String
-  correction   Correction @relation(fields: [correctionId], references: [id])
+  correction   Correction @relation(fields: [correctionId], references: [id], onDelete: Cascade)
   correctionId String
-  Answer       Answer[]
+  answer       Answer     @relation(fields: [answerId], references: [id])
+  answerId     String     @unique  // Ajout de @unique pour répondre à l'erreur
 
   @@unique([studentId, examId])
 }

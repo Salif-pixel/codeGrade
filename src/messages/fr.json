@@ -90,6 +90,28 @@
       "copyright": "© {year} CodeGrade. Tous droits réservés."
     }
   },
+  "exam": {
+    "create": {
+      "title": "Créer un nouvel examen"
+    },
+    "form": {
+      "title": "Titre",
+      "description": "Description",
+      "format": "Format",
+      "select_format": "Sélectionnez un format",
+      "max_attempts": "Nombre maximum de tentatives",
+      "deadline": "Date limite",
+      "submit": "Créer l'examen"
+    },
+    "validation": {
+      "title_required": "Le titre est obligatoire",
+      "description_required": "La description est obligatoire",
+      "format_required": "Veuillez sélectionner un format",
+      "max_attempts_required": "Le nombre maximum de tentatives doit être au moins 1",
+      "deadline_required": "La date limite est obligatoire",
+      "deadline_invalid": "Veuillez entrer une date limite valide"
+    }
+  },
   "hero-section": {
     "tagline": "Révolutionnons l'éducation",
     "headline": "Planifiez. Évaluez.Automatisez",

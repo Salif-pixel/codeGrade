@@ -130,7 +130,7 @@ function AssignmentList({ assignments, onViewDetails, onCopyInviteLink }: Assign
   return (
     <div className="space-y-4">
       {assignments.map((assignment) => (
-        <Card key={assignment.id}>
+        <Card className="bg-zinc-900"  key={assignment.id}>
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
@@ -139,6 +139,7 @@ function AssignmentList({ assignments, onViewDetails, onCopyInviteLink }: Assign
               </div>
               <div className="flex gap-2">
                 <Button
+                className="dark:bg-zinc-800 hover:dark:bg-zinc-800" 
                   variant="outline"
                   size="sm"
                   onClick={() => onViewDetails(assignment.id)}
@@ -148,7 +149,7 @@ function AssignmentList({ assignments, onViewDetails, onCopyInviteLink }: Assign
                 </Button>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button className="dark:bg-zinc-800 hover:dark:bg-zinc-800" variant="outline" size="sm">
                       <LinkIcon className="mr-2 h-4 w-4" />
                       Inviter
                     </Button>
