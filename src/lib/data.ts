@@ -28,3 +28,12 @@ export const getExistingSession = async (token: string) => {
     });
     return session;
 };
+
+export const getExams = async () => {
+    const exams = await prisma.exam.findMany({
+        include: {
+            questions: true,
+        }
+    });
+    return exams;
+};
