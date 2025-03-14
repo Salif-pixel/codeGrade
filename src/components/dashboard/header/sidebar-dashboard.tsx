@@ -143,10 +143,19 @@ export default function SidebarDashboard({ user }: { user: User }) {
                                 3
                             </span>
                         </Button>
-                        {!collapsed && <span className="text-sm font-medium">Notifications</span>}
-                        <div className={cn("flex", collapsed ? "hidden flex-col items-center gap-3" : "items-center justify-between gap-3")}>
-                        <ModeToggle className="bg-background" />
-                        {!collapsed && <LanguageSwitcher />}
+                        <div className={cn("overflow-hidden transition-all duration-300", 
+                            collapsed ? "w-0" : "w-auto"
+                        )}>
+                            <span className="text-sm font-medium whitespace-nowrap">Notifications</span>
+                        </div>
+                        <div className={cn(
+                            "flex transition-all duration-300",
+                            collapsed 
+                                ? "opacity-0 w-0" 
+                                : "opacity-100 items-center justify-between gap-3"
+                        )}>
+                            <ModeToggle className="bg-background" />
+                            <LanguageSwitcher />
                         </div>
                     </div>
 
