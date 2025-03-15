@@ -54,7 +54,7 @@ export async function updateExam(examId: string, data: ExamDTO) {
       }
     })
 
-    revalidatePath('/[locale]/(dashboard)/exams')
+    revalidatePath('/[locale]/(dashboard)/exams', 'page')
     return { success: true, data: exam }
   } catch (error) {
     console.error('Error updating exam:', error)
