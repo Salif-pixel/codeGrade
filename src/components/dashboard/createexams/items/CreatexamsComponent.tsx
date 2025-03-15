@@ -677,7 +677,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="button" onClick={handleSubmit} disabled={isPending} className="bg-primary hover:bg-primary/90">
+                <Button type="button" onClick={handleSubmit} disabled={isPending} className={cn("bg-primary hover:bg-primary/90",isPending ? "" : "cursor-pointer")}>
                   {isPending ? <Loader2 className={'animate-spin w-4 h-4'} /> : <Save className="mr-2 h-4 w-4" />}
                   {t("exams.saveExam")}
                 </Button>
