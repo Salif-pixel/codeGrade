@@ -23,7 +23,7 @@ export async function createExam(data: ExamDTO, userId: string) {
       }
     })
 
-    revalidatePath('/[locale]/(dashboard)/exams')
+    revalidatePath('/[locale]/(dashboard)/exams', 'page')
     return { success: true, data: exam }
   } catch (error) {
     console.error('Error creating exam:', error)
