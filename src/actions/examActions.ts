@@ -1,26 +1,14 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { ExamType } from '@prisma/client'
-import {prisma} from '@/lib/prisma'
+import { Exam, Question } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
-interface ExamData {
-  title: string
-  description?: string
-  type: ExamType
-  filePath: string
-  format: string
-  maxAttempts?: number
-  enDate?: Date
-  startDate?: Date
-  questions: {
-    text: string
-    correctionAi: string
-    maxPoints: number
-  }[]
+type ExamDTO = Exam & {
+  questions: Question[]
 }
 
-export async function createExam(data: ExamData, userId: string) {
+export async function createExam(data: ExamDTO, userId: string) {
   try {
     const exam = await prisma.exam.create({
       data: {
@@ -43,7 +31,7 @@ export async function createExam(data: ExamData, userId: string) {
   }
 }
 
-export async function updateExam(examId: string, data: ExamData) {
+export async function updateExam(examId: string, data: ExamDTO) {
   try {
     const exam = await prisma.exam.update({
       where: { id: examId },
@@ -54,8 +42,8 @@ export async function updateExam(examId: string, data: ExamData) {
         filePath: data.filePath,
         format: data.format,
         maxAttempts: data.maxAttempts,
-        endDate: data.enDate,
-        startDate:data.startDate,
+        endDate: data.endDate,
+        startDate: data.startDate,
         questions: data.questions ? {
           deleteMany: {},
           create: data.questions

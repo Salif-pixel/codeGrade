@@ -23,22 +23,22 @@ enum ExamType {
 }
 
 model User {
-  id            String       @id
-  email         String       @unique
-  name          String?
-  profileCompleted Boolean  @default(false)
-  emailVerified Boolean
-  image         String?
-  background    String?
-  role          Role         @default(STUDENT)
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-  exams         Exam[]       @relation("ExamsCreated")
-  answers       Answer[]
-  grades        Grade[]
-  Correction    Correction[]
+  id               String       @id
+  email            String       @unique
+  name             String?
+  profileCompleted Boolean      @default(false)
+  emailVerified    Boolean
+  image            String?
+  background       String?
+  role             Role         @default(STUDENT)
+  createdAt        DateTime
+  updatedAt        DateTime
+  sessions         Session[]
+  accounts         Account[]
+  exams            Exam[]       @relation("ExamsCreated")
+  answers          Answer[]
+  grades           Grade[]
+  Correction       Correction[]
 
   @@map("user")
 }
@@ -101,7 +101,7 @@ model Exam {
   startDate   DateTime?
   endDate     DateTime?
 
-  questions   Question[]  @relation("ExamQuestions")
+  questions   Question[] @relation("ExamQuestions")
   createdBy   User       @relation("ExamsCreated", fields: [createdById], references: [id])
   createdById String
   answers     Answer[]   @relation("ExamAnswers")
@@ -132,7 +132,7 @@ model Answer {
   examId    String
 
   corrections Correction[] @relation("AnswerCorrections")
-  grade      Grade?      // Relation inverse, pas besoin de champs supplémentaires
+  grade       Grade? // Relation inverse, pas besoin de champs supplémentaires
 
   @@unique([studentId, examId, attemptNumber])
 }
@@ -165,7 +165,7 @@ model Grade {
   correction   Correction @relation(fields: [correctionId], references: [id], onDelete: Cascade)
   correctionId String
   answer       Answer     @relation(fields: [answerId], references: [id])
-  answerId     String     @unique  // Ajout de @unique pour répondre à l'erreur
+  answerId     String     @unique // Ajout de @unique pour répondre à l'erreur
 
   @@unique([studentId, examId])
 }

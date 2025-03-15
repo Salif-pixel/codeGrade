@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, type ChangeEvent } from "react"
+import React, { useState, useRef, type ChangeEvent, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import {
@@ -25,6 +25,7 @@ import {
   Notebook,
   FileQuestion,
   Info,
+  Loader2,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -54,6 +55,8 @@ interface ExamCreatorProps {
 }
 
 const ExamCreator = ({ userId }: ExamCreatorProps) => {
+
+  const [isPending, startTransition] = useTransition();
   const t = useTranslations()
   const router = useRouter()
   const { showToast } = useCustomToast()
@@ -135,6 +138,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   }
 
   const handleSubmit = async () => {
+
     try {
       // Validations
       if (!title) {
@@ -169,15 +173,18 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
         questions: questions.map(({ id, ...rest }) => rest),
       }
 
-      const result = await createExam(examData, userId)
+      startTransition(async () => {
+        const result = await createExam(examData as never, userId)
 
-      if (result.success) {
-        showToast(t("exams.success"), t("exams.examCreated"), "success")
+        if (result.success) {
+          showToast(t("exams.success"), t("exams.examCreated"), "success")
 
-        router.push(`/${local}/my-exams`)
-      } else {
-        showToast(t("exams.error"), result.error || t("exams.createFailed"), "error")
-      }
+          router.push(`/${local}/my-exams`)
+        } else {
+          showToast(t("exams.error"), result.error || t("exams.createFailed"), "error")
+        }
+      })
+
     } catch (error) {
       console.error("Error submitting exam:", error)
       showToast(t("exams.error"), t("exams.unknownError"), "error")
@@ -189,7 +196,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
       case 1:
         return (
           <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-6">
               <BookOpen className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-semibold">{t("exams.basicInfo")}</h2>
             </div>
@@ -596,17 +603,16 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
   return (
     <>
-      <SimpleHeaderTitle title={t("exams.createNew")} icon={Notebook} />
+      <SimpleHeaderTitle title={"exams.createNew"} Icon={<Notebook className="w-5 h-5 text-primary" />} />
       <div className="container  py-10">
-        <Card className="mb-8 shadow-md border-zinc-200 dark:border-primary/20">
+        <Card className="mb-8 px-12 border-zinc-50 bg-white shadow-sm dark:border-primary/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               {[1, 2, 3, 4].map((step) => (
                 <React.Fragment key={step}>
                   <div
-                    className={`flex flex-col items-center ${
-                      currentStep >= step ? "text-primary" : "text-muted-foreground"
-                    }`}
+                    className={`flex flex-col items-center ${currentStep >= step ? "text-primary" : "text-muted-foreground"
+                      }`}
                     onClick={() => step < currentStep && setCurrentStep(step)}
                   >
                     <div
@@ -647,7 +653,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-zinc-200 dark:border-primary/20">
+        <Card className="border-zinc-50 bg-white shadow-sm dark:border-primary/20">
           <CardContent className="p-6">
             {getStepContent()}
 
@@ -671,8 +677,8 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="button" onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
-                  <Save className="mr-2 h-4 w-4" />
+                <Button type="button" onClick={handleSubmit} disabled={isPending} className="bg-primary hover:bg-primary/90">
+                  {isPending ? <Loader2 className={'animate-spin w-4 h-4'} /> : <Save className="mr-2 h-4 w-4" />}
                   {t("exams.saveExam")}
                 </Button>
               )}

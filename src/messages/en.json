@@ -646,10 +646,12 @@
     "success": "Success",
     "examCreated": "Exam created successfully",
     "required":"Required",
-    "deadlineHelp": "The deadline determines when students will no longer be able to submit their answers",
+    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers",
     "selectFormat": "Please select an exam format",
     "formatDescription": "Choose the format that best suits your assessment needs",
-    "selected": "Format selected successfully"
+    "selected": "Format selected successfully",
+    "startDate": "Start Date",
+    "endDate": "End Date"
   },
   "settings": {
     "title": "Settings",

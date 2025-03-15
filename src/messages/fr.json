@@ -645,10 +645,12 @@
     "success": "Succès",
     "examCreated": "Examen créé avec succès",
     "required": "Obligatoire",
-    "deadlineHelp": "La date limite détermine quand les étudiants ne pourront plus soumettre leurs réponses",
+    "endDateHelp": "La date limite détermine quand les étudiants ne pourront plus soumettre leurs réponses",
     "selectFormat": "Veuillez sélectionner un format d'examen",
     "formatDescription": "Choisissez le format qui correspond le mieux à vos besoins d'évaluation",
-    "selected": "Format sélectionné avec succès"
+    "selected": "Format sélectionné avec succès",
+    "startDate": "Date de début",
+    "endDate": "Date de fin"
   },
   "settings": {
     "title": "Préférences",
