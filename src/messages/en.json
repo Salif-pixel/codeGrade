@@ -758,7 +758,8 @@
       "updateSuccess": "Assessment updated successfully",
       "updateError": "An error occurred while updating the assessment",
       "deleteSuccess": "Assessment deleted successfully",
-      "deleteError": "An error occurred while deleting the assessment"
+      "deleteError": "An error occurred while deleting the assessment",
+      "cannotEdit": "You cannot edit this assessment because it has already started"
     },
     "dates": {
       "days": {

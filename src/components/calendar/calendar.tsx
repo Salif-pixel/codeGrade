@@ -673,7 +673,12 @@ export default function CalendarView({
         </div>
 
         {/* Sheet pour afficher les détails d'un devoir */}
-        <Sheet open={isSheetOpen}  onOpenChange={setIsSheetOpen}>
+        <Sheet open={isSheetOpen} onOpenChange={(open) => {
+          if (!open) {
+            setEditMode(false); // Réinitialiser le mode édition à la fermeture
+          }
+          setIsSheetOpen(open);
+        }}>
           <SheetTitle>
             
           </SheetTitle>
@@ -705,7 +710,17 @@ export default function CalendarView({
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setEditMode(!editMode)}
+                          onClick={() => {
+                            if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                              showToast(
+                                "Erreur",
+                                t('toast.cannotEdit'),
+                                "error"
+                              );
+                              return;
+                            }
+                            setEditMode(!editMode);
+                          }}
                           className={cn("rounded-full h-8 w-8", editMode && "text-primary")}
                         >
                           {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
@@ -770,29 +785,17 @@ export default function CalendarView({
                     <Separator className="my-4" />
 
                     <div className="space-y-4">
-                      <div>
-                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-primary" />
-                          {t('sheet.format')}
-                        </h3>
-                        {editMode ? (
-                          <Input
-                            type="text"
-                            value={selectedAssignment.format}
-                            onChange={(e) =>
-                              setSelectedAssignment({
-                                ...selectedAssignment,
-                                format: e.target.value,
-                              })
-                            }
-                            className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
-                          />
-                        ) : (
+                      {!editMode && (
+                        <div>
+                          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-primary" />
+                            {t('sheet.format')}
+                          </h3>
                           <p className="text-sm bg-muted/30 p-2 rounded">
                             {selectedAssignment.format || selectedAssignment.submissionType || "Non spécifié"}
                           </p>
-                        )}
-                      </div>
+                        </div>
+                      )}
 
                       <div>
                         <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
@@ -1048,6 +1051,15 @@ export default function CalendarView({
                         onClick={async () => {
                           if (!selectedAssignment) return;
 
+                          if (selectedAssignment.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                            showToast(
+                              "Erreur",
+                              t('toast.cannotEdit'),
+                              "error"
+                            );
+                            return;
+                          }
+
                           // Format the assignment data for saving
                           const examData = {
                             title: selectedAssignment.title,
@@ -1084,14 +1096,27 @@ export default function CalendarView({
                             showToast("Erreur", result.error || t('toast.updateError'), "error")
                           }
                         }}
-                        disabled={selectedAssignment?.startDate ? new Date(selectedAssignment.startDate) <= new Date() : false}
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {t('edit.save')}
                       </Button>
                     ) : (
                       <>
-                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(true)}>
+                        <Button 
+                          variant="outline" 
+                          className="w-full sm:w-auto" 
+                          onClick={() => {
+                            if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                              showToast(
+                                "Erreur",
+                                t('toast.cannotEdit'),
+                                "error"
+                              );
+                              return;
+                            }
+                            setEditMode(true);
+                          }}
+                        >
                           <Edit className="h-4 w-4 mr-2" />
                           {t('edit.enable')}
                         </Button>
