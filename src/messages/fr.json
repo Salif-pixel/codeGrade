@@ -860,5 +860,62 @@
     "score": {
       "percentage": "%"
     }
+  },
+  "dashboard": {
+    "teacher": {
+      "title": "Tableau de bord enseignant",
+      "description": "Gérez vos évaluations et suivez les progrès de vos étudiants",
+      "metrics": {
+        "total_exams": "Total des évaluations",
+        "total_exams_description": "Nombre total d'évaluations créées",
+        "exams_in_progress": "En cours",
+        "exams_in_progress_description": "Évaluations actuellement actives",
+        "graded_exams": "Évaluations notées",
+        "graded_exams_description": "Évaluations terminées et notées",
+        "average_score": "Note moyenne",
+        "average_score_description": "Moyenne générale des étudiants"
+      },
+      "recent_exams": {
+        "title": "Évaluations récentes",
+        "view_all": "Voir toutes les évaluations",
+        "no_exams": "Aucune évaluation récente"
+      },
+      "quick_actions": {
+        "title": "Actions rapides",
+        "create_exam": "Créer une évaluation",
+        "create_exam_description": "Commencez à créer une nouvelle évaluation",
+        "view_exams": "Voir mes évaluations",
+        "view_exams_description": "Accédez à toutes vos évaluations",
+        "view_settings": "Paramètres",
+        "view_settings_description": "Configurez vos paramètres"
+      }
+    },
+    "student": {
+      "title": "Tableau de bord étudiant",
+      "description": "Suivez vos évaluations et votre progression",
+      "metrics": {
+        "completed_exams": "Évaluations terminées",
+        "completed_exams_description": "Évaluations que vous avez terminées",
+        "pending_exams": "Évaluations en attente",
+        "pending_exams_description": "Évaluations à compléter",
+        "average_score": "Note moyenne",
+        "average_score_description": "Votre moyenne générale",
+        "next_deadline": "Prochaine échéance",
+        "next_deadline_description": "Votre prochaine évaluation"
+      },
+      "upcoming_exams": {
+        "title": "Évaluations à venir",
+        "view_all": "Voir toutes les évaluations",
+        "no_exams": "Aucune évaluation à venir",
+        "submit": "Commencer"
+      },
+      "quick_actions": {
+        "title": "Actions rapides",
+        "view_available": "Voir les évaluations disponibles",
+        "view_available_description": "Accédez à vos évaluations actives",
+        "view_results": "Voir mes résultats",
+        "view_results_description": "Consultez vos performances"
+      }
+    }
   }
 }

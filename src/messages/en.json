@@ -844,5 +844,62 @@
       "minutes": "minutes",
       "undefined": "Duration undefined"
     }
+  },
+  "dashboard": {
+    "teacher": {
+      "title": "Teacher Dashboard",
+      "description": "Manage your assessments and track student progress",
+      "metrics": {
+        "total_exams": "Total Assessments",
+        "total_exams_description": "Total number of assessments created",
+        "exams_in_progress": "In Progress",
+        "exams_in_progress_description": "Currently active assessments",
+        "graded_exams": "Graded Assessments",
+        "graded_exams_description": "Completed and graded assessments",
+        "average_score": "Average Score",
+        "average_score_description": "Overall student average"
+      },
+      "recent_exams": {
+        "title": "Recent Assessments",
+        "view_all": "View all assessments",
+        "no_exams": "No recent assessments"
+      },
+      "quick_actions": {
+        "title": "Quick Actions",
+        "create_exam": "Create Assessment",
+        "create_exam_description": "Start creating a new assessment",
+        "view_exams": "View My Assessments",
+        "view_exams_description": "Access all your assessments",
+        "view_settings": "Settings",
+        "view_settings_description": "Configure your settings"
+      }
+    },
+    "student": {
+      "title": "Student Dashboard",
+      "description": "Track your assessments and progress",
+      "metrics": {
+        "completed_exams": "Completed Assessments",
+        "completed_exams_description": "Assessments you have completed",
+        "pending_exams": "Pending Assessments",
+        "pending_exams_description": "Assessments to complete",
+        "average_score": "Average Score",
+        "average_score_description": "Your overall average",
+        "next_deadline": "Next Deadline",
+        "next_deadline_description": "Your next assessment"
+      },
+      "upcoming_exams": {
+        "title": "Upcoming Assessments",
+        "view_all": "View all assessments",
+        "no_exams": "No upcoming assessments",
+        "submit": "Start"
+      },
+      "quick_actions": {
+        "title": "Quick Actions",
+        "view_available": "View Available Assessments",
+        "view_available_description": "Access your active assessments",
+        "view_results": "View My Results",
+        "view_results_description": "Check your performance"
+      }
+    }
   }
 }

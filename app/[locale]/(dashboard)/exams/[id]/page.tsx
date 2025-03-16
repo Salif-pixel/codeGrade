@@ -3,11 +3,12 @@
 import ExamInvitation from "@/components/exams/exam-invitation"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
-import {headers} from "next/headers";
-import {auth} from "@/lib/auth";
-import {ParticipantStatus} from "@prisma/client";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { ParticipantStatus } from "@prisma/client";
 
 async function getExamWithDetails(examId: string) {
+
   try {
     const exam = await prisma.exam.findUnique({
       where: { id: examId },
@@ -31,14 +32,19 @@ async function getExamWithDetails(examId: string) {
         },
       },
     })
+
     return exam
+
   } catch (error) {
+
     console.error("Error fetching exam:", error)
     return null
+
   }
 }
 
 export default async function ExamPage({ params }: { params: { id: string } }) {
+
   const header = await headers()
   const session = await auth.api.getSession({
     headers: header,
@@ -74,9 +80,9 @@ export default async function ExamPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <ExamInvitation 
-        exam={exam} 
-        user={session?.user as never }
+      <ExamInvitation
+        exam={exam}
+        user={session?.user as never}
         teacher={{
           name: exam.createdBy.name || "Enseignant",
           email: exam.createdBy.email,
