@@ -28,6 +28,7 @@ import {
   CalendarClock,
   Repeat,
   Save,
+  FileQuestion,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -62,22 +63,32 @@ type CalendarView = "day" | "week" | "month"
 // Types alignés avec le schéma Prisma
 export type ExamType = "DOCUMENT" | "QCM" | "CODE"
 
-export interface Assignment {
+interface ExamQuestion {
+  id: string
+  text: string
+  maxPoints: number
+  choices?: string[]
+  programmingLanguage?: string | null
+  examId: string
+}
+
+interface Assignment {
   id: string
   title: string
-  description: string
+  description?: string
   type: ExamType
+  format?: string
+  maxAttempts: number
+  startDate?: Date
+  endDate?: Date
+  status: ExamStatus
+  questions?: ExamQuestion[]
   date: Date | string
   duration: number
   fileUrl?: string
-  format: string
-  maxAttempts: number
-  startDate?: Date | string
-  endDate?: Date | string
   submissionType?: string
   language?: string
   tests?: { name: string; description: string }[]
-  status: ExamStatus
   submissions: {
     total: number
     pending: number
@@ -133,11 +144,11 @@ export default function CalendarView({
         startDate: exam.startDate,
         endDate: exam.endDate,
         submissionType: exam.format,
-        tests:
-          exam.questions?.map((q) => ({
-            name: q.text,
-            description: q.correctionAi,
-          })) || [],
+        // tests:
+        //   exam.questions?.map((q) => ({
+        //     name: q.text,
+        //     description: "",
+        //   })) || [],
         status: exam.status,
         submissions: {
           total: exam.answers.length,
@@ -145,6 +156,7 @@ export default function CalendarView({
           corrected: exam.answers.filter(a => a.status === "CORRECTED").length,
           revised: exam.answers.filter(a => a.status === "REVISED").length,
         },
+        questions: exam.questions,
       }))
       setAssignments(formattedAssignments as never)
     }
@@ -702,20 +714,9 @@ export default function CalendarView({
                     </div>
                     <div className="flex space-x-2 mt-2">
                       {editMode ? (
-                        <select
-                          value={selectedAssignment.type}
-                          onChange={(e) =>
-                            setSelectedAssignment({
-                              ...selectedAssignment,
-                              type: e.target.value as ExamType,
-                            })
-                          }
-                          className="py-1 px-2 text-xs rounded border border-input focus-visible:ring-primary"
-                        >
-                          <option value="QCM">QCM</option>
-                          <option value="CODE">Code</option>
-                          <option value="DOCUMENT">Document</option>
-                        </select>
+                        <div className="py-1 px-2 text-xs rounded border border-input focus-visible:ring-primary bg-muted/30">
+                          {selectedAssignment.type}
+                        </div>
                       ) : (
                         getExamTypeBadge(selectedAssignment.type as ExamType)
                       )}
@@ -881,7 +882,7 @@ export default function CalendarView({
                         </div>
                       )}
 
-                      {selectedAssignment.tests && (
+                      {/* {selectedAssignment.tests && (
                         <div>
                           <div className="flex justify-between items-center">
                             <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
@@ -978,84 +979,116 @@ export default function CalendarView({
                             ))}
                           </div>
                         </div>
+                      )} */}
+
+                      {selectedAssignment.questions && selectedAssignment.questions.length > 0 && (
+                        <div className="space-y-4">
+                          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+                            <FileQuestion className="h-4 w-4 text-primary" />
+                            Questions
+                          </h3>
+                          <div className="space-y-4">
+                            {selectedAssignment.questions.map((question, index) => (
+                              <Card key={index} className="border-border shadow-sm">
+                                <CardContent className="p-3">
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <p className="text-sm font-medium">{question.text}</p>
+                                      {editMode && (
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          value={question.maxPoints}
+                                          onChange={(e) => {
+                                            const updatedQuestions = [...selectedAssignment.questions ?? []];
+                                            updatedQuestions[index] = {
+                                              ...question,
+                                              maxPoints: Number(e.target.value)
+                                            };
+                                            setSelectedAssignment({
+                                              ...selectedAssignment,
+                                              questions: updatedQuestions
+                                            });
+                                          }}
+                                          className="w-20 text-sm border rounded border-input focus-visible:ring-primary"
+                                        />
+                                      )}
+                                    </div>
+                                    {question.choices && (
+                                      <div className="mt-2 space-y-1">
+                                        {question.choices.map((choice, choiceIndex) => (
+                                          <div key={choiceIndex} className="text-sm text-muted-foreground">
+                                            {choice}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                    {question.programmingLanguage && (
+                                      <div className="mt-2">
+                                        <Badge variant="outline" className="text-xs">
+                                          {question.programmingLanguage}
+                                        </Badge>
+                                      </div>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
 
                   <SheetFooter className="sm:justify-start gap-2 flex-wrap">
                     {editMode ? (
-                      <>
-                        <Button
-                          variant="default"
-                          className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-                          onClick={async () => {
-                            // Format the assignment data for saving
-                            const examData = {
-                              title: selectedAssignment.title,
-                              description: selectedAssignment.description,
-                              type: selectedAssignment.type as ExamType,
-                              format: selectedAssignment.format,
-                              maxAttempts: selectedAssignment.maxAttempts,
-                              startDate: selectedAssignment.startDate,
-                              endDate: selectedAssignment.endDate,
-                              questions:
-                                selectedAssignment.tests?.map((test) => ({
-                                  text: test.name,
-                                  correctionAi: test.description,
-                                  maxPoints: 10, // Default value
-                                })) || [],
-                              data: {
-                                language: selectedAssignment.language,
-                              },
-                            }
+                      <Button
+                        variant="default"
+                        className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+                        onClick={async () => {
+                          if (!selectedAssignment) return;
 
-                            // Update the exam
-                            const result = await updateExam(selectedAssignment.id, examData as never)
+                          // Format the assignment data for saving
+                          const examData = {
+                            title: selectedAssignment.title,
+                            description: selectedAssignment.description,
+                            type: selectedAssignment.type as ExamType,
+                            format: selectedAssignment.format,
+                            maxAttempts: selectedAssignment.maxAttempts,
+                            startDate: selectedAssignment.startDate,
+                            endDate: selectedAssignment.endDate,
+                            questions: selectedAssignment.questions ? selectedAssignment.questions.map((q) => ({
+                              id: q.id,
+                              text: q.text,
+                              maxPoints: Number(q.maxPoints),
+                              choices: q.choices || [],
+                              programmingLanguage: q.programmingLanguage,
+                              examId: q.examId
+                            })) : undefined
+                          }
 
-                            if (result.success) {
-                              // Update local state with the updated assignment
-                              setAssignments(
-                                assignments.map((a) =>
-                                  a.id === selectedAssignment.id
-                                    ? { ...selectedAssignment, date: selectedAssignment.date }
-                                    : a,
-                                ),
+                          // Update the exam
+                          const result = await updateExam(selectedAssignment.id, examData as never)
+
+                          if (result.success) {
+                            setAssignments(
+                              assignments.map((a) =>
+                                a.id === selectedAssignment.id
+                                  ? { ...selectedAssignment }
+                                  : a
                               )
-                              showToast("Succès", t('toast.updateSuccess'), "success")
-                              setEditMode(false)
-                            } else {
-                              showToast("Erreur", t('toast.updateError'), "error")
-                            }
-                          }}
-                        >
-                          <Save className="h-4 w-4 mr-2" />
-                          {t('edit.save')}
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          className="w-full sm:w-auto"
-                          onClick={async () => {
-                            if (confirm(t('sheet.deleteConfirm'))) {
-                              const result = await deleteExam(selectedAssignment.id)
-
-                              if (result.success) {
-                                setAssignments(assignments.filter((a) => a.id !== selectedAssignment.id))
-                                showToast("Succès", t('toast.deleteSuccess'), "success")
-                                setIsSheetOpen(false)
-                              } else {
-                                showToast("Erreur", t('toast.deleteError'), "error")
-                              }
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          {t('assignment.delete')}
-                        </Button>
-                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(false)}>
-                          <X className="h-4 w-4 mr-2" />
-                          {t('edit.cancel')}
-                        </Button>
-                      </>
+                            )
+                            showToast("Succès", t('toast.updateSuccess'), "success")
+                            setEditMode(false)
+                          } else {
+                            showToast("Erreur", result.error || t('toast.updateError'), "error")
+                          }
+                        }}
+                        disabled={selectedAssignment?.startDate ? new Date(selectedAssignment.startDate) <= new Date() : false}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        {t('edit.save')}
+                      </Button>
                     ) : (
                       <>
                         <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(true)}>

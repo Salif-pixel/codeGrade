@@ -112,13 +112,35 @@ export async function updateExam(examId: string, data: ExamData) {
       return { success: false, error: 'Examen non trouvé' }
     }
 
-    if (existingExam.status !== 'PENDING') {
+    // Vérifier que l'examen n'a pas encore commencé
+    const now = new Date()
+    if (existingExam.startDate && existingExam.startDate < now) {
       return { success: false, error: 'Impossible de modifier un examen qui a déjà commencé' }
     }
 
-    // Vérifier qu'on ne modifie pas le type d'examen ou les questions
+    if (existingExam.status !== 'PENDING') {
+      return { success: false, error: 'Impossible de modifier un examen qui n\'est plus en attente' }
+    }
+
+    // Vérifier qu'on ne modifie pas le type d'examen
     if (data.type && data.type !== existingExam.type) {
       return { success: false, error: 'Impossible de modifier le type d\'examen' }
+    }
+
+    // Vérifier qu'on ne modifie pas le contenu des questions (sauf le barème)
+    if (data.questions) {
+      const hasInvalidModifications = data.questions.some((newQ, index) => {
+        const existingQ = existingExam.questions[index]
+        return (
+          newQ.text !== existingQ.text ||
+          JSON.stringify(newQ.choices) !== JSON.stringify(existingQ.choices) ||
+          newQ.programmingLanguage !== existingQ.programmingLanguage
+        )
+      })
+
+      if (hasInvalidModifications) {
+        return { success: false, error: 'Seul le barème des questions peut être modifié' }
+      }
     }
 
     // Seules les métadonnées peuvent être modifiées
@@ -130,12 +152,12 @@ export async function updateExam(examId: string, data: ExamData) {
         maxAttempts: data.maxAttempts,
         startDate: data.startDate,
         endDate: data.endDate,
-        questions: {
-          update: data.questions?.map((q, index) => ({
+        questions: data.questions ? {
+          update: data.questions.map((q, index) => ({
             where: { id: existingExam.questions[index].id },
             data: { maxPoints: q.maxPoints }
           }))
-        }
+        } : undefined
       },
       include: {
         questions: true
@@ -146,7 +168,7 @@ export async function updateExam(examId: string, data: ExamData) {
     return { success: true, data: exam }
   } catch (error) {
     console.error('Error updating exam:', error)
-    return { success: false, error: 'Failed to update exam' }
+    return { success: false, error: 'Échec de la mise à jour de l\'examen' }
   }
 }
 
