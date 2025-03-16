@@ -652,7 +652,8 @@
     "selected": "Format selected successfully",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers"
+    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers",
+    "edit": "Edit"
   },
   "settings": {
     "title": "Settings",

@@ -607,6 +607,7 @@
     "startDate": "Date de début",
     "endDate": "Date de fin",
     "endDateHelp": "La date limite détermine quand les étudiants ne pourront plus soumettre leurs réponses",
+    "edit": "Modifier",
     "formatSettings": "Paramètres de format",
     "qcm": "QCM",
     "qcmDescription": "Questions à choix multiples",
