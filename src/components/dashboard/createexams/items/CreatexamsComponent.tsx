@@ -26,6 +26,7 @@ import {
   FileQuestion,
   Info,
   Loader2,
+  Bot,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -34,12 +35,14 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { createExam } from "@/actions/examActions"
+import { createExam, generateAnswers, updateExamAnswers } from "@/actions/examActions"
 import { useCustomToast } from "@/components/alert/alert"
 import { ExamType } from "@prisma/client"
 import { SimpleHeaderTitle } from "@/components/dashboard/header/header-title"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+
+import { Skeleton } from "@/components/ui/skeleton"
 
 type ExamFormat = "QCM" | "PDF" | "CODE"
 
@@ -49,6 +52,9 @@ interface Question {
   maxPoints: number
   choices: string[] // Pour les QCM : tableau des choix possibles
   programmingLanguage?: string // Pour les questions de code : langage à utiliser
+  answer?: string
+  isEditingAnswer?: boolean
+  examId?: string
 }
 
 interface ExamCreatorProps {
@@ -59,9 +65,8 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   const t = useTranslations('exams')
   const router = useRouter()
   const { showToast } = useCustomToast()
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const local = useLocale()
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   // Step control
   const [currentStep, setCurrentStep] = useState<number>(1)
@@ -73,17 +78,17 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   const [type, ] = useState<ExamType>(ExamType.QCM)
   const [format, setFormat] = useState<ExamFormat>("QCM")
   const [filePath, setFilePath] = useState<string>("")
-  const [maxAttempts, setMaxAttempts] = useState<number>(1)
+  const [maxAttempts, ] = useState<number>(1)
   const [startDate, setStartDate] = useState<string>(
     new Date().toISOString().slice(0, 16),
   )
   const [endDate, setEndDate] = useState<string>(
     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
   )
-  const [deadline, setDeadline] = useState<string>(
+  const [deadline, ] = useState<string>(
     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
   )
-  const [file, setFile] = useState<File | null>(null)
+  const [, setFile] = useState<File | null>(null)
   const [questions, setQuestions] = useState<Question[]>([{ 
     id: "1", 
     text: "", 
@@ -91,6 +96,12 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     choices: format === "QCM" ? [""] : [],
     programmingLanguage: format === "CODE" ? "python" : undefined
   }])
+  const [showAnswers, setShowAnswers] = useState(false)
+  const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false)
+  const [selectedModel, setSelectedModel] = useState("deepseek-chat")
+  const [isRegenerating, setIsRegenerating] = useState(false)
+  const [examCreated, setExamCreated] = useState(false)
+  const [createdExamId, setCreatedExamId] = useState<string | null>(null)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -100,9 +111,6 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     }
   }
 
-  const canEditExam = () => {
-    return !startDate || new Date(startDate) > new Date();
-  }
 
   const handleChoiceChange = (questionId: string, choiceIndex: number, value: string) => {
     setQuestions(questions.map(q => {
@@ -179,8 +187,15 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   }
 
   const handleSubmit = async () => {
+    setIsGeneratingAnswers(true)
     startTransition(async () => {
       try {
+        // Empêcher la création multiple
+        if (examCreated) {
+          showToast(t("error"), t("examAlreadyCreated"), "error")
+          return
+        }
+
         // Validations
         if (!title) {
           showToast(t("error"), t("titleRequired"), "error")
@@ -203,7 +218,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           }
         }
 
-        // Prepare data
+        // Créer l'examen
         const examData = {
           title,
           description,
@@ -213,23 +228,110 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           maxAttempts: Number(maxAttempts),
           startDate: startDate ? new Date(startDate) : undefined,
           endDate: endDate ? new Date(endDate) : undefined,
-          questions: format !== "PDF" ? questions.map(({ id, ...rest }) => rest) : undefined
+          questions: format !== "PDF" ? questions.map(({ id, isEditingAnswer, answer, ...rest }) => rest) : undefined
         }
 
         const result = await createExam(examData, userId)
 
-        if (result.success) {
+        if (result.success && result.data) {
+          setExamCreated(true)
+          setCreatedExamId(result.data.id)
           showToast(t("success"), t("examCreated"), "success")
-          router.push(`/${local}/exams`)
+
+          // Générer les réponses
+          if (format !== "PDF") {
+            const answersResult = await generateAnswers(questions, selectedModel)
+            
+            if (answersResult.success && answersResult.questions) {
+              const questionsWithAnswers = await Promise.all(
+                answersResult.questions.map(async (q, index) => ({
+                  ...q,
+                  id: result.data!.questions[index].id,
+                  examId: result.data!.id,
+                  answer: await q.answer,
+                  isEditingAnswer: false
+                }))
+              )
+              setQuestions(questionsWithAnswers)
+              setShowAnswers(true)
+            }
+          }
         } else {
           showToast(t("error"), result.error || t("createFailed"), "error")
         }
       } catch (error) {
         console.error("Error submitting exam:", error)
         showToast(t("error"), t("unknownError"), "error")
+      } finally {
+        setIsGeneratingAnswers(false)
       }
     })
   }
+
+  const updateAnswer = (questionId: string, newAnswer: string) => {
+    setQuestions(questions.map(q =>
+      q.id === questionId ? { ...q, answer: newAnswer } : q
+    ))
+  }
+
+  const handleRedirect = async () => {
+    try {
+      // Mettre à jour les réponses avant la redirection
+      const result = await updateExamAnswers(questions[0].examId!, questions);
+
+      if (result.success) {
+        showToast(t("success"), t("answersUpdated"), "success");
+        router.push(`/${local}/exams`);
+      } else {
+        showToast(t("error"), t("updateAnswersError"), "error");
+      }
+    } catch (error) {
+      console.error("Error updating answers:", error);
+      showToast(t("error"), t("unknownError"), "error");
+    }
+  }
+
+  const handleGenerateAnswers = async (regenerate = false) => {
+    const actionToExecute = regenerate ? setIsRegenerating : setIsGeneratingAnswers
+    actionToExecute(true)
+    
+    try {
+      const answersResult = await generateAnswers(questions, selectedModel)
+      
+      if (answersResult.success && answersResult.questions) {
+        setQuestions(answersResult.questions.map((q, index) => ({
+          ...q,
+          id: questions[index].id, // Use the original question's ID
+          isEditingAnswer: false
+        })))
+        setShowAnswers(true)
+      } else {
+        showToast(t("error"), t("aiGeneration.error"), "error")
+      }
+    } catch (error) {
+      console.error("Error generating answers:", error)
+      showToast(t("error"), t("aiGeneration.error"), "error")
+    } finally {
+      actionToExecute(false)
+    }
+  }
+
+  const AnswerSkeleton = () => (
+    <div className="space-y-6">
+      {questions.map((question) => (
+        <Card key={question.id} className="border-primary/20">
+          <CardHeader>
+            <Skeleton className="h-6 w-3/4" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
 
   const getStepContent = () => {
     switch (currentStep) {
@@ -473,7 +575,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
                       {format === "QCM" && question.choices && (
                         <div className="space-y-4">
-                          <Label>{t(`choices.QCM`)}</Label>
+                          <Label>{t(`choices.${format}`)}</Label>
                           {question.choices.map((choice, choiceIndex) => (
                             <div key={choiceIndex} className="flex items-center gap-2">
                               <Input
@@ -658,9 +760,9 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
   return (
     <>
-      <SimpleHeaderTitle 
-        title={'exams.createNew'} 
-        Icon={<Notebook className="h-5 w-5"/>} 
+      <SimpleHeaderTitle
+        title={'exams.createNew'}
+        Icon={<Notebook className="h-5 w-5"/>}
       />
       <div className="container py-10">
         <Card className="mb-8 shadow-md border-zinc-200 dark:border-primary/20">
@@ -731,28 +833,127 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               </Button>
 
               {currentStep < totalSteps ? (
-                <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90">
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="bg-primary hover:bg-primary/90"
+                >
                   {t('next')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button 
-                  type="button" 
-                  onClick={handleSubmit} 
-                  disabled={isPending}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  {isPending ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <>
+                  {!examCreated ? (
+                    <Button 
+                      type="button" 
+                      onClick={handleSubmit} 
+                      disabled={isGeneratingAnswers}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {isGeneratingAnswers ? (
+                        <div className="flex items-center">
+                          <Bot className="mr-2 h-4 w-4 animate-pulse" />
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('aiGeneration.generating')}
+                        </div>
+                      ) : (
+                        <>
+                          <Bot className="mr-2 h-4 w-4" />
+                          {t('aiGeneration-generate')}
+                        </>
+                      )}
+                    </Button>
                   ) : (
-                    <Save className="mr-2 h-4 w-4" />
+                    <Button 
+                      onClick={() => handleGenerateAnswers(true)}
+                      disabled={isRegenerating}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {isRegenerating ? (
+                        <div className="flex items-center">
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('aiGeneration.regenerating')}
+                        </div>
+                      ) : (
+                        <>
+                          <Bot className="mr-2 h-4 w-4" />
+                          {t('aiGeneration.regenerate')}
+                        </>
+                      )}
+                    </Button>
                   )}
-                  {t('saveExam')}
-                </Button>
+                </>
               )}
             </div>
           </CardContent>
         </Card>
+
+        {/* Affichage des réponses générées */}
+        {showAnswers && (
+          <Card className="mt-8 border-primary/20">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>{t('aiGeneration.preview')}</CardTitle>
+              <Button
+                onClick={() => handleGenerateAnswers(true)}
+                disabled={isRegenerating}
+                variant="outline"
+                size="sm"
+              >
+                {isRegenerating ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t('aiGeneration.regenerating')}
+                  </div>
+                ) : (
+                  <>
+                    <Bot className="mr-2 h-4 w-4" />
+                    {t('aiGeneration.regenerate')}
+                  </>
+                )}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {(isGeneratingAnswers || isRegenerating) ? (
+                <AnswerSkeleton />
+              ) : (
+                <div className="space-y-6">
+                  {questions.map((question) => (
+                    <Card key={question.id} className="border-primary/20">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{question.text}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <Textarea
+                            value={question.answer || ''}
+                            onChange={(e) => updateAnswer(question.id, e.target.value)}
+                            placeholder={t("aiGeneration.answerPlaceholder")}
+                            className="min-h-[100px]"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="flex justify-end space-x-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowAnswers(false)}
+              >
+                {t('back')}
+              </Button>
+              <Button 
+                onClick={handleRedirect}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {t('finalize')}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </div>
     </>
   )

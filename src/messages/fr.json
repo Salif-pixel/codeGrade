@@ -593,6 +593,7 @@
         "document": "Document",
         "code": "Code"
     },
+    "aiGeneration-generate": "Generer les réponses",
     "addChoice": "Ajouter un choix",
     "choice": "Choix de l'examen",
     "createNew": "Créer un Nouvel Examen",
@@ -643,7 +644,7 @@
     "questionCount": "Nombre de questions",
     "finalConfirmation": "Veuillez vérifier toutes les informations avant de créer l'examen",
     "back": "Retour",
-    "next": "Suivant",
+    "next": "Étape suivante",
     "step1": "Informations",
     "step2": "Format",
     "step3": "Questions",
@@ -663,7 +664,30 @@
     "documentUploadNotAllowed": "Le téléchargement de documents n'est pas autorisé pour ce type d'examen",
     "programmingLanguage": "Langage de programmation",
     "questionsNotRequiredForPDF": "Les questions ne sont pas requises pour les examens PDF",
-    "uploadDocument": "Téléverser un document"
+    "uploadDocument": "Téléverser un document",
+    "aiGeneration": {
+      "title": "Génération des réponses",
+      "generating": "Génération en cours...",
+      "editAnswer": "Modifier la réponse",
+      "saveAnswer": "Enregistrer la réponse",
+      "answer": "Réponse",
+      "answerPlaceholder": "Réponse générée par l'IA",
+      "regenerate": "Régénérer",
+      "preview": "Aperçu des questions et réponses",
+      "error": "Erreur lors de la génération des réponses",
+      "generate": "Générer les réponses",
+      "generating": "Génération des réponses en cours...",
+      "selectModel": "Sélectionner un modèle",
+      "regenerating": "Régénération en cours..."
+    },
+    "details": {
+      "title": "Détails de l'examen",
+      "suggestedAnswer": "Réponse suggérée"
+    },
+    "finalize": "Finaliser et terminer",
+    "answersUpdated": "Réponses mises à jour avec succès",
+    "updateAnswersError": "Erreur lors de la mise à jour des réponses",
+    "examAlreadyCreated": "L'examen a déjà été créé"
   },
   "settings": {
     "title": "Préférences",

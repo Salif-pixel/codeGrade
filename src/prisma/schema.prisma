@@ -136,6 +136,7 @@ model Question {
   maxPoints    Float
   choices      String[]  // Pour les QCM : tableau des choix possibles
   programmingLanguage String? // Pour les questions de code : langage à utiliser
+  answer       String?
   exam         Exam   @relation("ExamQuestions", fields: [examId], references: [id], onDelete: Cascade)
   examId       String
 

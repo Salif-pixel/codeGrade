@@ -594,6 +594,7 @@
         "code": "Code",
         "document": "Document"
     },
+    "aiGeneration-generate": "Generate answers",
     "addChoice": "Add Choice",
     "choice": "Choose an exam type",
     "createNew": "Create New Exam",
@@ -637,7 +638,7 @@
     "finalConfirmation": "Please review all information before creating the exam",
     "saving": "Saving...",
     "saveExam": "Save Exam",
-    "next": "Next",
+    "next": "Next Step",
     "back": "Back",
     "step1": "Information",
     "step2": "Format",
@@ -660,7 +661,29 @@
     "selected": "Format selected successfully",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers"
+    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers",
+    "aiGeneration": {
+      "title": "Answer Generation",
+      "generating": "Generating answers...",
+      "editAnswer": "Edit Answer",
+      "saveAnswer": "Save Answer",
+      "answer": "Answer",
+      "answerPlaceholder": "AI generated answer",
+      "regenerate": "Regenerate",
+      "preview": "Questions and Answers Preview",
+      "error": "Error generating answers",
+      "generate": "Generate answers",
+      "selectModel": "Select a model",
+      "regenerating": "Regenerating..."
+    },
+    "details": {
+      "title": "Exam Details",
+      "suggestedAnswer": "Suggested Answer"
+    },
+    "finalize": "Finalize and complete",
+    "answersUpdated": "Answers updated successfully",
+    "updateAnswersError": "Error updating answers",
+    "examAlreadyCreated": "The exam has already been created"
   },
   "settings": {
     "title": "Settings",

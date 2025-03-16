@@ -307,3 +307,114 @@ export async function updateParticipantStatus(participantId: string, status: Par
     return { success: false, error: 'Failed to update participant status' };
   }
 }
+
+export async function generateAnswers(questions: QuestionData[], model: string = "mistralai/mistral-7b-instruct") {
+  try {
+    const questionsWithAnswers = await Promise.all(
+      questions.map(async (question) => ({
+        ...question,
+        answer: await generateFakeAnswer(question, model)
+      }))
+    );
+
+    return { success: true, questions: questionsWithAnswers };
+  } catch (error) {
+    console.error('Error generating answers:', error);
+    return { success: false, error: 'Failed to generate answers' };
+  }
+}
+
+async function generateFakeAnswer(question: QuestionData, model: string) {
+  console.log('Generating answer for:', question.text)
+  try {
+    let prompt = '';
+    
+    if (question.programmingLanguage) {
+      prompt = `Génère une réponse détaillée avec exemple de code en ${question.programmingLanguage} pour la question suivante: ${question.text}`;
+    } else if (question.choices?.length) {
+      prompt = `Tu es un expert en évaluation. Analyse cette question QCM et fournis la ou les bonnes réponses.
+
+Question: ${question.text}
+Choix disponibles: ${question.choices.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+Retourne ta réponse sous ce format JSON exact:
+{
+  "type": "single" OU "multiple",
+  "correctAnswers": [numéro(s) de(s) réponse(s) correcte(s)],
+  "explanation": "Explication détaillée du choix",
+  "feedback": {
+    "correct": "Message à afficher si l'étudiant choisit la bonne réponse",
+    "incorrect": "Message à afficher si l'étudiant se trompe"
+  }
+}
+
+Important:
+- Analyse attentivement chaque option
+- Justifie clairement pourquoi certaines réponses sont correctes et d'autres incorrectes
+- Fournis des explications pédagogiques et constructives
+- Assure-toi que le format JSON est strictement respecté`;
+    } else {
+      prompt = `Réponds de façon détaillée à la question suivante: ${question.text}`;
+    }
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "mistralai/mistral-7b-instruct",
+        messages: [{ role: 'user', content: prompt }],
+        response_format: question.choices?.length ? { type: "json_object" } : undefined
+      })
+    });
+    console.log(response)
+    if (!response.ok) {
+      throw new Error('Failed to generate answer');
+    }
+
+    const data = await response.json();
+    console.log('Generated answer:', data.choices[0].message.content)
+    
+    // Pour les QCM, formater la réponse
+    if (question.choices?.length) {
+      try {
+        const parsedAnswer = JSON.parse(data.choices[0].message.content);
+        return JSON.stringify(parsedAnswer, null, 2); // Retourner le JSON formaté
+      } catch (e) {
+        console.error('Error parsing JSON answer:', e);
+        return data.choices[0].message.content;
+      }
+    }
+
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error('Error generating answer:', error);
+    return `Une erreur est survenue lors de la génération de la réponse pour: "${question.text}"`;
+  }
+}
+
+export async function updateExamAnswers(examId: string, questions: QuestionData[]) {
+  try {
+    // Mettre à jour chaque question avec sa réponse
+    await Promise.all(
+      questions.map(async (question) => {
+        await prisma.question.update({
+          where: {
+            id: question.id
+          },
+          data: {
+            answer: question.answer
+          }
+        });
+      })
+    );
+
+    revalidatePath('/[locale]/exams');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating exam answers:', error);
+    return { success: false, error: 'Failed to update exam answers' };
+  }
+}
