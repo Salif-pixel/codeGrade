@@ -660,7 +660,11 @@
     "selected": "Format selected successfully",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers"
+    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers",
+    "documentUploadNotAllowed": "Document upload is not allowed for this exam type",
+    "programmingLanguage": "Programming Language",
+    "questionsNotRequiredForPDF": "Questions are not required for PDF exams",
+    "uploadDocument": "Upload Document"
   },
   "settings": {
     "title": "Settings",
@@ -755,7 +759,9 @@
       "type": "Type",
       "questions": "Questions",
       "duration": "Duration",
-      "status": "Status"
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date"
     },
     "toast": {
       "updateSuccess": "Assessment updated successfully",

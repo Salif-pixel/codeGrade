@@ -758,7 +758,9 @@
       "type": "Type",
       "questions": "Questions",
       "duration": "Durée",
-      "status": "Statut"
+      "status": "Statut",
+      "startDate": "Date de début",
+      "endDate": "Date de fin"
     },
     "toast": {
       "updateSuccess": "L'évaluation a été mise à jour avec succès",
