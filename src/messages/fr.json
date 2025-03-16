@@ -636,7 +636,6 @@
     "finalConfirmation": "Veuillez vérifier toutes les informations avant de créer l'examen",
     "back": "Retour",
     "next": "Suivant",
-    "saveExam": "Enregistrer l'examen",
     "step1": "Informations",
     "step2": "Format",
     "step3": "Questions",
@@ -650,7 +649,13 @@
     "success": "Succès",
     "examCreated": "Examen créé avec succès",
     "createFailed": "Échec de la création de l'examen",
-    "unknownError": "Une erreur inconnue est survenue"
+    "unknownError": "Une erreur inconnue est survenue",
+    "saving": "Enregistrement en cours...",
+    "saveExam": "Enregistrer l'examen",
+    "documentUploadNotAllowed": "Le téléchargement de documents n'est pas autorisé pour ce type d'examen",
+    "programmingLanguage": "Langage de programmation",
+    "questionsNotRequiredForPDF": "Les questions ne sont pas requises pour les examens PDF",
+    "uploadDocument": "Téléverser un document"
   },
   "settings": {
     "title": "Préférences",

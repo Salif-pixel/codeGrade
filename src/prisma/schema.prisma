@@ -112,8 +112,8 @@ model Exam {
   id          String    @id @default(uuid())
   title       String
   description String?
-  filePath    String
-  format      String
+  filePath    String?
+  format      String?
   type        ExamType
   maxAttempts Int       @default(1)
   createdAt   DateTime  @default(now())
@@ -133,8 +133,9 @@ model Exam {
 model Question {
   id           String @id @default(uuid())
   text         String
-  correctionAi String
   maxPoints    Float
+  choices      String[]  // Pour les QCM : tableau des choix possibles
+  programmingLanguage String? // Pour les questions de code : langage à utiliser
   exam         Exam   @relation("ExamQuestions", fields: [examId], references: [id], onDelete: Cascade)
   examId       String
 

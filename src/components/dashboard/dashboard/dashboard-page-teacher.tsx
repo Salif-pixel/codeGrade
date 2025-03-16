@@ -167,7 +167,7 @@ export default function DashboardPageTeacher({ data }: DashboardPageTeacherProps
                             <span className="text-xs text-black dark:text-accent text-wrap text-left">{t('dashboard.teacher.quick_actions.create_exam_description')}</span>
                         </Button>
                     </Link>
-                    <Link href="/my-exams" className="w-full h-24">
+                    <Link href="/exams" className="w-full h-24">
                         <Button variant="outline" className="w-full cursor-pointer h-full flex-col items-start gap-1 p-4 justify-start">
                             <div className="flex items-center gap-2">
                                 <FileText className="h-4 w-4 sm:h-5 sm:w-5" />

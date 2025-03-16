@@ -41,9 +41,9 @@ export const navigationConfig = () => {
       roles: [Role.TEACHER, Role.SUPERADMIN],
     },
     {
-      id: "my-exams",
+      id: "exams",
       title: t("my_exams"),
-      href: "/my-exams",
+      href: "/exams",
       icon: <Book className="w-5 h-5" />,
       roles: [Role.TEACHER, Role.SUPERADMIN],
     },
@@ -104,9 +104,9 @@ export const navigationConfigForMiddleware = () => {
     },
 
     {
-      id: "my-exams",
+      id: "exams",
       title: "My Exams",
-      href: "/my-exams",
+      href: "/exams",
       icon: <Book className="w-5 h-5" />,
       roles: [Role.TEACHER, Role.SUPERADMIN],
     },
