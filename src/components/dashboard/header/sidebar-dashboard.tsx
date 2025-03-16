@@ -41,8 +41,8 @@ export default function SidebarDashboard({ user }: { user: User }) {
         return () => document.removeEventListener("keydown", down)
     }, [])
 
-    const filteredNavigation = navigationConfig().filter((item) =>
-        item.roles.includes(user.role)
+    const filteredNavigation = navigationConfig().filter((item) => 
+        item.roles.includes(user.role) && !item.isProtectedRoute
     )
 
     return (

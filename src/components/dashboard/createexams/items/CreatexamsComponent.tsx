@@ -67,7 +67,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   // Form state
   const [title, setTitle] = useState<string>("")
   const [description, setDescription] = useState<string>("")
-  const [type, setType] = useState<ExamType>(ExamType.QCM)
+  const [type, ] = useState<ExamType>(ExamType.QCM)
   const [format, setFormat] = useState<ExamFormat>("QCM")
   const [filePath, setFilePath] = useState<string>("")
   const [maxAttempts, setMaxAttempts] = useState<number>(1)

@@ -44,10 +44,34 @@ export default async function middleware(request: NextRequest) {
             // Vérifier les permissions basées sur le rôle
             if (user && user.role) {
                 const navItems = navigationConfigForMiddleware();
-                const currentPath = pathnameWithoutLocale.split('/')[1]; // Get the first segment of the path
+                const pathSegments = pathnameWithoutLocale.split('/').filter(Boolean);
+                
+                // Convertir le chemin actuel en pattern de route
+                const currentPathPattern = pathSegments.map(segment => {
+                    // Si le segment ressemble à un UUID, le considérer comme un paramètre dynamique
+                    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment) 
+                        ? '[id]' 
+                        : segment;
+                }).join('/');
+
+                // Trouver la route correspondante
                 const matchingRoute = navItems.find(item => {
-                    const routeFirstSegment = item.href.split('/')[1];
-                    return routeFirstSegment === currentPath;
+                    const routePath = item.href.startsWith('/') ? item.href.slice(1) : item.href;
+                    
+                    // Gérer les routes dynamiques
+                    if (routePath.includes('[id]')) {
+                        const routePattern = routePath.split('/');
+                        const currentPattern = currentPathPattern.split('/');
+                        
+                        if (routePattern.length !== currentPattern.length) return false;
+                        
+                        return routePattern.every((segment, index) => {
+                            return segment === '[id]' || segment === currentPattern[index];
+                        });
+                    }
+                    
+                    // Pour les routes statiques, comparaison directe
+                    return routePath === currentPathPattern;
                 });
 
                 if (matchingRoute && !matchingRoute.roles.includes(user.role as Role)) {

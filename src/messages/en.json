@@ -691,5 +691,155 @@
       "sidebar": "Sidebar Navigation",
       "topnav": "Top Navigation"
     }
+  },
+  "calendar": {
+    "title": "Assessment Calendar",
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "today": "Today"
+    },
+    "views": {
+      "day": "Day",
+      "week": "Week"
+    },
+    "assignment": {
+      "add": "Add Assessment",
+      "details": "Details",
+      "delete": "Delete",
+      "close": "Close",
+      "type": {
+        "QCM": "MCQ",
+        "CODE": "Code",
+        "DOCUMENT": "Document"
+      }
+    },
+    "edit": {
+      "enable": "Enable edit mode",
+      "disable": "Disable edit mode",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "details": {
+      "title": "Assessment Details",
+      "info": {
+        "type": "Type",
+        "questions": "Questions",
+        "duration": "Duration",
+        "status": "Status",
+        "description": "Description"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "ACTIVE": "Active",
+        "COMPLETED": "Completed"
+      },
+      "close": "Close"
+    },
+    "sheet": {
+      "format": "Submission format",
+      "deadline": "Deadline",
+      "maxAttempts": "Maximum attempts",
+      "deleteConfirm": "Are you sure you want to delete this assessment?",
+      "type": "Type",
+      "questions": "Questions",
+      "duration": "Duration",
+      "status": "Status"
+    },
+    "toast": {
+      "updateSuccess": "Assessment updated successfully",
+      "updateError": "An error occurred while updating the assessment",
+      "deleteSuccess": "Assessment deleted successfully",
+      "deleteError": "An error occurred while deleting the assessment"
+    },
+    "dates": {
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      },
+      "format": {
+        "full": "EEEE, MMMM d, yyyy",
+        "monthYear": "MMMM yyyy"
+      }
+    }
+  },
+  "exams-component": {
+    "title": "Exams",
+    "tabs": {
+      "list": "List",
+      "calendar": "Calendar"
+    },
+    "assignment": {
+      "deadline": "Deadline",
+      "viewDetails": "View details",
+      "invite": "Invite",
+      "inviteLink": {
+        "title": "Invitation Link",
+        "description": "Share this link with your students so they can join this assignment."
+      },
+      "type": "Type",
+      "questions": "questions",
+      "submissions": "submissions",
+      "students": "students",
+      "participation": "participation"
+    },
+    "details": {
+      "title": "Assignment Details",
+      "back": "Back",
+      "information": {
+        "title": "Information",
+        "type": "Type",
+        "questions": "Questions",
+        "duration": "Duration",
+        "status": "Status",
+        "description": "Description"
+      },
+      "results": {
+        "title": "Student Results",
+        "submissions": "submissions",
+        "students": "students",
+        "table": {
+          "student": "Student",
+          "email": "Email",
+          "status": "Status",
+          "submissionDate": "Submission Date",
+          "score": "Score"
+        },
+        "status": {
+          "completed": "Completed",
+          "accepted": "Accepted",
+          "declined": "Declined",
+          "pending": "Pending"
+        }
+      }
+    },
+    "duration": {
+      "day": "day",
+      "days": "days",
+      "hour": "hour",
+      "hours": "hours",
+      "minute": "minute",
+      "minutes": "minutes",
+      "undefined": "Duration undefined"
+    }
   }
 }

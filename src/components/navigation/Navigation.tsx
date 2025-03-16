@@ -9,8 +9,8 @@ import { usePathname } from "next/navigation";
 import { log } from "console";
 
 const Navigation = ({ userRole }: { userRole: Role }) => {
-    const filteredNavigation = navigationConfig().filter((item) =>
-        item.roles.includes(userRole)
+    const filteredNavigation = navigationConfig().filter((item) => 
+        item.roles.includes(userRole) && !item.isProtectedRoute
     );
 
     const pathname = usePathname();

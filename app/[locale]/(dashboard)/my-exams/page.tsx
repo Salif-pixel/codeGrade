@@ -13,9 +13,5 @@ export default async function ExamsPage() {
     return null;
   }
 
-  return (
-      <div className="container mx-auto py-6">
-        <ExamsComponent user={user} exams={exams}/>
-      </div>
-  )
+  return <ExamsComponent user={user} exams={exams as never}/>
 }

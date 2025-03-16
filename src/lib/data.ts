@@ -33,6 +33,12 @@ export const getExams = async () => {
     const exams = await prisma.exam.findMany({
         include: {
             questions: true,
+            participants: {
+                include: {
+                    user: true
+                }
+            },
+            answers: true,
         }
     });
     return exams;

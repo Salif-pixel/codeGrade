@@ -690,5 +690,155 @@
       "sidebar": "Navigation latérale",
       "topnav": "Navigation supérieure"
     }
+  },
+  "calendar": {
+    "title": "Calendrier des évaluations",
+    "navigation": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "today": "Aujourd'hui"
+    },
+    "views": {
+      "day": "Jour",
+      "week": "Semaine"
+    },
+    "assignment": {
+      "add": "Ajouter une évaluation",
+      "details": "Détails",
+      "delete": "Supprimer",
+      "close": "Fermer",
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Code",
+        "DOCUMENT": "Document"
+      }
+    },
+    "edit": {
+      "enable": "Activer le mode édition",
+      "disable": "Désactiver le mode édition",
+      "save": "Enregistrer",
+      "cancel": "Annuler"
+    },
+    "details": {
+      "title": "Détails de l'évaluation",
+      "info": {
+        "type": "Type",
+        "questions": "Questions",
+        "duration": "Durée",
+        "status": "Statut",
+        "description": "Description"
+      },
+      "status": {
+        "PENDING": "En attente",
+        "ACTIVE": "En cours",
+        "COMPLETED": "Terminé"
+      },
+      "close": "Fermer"
+    },
+    "sheet": {
+      "format": "Format de soumission",
+      "deadline": "Date limite",
+      "maxAttempts": "Tentatives maximum",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette évaluation ?",
+      "type": "Type",
+      "questions": "Questions",
+      "duration": "Durée",
+      "status": "Statut"
+    },
+    "toast": {
+      "updateSuccess": "L'évaluation a été mise à jour avec succès",
+      "updateError": "Une erreur est survenue lors de la mise à jour de l'évaluation",
+      "deleteSuccess": "L'évaluation a été supprimée avec succès",
+      "deleteError": "Une erreur est survenue lors de la suppression de l'évaluation"
+    },
+    "dates": {
+      "days": {
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche"
+      },
+      "months": {
+        "january": "Janvier",
+        "february": "Février",
+        "march": "Mars",
+        "april": "Avril",
+        "may": "Mai",
+        "june": "Juin",
+        "july": "Juillet",
+        "august": "Août",
+        "september": "Septembre",
+        "october": "Octobre",
+        "november": "Novembre",
+        "december": "Décembre"
+      },
+      "format": {
+        "full": "EEEE d MMMM yyyy",
+        "monthYear": "MMMM yyyy"
+      }
+    }
+  },
+  "exams-component": {
+    "title": "Examens",
+    "tabs": {
+      "list": "Liste",
+      "calendar": "Calendrier"
+    },
+    "assignment": {
+      "deadline": "Date limite",
+      "viewDetails": "Voir les détails",
+      "invite": "Inviter",
+      "inviteLink": {
+        "title": "Lien d'invitation",
+        "description": "Partagez ce lien avec vos étudiants pour qu'ils puissent rejoindre ce devoir."
+      },
+      "type": "Type",
+      "questions": "questions",
+      "submissions": "soumissions",
+      "students": "étudiants",
+      "participation": "de participation"
+    },
+    "details": {
+      "title": "Détails du devoir",
+      "back": "Retour",
+      "information": {
+        "title": "Informations",
+        "type": "Type",
+        "questions": "Questions",
+        "duration": "Durée",
+        "status": "Statut",
+        "description": "Description"
+      },
+      "results": {
+        "title": "Résultats des étudiants",
+        "submissions": "soumissions",
+        "students": "étudiants",
+        "table": {
+          "student": "Étudiant",
+          "email": "Email",
+          "status": "Statut",
+          "submissionDate": "Date de soumission",
+          "score": "Score"
+        },
+        "status": {
+          "completed": "Complété",
+          "accepted": "Accepté",
+          "declined": "Refusé",
+          "pending": "En attente"
+        }
+      }
+    },
+    "duration": {
+      "day": "jour",
+      "days": "jours",
+      "hour": "heure",
+      "hours": "heures",
+      "minute": "minute",
+      "minutes": "minutes",
+      "undefined": "Durée non définie"
+    }
   }
 }
