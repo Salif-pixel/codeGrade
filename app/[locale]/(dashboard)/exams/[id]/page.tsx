@@ -64,12 +64,12 @@ export default async function ExamPage({ params }: { params: { id: string } }) {
 
   // Si l'utilisateur est le créateur de l'examen, rediriger vers le dashboard
   if (exam.createdById === session?.user.id) {
-    redirect(`/${local}/my-exams/`)
+    redirect(`/${local}/exams/`)
   }
 
   // Si l'utilisateur est déjà participant et a accepté, rediriger vers l'examen
   if (existingParticipant?.status === ParticipantStatus.ACCEPTED) {
-    redirect(`/${local}/my-exams/`)
+    redirect(`/${local}/exams/`)
   }
 
   // Vérifier si l'examen est encore ouvert aux inscriptions

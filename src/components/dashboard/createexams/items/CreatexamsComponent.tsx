@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, type ChangeEvent } from "react"
+import React, { useState, useRef, type ChangeEvent, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import {
@@ -25,6 +25,7 @@ import {
   Notebook,
   FileQuestion,
   Info,
+  Loader2,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -45,8 +46,9 @@ type ExamFormat = "QCM" | "PDF" | "CODE"
 interface Question {
   id: string
   text: string
-  correctionAi: string
   maxPoints: number
+  choices: string[] // Pour les QCM : tableau des choix possibles
+  programmingLanguage?: string // Pour les questions de code : langage à utiliser
 }
 
 interface ExamCreatorProps {
@@ -59,6 +61,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   const { showToast } = useCustomToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const local = useLocale()
+  const [isPending, startTransition] = useTransition()
 
   // Step control
   const [currentStep, setCurrentStep] = useState<number>(1)
@@ -81,7 +84,13 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
   )
   const [file, setFile] = useState<File | null>(null)
-  const [questions, setQuestions] = useState<Question[]>([{ id: "1", text: "", correctionAi: "", maxPoints: 10 }])
+  const [questions, setQuestions] = useState<Question[]>([{ 
+    id: "1", 
+    text: "", 
+    maxPoints: 10,
+    choices: format === "QCM" ? [""] : [],
+    programmingLanguage: format === "CODE" ? "python" : undefined
+  }])
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -91,14 +100,49 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     }
   }
 
+  const canEditExam = () => {
+    return !startDate || new Date(startDate) > new Date();
+  }
+
+  const handleChoiceChange = (questionId: string, choiceIndex: number, value: string) => {
+    setQuestions(questions.map(q => {
+      if (q.id === questionId && q.choices) {
+        const newChoices = [...q.choices];
+        newChoices[choiceIndex] = value;
+        return { ...q, choices: newChoices };
+      }
+      return q;
+    }));
+  }
+
+  const addChoice = (questionId: string) => {
+    setQuestions(questions.map(q => {
+      if (q.id === questionId && q.choices) {
+        return { ...q, choices: [...q.choices, ""] };
+      }
+      return q;
+    }));
+  }
+
+  const removeChoice = (questionId: string, choiceIndex: number) => {
+    setQuestions(questions.map(q => {
+      if (q.id === questionId && q.choices && q.choices.length > 1) {
+        const newChoices = q.choices.filter((_, index) => index !== choiceIndex);
+        return { ...q, choices: newChoices };
+      }
+      return q;
+    }));
+  }
+
   const addQuestion = () => {
     setQuestions([
       ...questions,
       {
         id: Date.now().toString(),
         text: "",
-        correctionAi: "",
         maxPoints: 10,
+        choices: format === "QCM" ? [""] : [],
+        programmingLanguage: format === "CODE" ? "python" : undefined
       },
     ])
   }
@@ -135,53 +179,56 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   }
 
   const handleSubmit = async () => {
-    try {
-      // Validations
-      if (!title) {
-        showToast(t("error"), t("titleRequired"), "error")
-        setCurrentStep(1)
-        return
+    startTransition(async () => {
+      try {
+        // Validations
+        if (!title) {
+          showToast(t("error"), t("titleRequired"), "error")
+          setCurrentStep(1)
+          return
+        }
+
+        if (format === "PDF" && !filePath) {
+          showToast(t("error"), t("fileRequired"), "error")
+          setCurrentStep(2)
+          return
+        }
+
+        if (format !== "PDF") {
+          const questionsMissing = questions.some((q) => !q.text)
+          if (questionsMissing) {
+            showToast(t("error"), t("questionsIncomplete"), "error")
+            setCurrentStep(3)
+            return
+          }
+        }
+
+        // Prepare data
+        const examData = {
+          title,
+          description,
+          type: format === "PDF" ? ExamType.DOCUMENT : format === "QCM" ? ExamType.QCM : ExamType.CODE,
+          format,
+          filePath: format === "PDF" ? filePath : "",
+          maxAttempts: Number(maxAttempts),
+          startDate: startDate ? new Date(startDate) : undefined,
+          endDate: endDate ? new Date(endDate) : undefined,
+          questions: format !== "PDF" ? questions.map(({ id, ...rest }) => rest) : undefined
+        }
+
+        const result = await createExam(examData, userId)
+
+        if (result.success) {
+          showToast(t("success"), t("examCreated"), "success")
+          router.push(`/${local}/exams`)
+        } else {
+          showToast(t("error"), result.error || t("createFailed"), "error")
+        }
+      } catch (error) {
+        console.error("Error submitting exam:", error)
+        showToast(t("error"), t("unknownError"), "error")
       }
-
-      if (!filePath) {
-        showToast(t("error"), t("fileRequired"), "error")
-        setCurrentStep(2)
-        return
-      }
-
-      const questionsMissing = questions.some((q) => !q.text)
-      if (questionsMissing) {
-        showToast(t("error"), t("questionsIncomplete"), "error")
-        setCurrentStep(3)
-        return
-      }
-
-      // Prepare data
-      const examData = {
-        title,
-        description,
-        type,
-        format,
-        filePath,
-        maxAttempts: Number(maxAttempts),
-        startDate: startDate ? new Date(startDate) : undefined,
-        endDate: endDate ? new Date(endDate) : undefined,
-        questions: questions.map(({ id, ...rest }) => rest),
-      }
-
-      const result = await createExam(examData, userId)
-
-      if (result.success) {
-        showToast(t("success"), t("examCreated"), "success")
-
-        router.push(`/${local}/my-exams`)
-      } else {
-        showToast(t("error"), result.error || t("createFailed"), "error")
-      }
-    } catch (error) {
-      console.error("Error submitting exam:", error)
-      showToast(t("error"), t("unknownError"), "error")
-    }
+    })
   }
 
   const getStepContent = () => {
@@ -194,7 +241,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               <h2 className="text-xl font-semibold">{t("basicInfo")}</h2>
             </div>
 
-            <Card>
+            <Card className="dark:bg-zinc-900 border-primary/20">
               <CardContent className="pt-6">
                 <div className="space-y-6">
                   <div className="space-y-2">
@@ -210,9 +257,57 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder={t("titlePlaceholder")}
-                      className="transition-all focus-visible:ring-primary"
+                      className="transition-all focus-visible:ring-primary dark:bg-zinc-800"
                       required
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="format" className="flex items-center gap-2">
+                      <FileQuestion className="h-4 w-4 text-primary" />
+                      {t("format")}
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        {t("required")}
+                      </Badge>
+                    </Label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Button
+                        type="button"
+                        variant={format === "QCM" ? "default" : "outline"}
+                        className={cn(
+                          "flex items-center gap-2 w-full",
+                          format === "QCM" && "border-primary"
+                        )}
+                        onClick={() => setFormat("QCM")}
+                      >
+                        <CheckSquare className="h-4 w-4" />
+                        QCM
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={format === "CODE" ? "default" : "outline"}
+                        className={cn(
+                          "flex items-center gap-2 w-full",
+                          format === "CODE" && "border-primary"
+                        )}
+                        onClick={() => setFormat("CODE")}
+                      >
+                        <Code className="h-4 w-4" />
+                        Code
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={format === "PDF" ? "default" : "outline"}
+                        className={cn(
+                          "flex items-center gap-2 w-full",
+                          format === "PDF" && "border-primary"
+                        )}
+                        onClick={() => setFormat("PDF")}
+                      >
+                        <FileText className="h-4 w-4" />
+                        Document
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -281,220 +376,187 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
         return (
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">{t("formatSettings")}</h2>
+              <Upload className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">{t("uploadFile")}</h2>
             </div>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{t("selectFormat")}</CardTitle>
-                <CardDescription>{t("formatDescription")}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card
-                    className={cn(
-                      "cursor-pointer border-2 transition-all hover:shadow-md",
-                      format === "QCM" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
-                    )}
-                    onClick={() => setFormat("QCM")}
-                  >
-                    <CardContent className="flex flex-col items-center p-4 text-center">
-                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <CheckSquare className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-medium">{t("qcm")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{t("qcmDescription")}</p>
-                      {format === "QCM" && <Badge className="mt-3 bg-primary">{t("selected")}</Badge>}
-                    </CardContent>
-                  </Card>
-
-                  <Card
-                    className={cn(
-                      "cursor-pointer border-2 transition-all hover:shadow-md",
-                      format === "PDF" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
-                    )}
-                    onClick={() => setFormat("PDF")}
-                  >
-                    <CardContent className="flex flex-col items-center p-4 text-center">
-                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <FileText className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-medium">{t("pdf")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{t("pdfDescription")}</p>
-                      {format === "PDF" && <Badge className="mt-3 bg-primary">{t("selected")}</Badge>}
-                    </CardContent>
-                  </Card>
-
-                  <Card
-                    className={cn(
-                      "cursor-pointer border-2 transition-all hover:shadow-md",
-                      format === "CODE" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
-                    )}
-                    onClick={() => setFormat("CODE")}
-                  >
-                    <CardContent className="flex flex-col items-center p-4 text-center">
-                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Code className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-medium">{t("code")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{t("codeDescription")}</p>
-                      {format === "CODE" && <Badge className="mt-3 bg-primary">{t("selected")}</Badge>}
-                    </CardContent>
-                  </Card>
-                </div>
+            <Card className="dark:bg-zinc-900 border-primary/20">
+              <CardContent className="pt-6">
+                {format === "PDF" ? (
+                  <div className="space-y-4">
+                    <Label className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      {t("uploadDocument")}
+                    </Label>
+                    <Input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      className="dark:bg-zinc-800"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-32">
+                    <p className="text-muted-foreground">
+                      {t("documentUploadNotAllowed")}
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Repeat className="h-4 w-4 text-primary" />
-                    {t("maxAttempts")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Input
-                    id="maxAttempts"
-                    type="number"
-                    min="1"
-                    value={maxAttempts}
-                    onChange={(e) => setMaxAttempts(Number(e.target.value))}
-                    className="transition-all focus-visible:ring-primary"
-                  />
-                  <p className="text-sm text-muted-foreground mt-2">{t("maxAttemptsDescription")}</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Upload className="h-4 w-4 text-primary" />
-                    {t("uploadFile")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <input type="file" id="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="transition-all hover:border-primary hover:text-primary"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      {t("chooseFile")}
-                    </Button>
-                    {file && <span className="text-sm text-muted-foreground truncate max-w-[200px]">{file.name}</span>}
-                  </div>
-                  {filePath && (
-                    <div className="mt-3 flex items-center rounded-md bg-primary/10 p-2 text-sm text-primary">
-                      <FileText className="mr-2 h-4 w-4" />
-                      {t("fileAdded")}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
           </div>
         )
 
       case 3:
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileQuestion className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">{t("questions")}</h2>
+            <div className="flex items-center gap-2 mb-2">
+              <HelpCircle className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">{t("questions")}</h2>
+            </div>
+
+            {format !== "PDF" && (
+              <div className="space-y-6">
+                {questions.map((question, index) => (
+                  <Card key={question.id} className="dark:bg-zinc-900 border-primary/20">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-base font-medium">
+                        {t("question")} {index + 1}
+                      </CardTitle>
+                      {questions.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeQuestion(question.id)}
+                          className="h-8 w-8 text-destructive"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`question-${question.id}`}>
+                          {t("questionText")}
+                        </Label>
+                        <Textarea
+                          id={`question-${question.id}`}
+                          value={question.text}
+                          onChange={(e) =>
+                            updateQuestion(question.id, "text", e.target.value)
+                          }
+                          className="resize-none dark:bg-zinc-800"
+                          rows={3}
+                        />
+                      </div>
+
+                      {format === "CODE" && (
+                        <div className="space-y-2">
+                          <Label htmlFor={`language-${question.id}`}>
+                            {t("programmingLanguage")}
+                          </Label>
+                          <select
+                            id={`language-${question.id}`}
+                            value={question.programmingLanguage}
+                            onChange={(e) =>
+                              updateQuestion(question.id, "programmingLanguage", e.target.value)
+                            }
+                            className="w-full p-2 rounded-md border dark:bg-zinc-800"
+                          >
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                          </select>
+                        </div>
+                      )}
+
+                      {format === "QCM" && question.choices && (
+                        <div className="space-y-4">
+                          <Label>{t("choices")}</Label>
+                          {question.choices.map((choice, choiceIndex) => (
+                            <div key={choiceIndex} className="flex items-center gap-2">
+                              <Input
+                                value={choice}
+                                onChange={(e) =>
+                                  handleChoiceChange(
+                                    question.id,
+                                    choiceIndex,
+                                    e.target.value
+                                  )
+                                }
+                                className="dark:bg-zinc-800"
+                                placeholder={`${t("choice")} ${choiceIndex + 1}`}
+                              />
+                              {question.choices!.length > 1 && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    removeChoice(question.id, choiceIndex)
+                                  }
+                                  className="h-8 w-8 text-destructive"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addChoice(question.id)}
+                            className="mt-2"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t("addChoice")}
+                          </Button>
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`points-${question.id}`}>
+                          {t("maxPoints")}
+                        </Label>
+                        <Input
+                          id={`points-${question.id}`}
+                          type="number"
+                          min="0"
+                          value={question.maxPoints}
+                          onChange={(e) =>
+                            updateQuestion(
+                              question.id,
+                              "maxPoints",
+                              parseInt(e.target.value) || 0
+                            )
+                          }
+                          className="w-32 dark:bg-zinc-800"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addQuestion}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("addQuestion")}
+                </Button>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addQuestion}
-                size="sm"
-                className="transition-all hover:border-primary hover:text-primary"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {t("addQuestion")}
-              </Button>
-            </div>
+            )}
 
-            <div className="space-y-6">
-              {questions.map((question, index) => (
-                <Card key={question.id} className="border-border shadow-sm hover:shadow-md transition-all">
-                  <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="h-6 w-6 rounded-full p-0 flex items-center justify-center font-normal"
-                      >
-                        {index + 1}
-                      </Badge>
-                      {t("question")} #{index + 1}
-                    </CardTitle>
-                    {questions.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => removeQuestion(question.id)}
-                      >
-                        <Trash className="h-4 w-4 mr-1" />
-                        {t("remove")}
-                      </Button>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`question-${index}`} className="text-sm flex items-center gap-2">
-                        <HelpCircle className="h-4 w-4 text-primary" />
-                        {t("questionText")}
-                      </Label>
-                      <Textarea
-                        id={`question-${index}`}
-                        value={question.text}
-                        onChange={(e) => updateQuestion(question.id, "text", e.target.value)}
-                        rows={2}
-                        className="resize-none transition-all focus-visible:ring-primary"
-                        placeholder={t("questionTextPlaceholder")}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor={`correction-${index}`} className="text-sm flex items-center gap-2">
-                        <AlertCircle className="h-4 w-4 text-primary" />
-                        {t("correctionAi")}
-                      </Label>
-                      <Textarea
-                        id={`correction-${index}`}
-                        value={question.correctionAi}
-                        onChange={(e) => updateQuestion(question.id, "correctionAi", e.target.value)}
-                        rows={2}
-                        className="resize-none transition-all focus-visible:ring-primary"
-                        placeholder={t("correctionAiPlaceholder")}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor={`points-${index}`} className="text-sm flex items-center gap-2">
-                        <Award className="h-4 w-4 text-primary" />
-                        {t("maxPoints")}
-                      </Label>
-                      <Input
-                        id={`points-${index}`}
-                        type="number"
-                        min="1"
-                        value={question.maxPoints}
-                        onChange={(e) => updateQuestion(question.id, "maxPoints", e.target.value)}
-                        className="transition-all focus-visible:ring-primary"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {format === "PDF" && (
+              <div className="flex items-center justify-center h-32">
+                <p className="text-muted-foreground">
+                  {t("questionsNotRequiredForPDF")}
+                </p>
+              </div>
+            )}
           </div>
         )
 
@@ -674,8 +736,17 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="button" onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
-                  <Save className="mr-2 h-4 w-4" />
+                <Button 
+                  type="button" 
+                  onClick={handleSubmit} 
+                  disabled={isPending}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  {isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
                   {t('saveExam')}
                 </Button>
               )}
