@@ -589,6 +589,13 @@
     "tryAgain": "Try Again"
   },
   "exams": {
+    "choices": {
+      "QCM": "Multiple Choice",
+        "code": "Code",
+        "document": "Document"
+    },
+    "addChoice": "Add Choice",
+    "choice": "Choose an exam type",
     "createNew": "Create New Exam",
     "createDescription": "Create a new exam, assignment, or project for your students.",
     "basicInfo": "Basic Information",
@@ -653,11 +660,7 @@
     "selected": "Format selected successfully",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers",
-    "documentUploadNotAllowed": "Document upload is not allowed for this exam type",
-    "programmingLanguage": "Programming Language",
-    "questionsNotRequiredForPDF": "Questions are not required for PDF exams",
-    "uploadDocument": "Upload Document"
+    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers"
   },
   "settings": {
     "title": "Settings",

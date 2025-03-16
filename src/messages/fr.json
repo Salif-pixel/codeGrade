@@ -588,6 +588,13 @@
     "tryAgain": "Réessayer"
   },
   "exams": {
+    "choices": {
+        "QCM": "Choix multiples",
+        "document": "Document",
+        "code": "Code"
+    },
+    "addChoice": "Ajouter un choix",
+    "choice": "Choix de l'examen",
     "createNew": "Créer un Nouvel Examen",
     "createDescription": "Créez un nouvel examen, devoir ou projet pour vos étudiants.",
     "type": "Type",
@@ -607,6 +614,7 @@
     "startDate": "Date de début",
     "endDate": "Date de fin",
     "endDateHelp": "La date limite détermine quand les étudiants ne pourront plus soumettre leurs réponses",
+    "edit": "Modifier",
     "formatSettings": "Paramètres de format",
     "qcm": "QCM",
     "qcmDescription": "Questions à choix multiples",
