@@ -859,7 +859,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       ) : (
                         <>
                           <Bot className="mr-2 h-4 w-4" />
-                          {t('aiGeneration-generate')}
+                          {t('aiGeneration.generate')}
                         </>
                       )}
                     </Button>

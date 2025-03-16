@@ -594,7 +594,6 @@
         "code": "Code",
         "document": "Document"
     },
-    "aiGeneration-generate": "Generate answers",
     "addChoice": "Add Choice",
     "choice": "Choose an exam type",
     "createNew": "Create New Exam",
