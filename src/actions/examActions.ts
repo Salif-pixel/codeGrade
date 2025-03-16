@@ -12,7 +12,7 @@ interface ExamData {
   filePath: string
   format: string
   maxAttempts?: number
-  enDate?: Date
+  endDate?: Date
   startDate?: Date
   questions: {
     text: string
@@ -55,8 +55,8 @@ export async function updateExam(examId: string, data: ExamData) {
         filePath: data.filePath,
         format: data.format,
         maxAttempts: data.maxAttempts,
-        endDate: data.enDate,
         startDate:data.startDate,
+        endDate: data.endDate,
         questions: data.questions ? {
           deleteMany: {},
           create: data.questions
@@ -66,7 +66,7 @@ export async function updateExam(examId: string, data: ExamData) {
         questions: true
       }
     })
-
+    console.log('data', exam)
     revalidatePath('/[locale]/(dashboard)/exams')
     return { success: true, data: exam }
   } catch (error) {
