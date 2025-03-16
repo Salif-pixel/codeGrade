@@ -473,7 +473,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
                       {format === "QCM" && question.choices && (
                         <div className="space-y-4">
-                          <Label>{t("choices")}</Label>
+                          <Label>{t(`choices.QCM`)}</Label>
                           {question.choices.map((choice, choiceIndex) => (
                             <div key={choiceIndex} className="flex items-center gap-2">
                               <Input

@@ -588,6 +588,13 @@
     "tryAgain": "Réessayer"
   },
   "exams": {
+    "choices": {
+        "QCM": "Choix multiples",
+        "document": "Document",
+        "code": "Code"
+    },
+    "addChoice": "Ajouter un choix",
+    "choice": "Choix de l'examen",
     "createNew": "Créer un Nouvel Examen",
     "createDescription": "Créez un nouvel examen, devoir ou projet pour vos étudiants.",
     "type": "Type",
