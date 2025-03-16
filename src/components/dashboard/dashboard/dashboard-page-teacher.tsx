@@ -99,7 +99,7 @@ export default function DashboardPageTeacher({ data }: DashboardPageTeacherProps
                             <TableRow>
                                 <TableHead className="w-[200px]">{t('exam.form.title')}</TableHead>
                                 <TableHead className="hidden md:table-cell">{t('exam.form.format')}</TableHead>
-                                <TableHead className="hidden sm:table-cell">{t('exam.deadline')}</TableHead>
+                                <TableHead className="hidden sm:table-cell">{t('exam.form.deadline')}</TableHead>
                                 <TableHead className="w-[100px]">{t('exams-component.details.information.status')}</TableHead>
                                 <TableHead className="text-right w-[100px]">{t('exams-component.details.title')}</TableHead>
                             </TableRow>
