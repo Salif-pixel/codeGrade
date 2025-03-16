@@ -52,7 +52,7 @@ export default function PreferencesPage() {
                                     className={theme === "light" ? "border-primary" : ""}
                                 >
                                     <Sun className="h-5 w-5" />
-                                    <span className="sr-only">{t("appearance.theme.light")}</span>
+                                    <span className="sr-only">Light</span>
                                 </Button>
                                 <Button
                                     variant="outline"

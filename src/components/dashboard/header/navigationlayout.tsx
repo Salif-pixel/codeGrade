@@ -79,7 +79,7 @@ export default function NavigationLayout({
     return (
         <div
             ref={containerRef}
-            className={cn("flex min-h-screen bg-background", layout === "top" ? "flex-col" : "flex-row")}
+            className={cn("flex min-h-screen bg-background dark:bg-zinc-950", layout === "top" ? "flex-col" : "flex-row")}
         >
 
             {layout === "top" ? (
@@ -92,7 +92,7 @@ export default function NavigationLayout({
                         className={cn(
                             "flex-1 transition-all duration-200",
                             "pb-4",
-                            "bg-background/50 backdrop-blur-sm",
+                            "bg-background/50 backdrop-blur-sm dark:bg-zinc-950",
                         )}
                     >
                         {children}
@@ -108,7 +108,7 @@ export default function NavigationLayout({
                         className={cn(
                             "flex-1 overflow-auto transition-all duration-200",
                             "px-0 py-0",
-                            "bg-background/50 backdrop-blur-sm",
+                            "bg-background/50 backdrop-blur-sm dark:bg-zinc-950",
                         )}
                     >
                         {children}

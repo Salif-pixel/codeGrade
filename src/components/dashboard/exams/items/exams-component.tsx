@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import  Calendar  from "@/components/calendar/calendar"
+import Calendar from "@/components/calendar/calendar"
 import { ChevronRight, Copy, Eye, Link as LinkIcon, FileText } from "lucide-react"
-import {useCustomToast} from "@/components/alert/alert";
-import {Exam, User,Question, ExamStatus, SubmissionStatus, ParticipantStatus} from "@prisma/client"
-import {useLocale, useTranslations} from "next-intl";
+import { useCustomToast } from "@/components/alert/alert";
+import { Exam, User, Question, ExamStatus, SubmissionStatus, ParticipantStatus } from "@prisma/client"
+import { useLocale, useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,7 +73,7 @@ interface Assignment extends Exam {
 //   score: number | null
 // }
 
-export default function ExamsComponent({user, exams}:{user:User, exams: Assignment[]}) {
+export default function ExamsComponent({ user, exams }: { user: User, exams: Assignment[] }) {
   const [selectedAssignment, setSelectedAssignment] = useState<string | null>(null)
   const [showAssignmentDetails, setShowAssignmentDetails] = useState(false)
   const { showToast } = useCustomToast()
@@ -123,8 +123,8 @@ export default function ExamsComponent({user, exams}:{user:User, exams: Assignme
   const copyInviteLink = (link: string) => {
     navigator.clipboard.writeText(link)
     showToast(
-      t('toast.linkCopied.title'), 
-      t('toast.linkCopied.description'), 
+      t('toast.linkCopied.title'),
+      t('toast.linkCopied.description'),
       "success"
     )
   }
@@ -132,46 +132,55 @@ export default function ExamsComponent({user, exams}:{user:User, exams: Assignme
 
   return (
     <>
-      <div className="px-0 md:px-4 lg:px-8 xl:px-12 pt-10 pb-4 dark:bg-zinc-950 mb-10">
-        <SimpleHeaderTitle 
-          title="exams-component.title" 
-          Icon={<FileText className="h-5 w-5 text-primary" />} 
+      <div className="px-0 md:px-4 lg:px-8 xl:px-12 pt-10 pb-4 dark:bg-zinc-950 mb-10 flex flex-col gap-12">
+        <SimpleHeaderTitle
+          title="exams-component.title"
+          Icon={<FileText className="h-5 w-5 text-primary" />}
         />
-      </div>
+        <div className="px-0 md:px-4 lg:px-8 xl:px-12 dark:bg-zinc-950">
+          <Tabs defaultValue="calendar" className="mb-6">
+            <TabsList className="grid w-60 md:w-96 mx-auto grid-cols-2 gap-2 rounded-lg bg-muted p-1 h-auto mb-4 dark:bg-zinc-900">
+              <TabsTrigger
+                value="list"
+                className="rounded-md px-3 py-2.5 text-sm font-medium transition-all data-[state=active]:cursor-default data-[state=active]:dark:hover:bg-background data-[state=active]:bg-background cursor-pointer hover:bg-white dark:hover:bg-zinc-950/25 data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+              >
+                {t("tabs.list")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="calendar"
+                className="rounded-md px-3 py-2.5 text-sm font-medium transition-all data-[state=active]:cursor-default data-[state=active]:dark:hover:bg-background data-[state=active]:bg-background cursor-pointer hover:bg-white dark:hover:bg-zinc-950/25 data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+              >
+                {t("tabs.calendar")}
+              </TabsTrigger>
+            </TabsList>
 
-      <div className="px-0 md:px-4 lg:px-8 xl:px-12 dark:bg-zinc-950">
-        <Tabs defaultValue="calendar" className="mb-6">
-          <TabsList>
-            <TabsTrigger value="list">{t('tabs.list')}</TabsTrigger>
-            <TabsTrigger value="calendar">{t('tabs.calendar')}</TabsTrigger>
-          </TabsList>
+            <TabsContent value="list" className="space-y-4">
+              {!showAssignmentDetails ? (
+                <AssignmentList
+                  user={user}
+                  assignments={assignments}
+                  onViewDetails={(id) => {
+                    setSelectedAssignment(id)
+                    setShowAssignmentDetails(true)
+                  }}
+                  onCopyInviteLink={copyInviteLink}
+                />
+              ) : (
+                <AssignmentDetails
+                  assignment={assignments.find((a) => a.id === selectedAssignment)!}
+                  onBack={() => setShowAssignmentDetails(false)}
+                  onCopyInviteLink={copyInviteLink}
+                />
+              )}
+            </TabsContent>
 
-          <TabsContent value="list" className="space-y-4">
-            {!showAssignmentDetails ? (
-              <AssignmentList
-                user={user}
-                assignments={assignments}
-                onViewDetails={(id) => {
-                  setSelectedAssignment(id)
-                  setShowAssignmentDetails(true)
-                }}
-                onCopyInviteLink={copyInviteLink}
-              />
-            ) : (
-              <AssignmentDetails
-                assignment={assignments.find((a) => a.id === selectedAssignment)!}
-                onBack={() => setShowAssignmentDetails(false)}
-                onCopyInviteLink={copyInviteLink}
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="calendar">
-            <div className="flex flex-col h-[calc(100vh-12rem)]">
-              <Calendar user={user} initialExams={exams as never} />
-            </div>
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="calendar">
+              <div className="flex flex-col px-6 md:px-0">
+                <Calendar user={user} initialExams={exams as never} />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </>
   )
@@ -186,7 +195,7 @@ interface AssignmentListProps {
 const getStatusBadge = (status: ExamStatus) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const t = useTranslations('calendar.details.status')
-  
+
   switch (status) {
     case "PENDING":
       return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">{t('PENDING')}</Badge>
@@ -200,7 +209,7 @@ const getStatusBadge = (status: ExamStatus) => {
 const formatDuration = (startDate: Date | null | undefined, endDate: Date | null | undefined): string => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const t = useTranslations('exams-component.duration')
-  
+
   if (!startDate || !endDate) return t('undefined')
 
   const start = new Date(startDate)
@@ -218,7 +227,7 @@ const formatDuration = (startDate: Date | null | undefined, endDate: Date | null
 
   return parts.join(' ')
 }
-function  AssignmentList({ assignments, onViewDetails, onCopyInviteLink,user }: AssignmentListProps) {
+function AssignmentList({ assignments, onViewDetails, onCopyInviteLink, user }: AssignmentListProps) {
   const t = useTranslations('exams-component')
 
   return (
@@ -235,7 +244,7 @@ function  AssignmentList({ assignments, onViewDetails, onCopyInviteLink,user }: 
               </div>
               <div className="flex gap-2">
                 <Button
-                  className="dark:bg-zinc-800 hover:dark:bg-zinc-800" 
+                  className="dark:bg-zinc-800 hover:dark:bg-zinc-800"
                   variant="outline"
                   size="sm"
                   onClick={() => onViewDetails(assignment.id)}
@@ -303,7 +312,7 @@ interface AssignmentDetailsProps {
 function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentDetailsProps) {
   const studentsResults = assignment.participants.map(participant => {
     const answer = assignment.answers.find(a => a.student.id === participant.user.id)
-    
+
     return {
       id: participant.user.id,
       name: participant.user.name || "Anonyme",
@@ -321,11 +330,11 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
   const handleStatusUpdate = async (participantId: string, newStatus: ParticipantStatus) => {
     try {
       const result = await updateParticipantStatus(participantId, newStatus)
-      
+
       if (result.success) {
         showToast("Succès", t('toast.statusUpdate.success'), "success")
-        const updatedResults = studentResults.map(student => 
-          student.id === participantId 
+        const updatedResults = studentResults.map(student =>
+          student.id === participantId
             ? { ...student, status: newStatus }
             : student
         )
@@ -451,8 +460,8 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
-                          <Badge 
-                            variant="outline" 
+                          <Badge
+                            variant="outline"
                             className={cn(
                               student.status === ParticipantStatus.COMPLETED && "bg-green-100 text-green-800",
                               student.status === ParticipantStatus.ACCEPTED && "bg-blue-100 text-blue-800",
@@ -461,32 +470,32 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                             )}
                           >
                             {student.status === ParticipantStatus.COMPLETED ? t('details.results.status.completed') :
-                             student.status === ParticipantStatus.ACCEPTED ? t('details.results.status.accepted') :
-                             student.status === ParticipantStatus.DECLINED ? t('details.results.status.declined') :
-                             t('details.results.status.pending')}
+                              student.status === ParticipantStatus.ACCEPTED ? t('details.results.status.accepted') :
+                                student.status === ParticipantStatus.DECLINED ? t('details.results.status.declined') :
+                                  t('details.results.status.pending')}
                           </Badge>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleStatusUpdate(student.id, ParticipantStatus.PENDING)}
                           className="text-yellow-600"
                         >
                           {t('details.results.status.pending')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleStatusUpdate(student.id, ParticipantStatus.ACCEPTED)}
                           className="text-blue-600"
                         >
                           {t('details.results.status.accepted')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleStatusUpdate(student.id, ParticipantStatus.DECLINED)}
                           className="text-red-600"
                         >
                           {t('details.results.status.declined')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleStatusUpdate(student.id, ParticipantStatus.COMPLETED)}
                           className="text-green-600"
                         >
@@ -496,20 +505,19 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                     </DropdownMenu>
                   </TableCell>
                   <TableCell>
-                    {student.submissionDate 
+                    {student.submissionDate
                       ? new Date(student.submissionDate).toLocaleDateString()
                       : "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     {student.score !== null ? (
                       <span
-                        className={`font-medium ${
-                          student.score >= 80
-                            ? "text-green-600"
-                            : student.score >= 60
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                        }`}
+                        className={`font-medium ${student.score >= 80
+                          ? "text-green-600"
+                          : student.score >= 60
+                            ? "text-yellow-600"
+                            : "text-red-600"
+                          }`}
                       >
                         {student.score}{t('score.percentage')}
                       </span>
