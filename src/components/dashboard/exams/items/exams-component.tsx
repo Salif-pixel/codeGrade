@@ -9,114 +9,171 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import  Calendar  from "@/components/calendar/calendar"
-import { ChevronRight, Copy, Eye, Link as LinkIcon } from "lucide-react"
+import { ChevronRight, Copy, Eye, Link as LinkIcon, FileText } from "lucide-react"
 import {useCustomToast} from "@/components/alert/alert";
-import {Exam, User,Question} from "@prisma/client"
+import {Exam, User,Question, ExamStatus, SubmissionStatus, ParticipantStatus} from "@prisma/client"
+import {useLocale, useTranslations} from "next-intl";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { updateParticipantStatus } from "@/actions/examActions"
+import { SimpleHeaderTitle } from "@/components/dashboard/header/header-title"
 
 
-interface Assignment {
-  id: string
-  title: string
-  dueDate: string
-  language: string
-  questions: number
-  duration: number
-  submissions: number
-  totalStudents: number
-  status: "active" | "completed"
-  description: string
+interface Assignment extends Exam {
+  questions: Question[]
+  participants: {
+    user: {
+      id: string
+      name: string | null
+      email: string
+    }
+    status: string
+    joinedAt: Date
+  }[]
+  answers: {
+    id: string
+    createdAt: Date
+    student: {
+      id: string
+      name: string | null
+      email: string
+    }
+    grade?: {
+      finalScore: number
+    }
+    status: SubmissionStatus
+  }[]
+  createdBy: {
+    id: string
+    name: string | null
+    email: string
+  }
   inviteLink: string
+  status: ExamStatus
+  submissions: {
+    total: number
+    pending: number
+    corrected: number
+    revised: number
+  }
+  totalStudents: number
 }
 
-interface StudentResult {
-  id: string
-  name: string
-  email: string
-  status: "completed" | "pending"
-  submissionDate: string | null
-  score: number | null
-}
+// interface StudentResult {
+//   id: string
+//   name: string | null
+//   email: string
+//   status: ParticipantStatus
+//   submissionDate: Date | null
+//   score: number | null
+// }
 
-
-export default function ExamsComponent({user, exams}:{user:User, exams: (Exam & {questions: Question[]})[]}) {
+export default function ExamsComponent({user, exams}:{user:User, exams: Assignment[]}) {
   const [selectedAssignment, setSelectedAssignment] = useState<string | null>(null)
   const [showAssignmentDetails, setShowAssignmentDetails] = useState(false)
   const { showToast } = useCustomToast()
+  const local = useLocale();
+  const t = useTranslations('exams-component')
 
-  // Mock data - replace with actual API calls
-  const assignments: Assignment[] = [
-    {
-      id: "1",
-      title: "Introduction à Python",
-      dueDate: "2024-02-15",
-      language: "Python",
-      questions: 10,
-      duration: 60,
-      submissions: 15,
-      totalStudents: 20,
-      status: "active",
-      description: "Un examen d'introduction couvrant les bases de Python.",
-      inviteLink: "https://codegrade.com/exam/123"
+  const getExamStatus = (exam: Exam): ExamStatus => {
+    const now = new Date()
+    if (!exam.startDate || new Date(exam.startDate) > now) {
+      return "PENDING"
     }
-  ]
-
-  const studentResults: StudentResult[] = [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      status: "completed",
-      submissionDate: "2024-02-10",
-      score: 85
+    if (!exam.endDate || new Date(exam.endDate) > now) {
+      return "ACTIVE"
     }
-  ]
+    return "COMPLETED"
+  }
 
+  const assignments: Assignment[] = exams.map(exam => {
+    const submissionStats = exam.answers.reduce(
+      (acc, answer) => {
+        acc.total++
+        switch (answer.status) {
+          case "PENDING":
+            acc.pending++
+            break
+          case "CORRECTED":
+            acc.corrected++
+            break
+          case "REVISED":
+            acc.revised++
+            break
+        }
+        return acc
+      },
+      { total: 0, pending: 0, corrected: 0, revised: 0 }
+    )
 
+    return {
+      ...exam,
+      status: getExamStatus(exam),
+      submissions: submissionStats,
+      totalStudents: exam.participants.length,
+      inviteLink: `${process.env.NEXT_PUBLIC_APP_URL}/${local}/exams/${exam.id}`
+    }
+  })
 
   const copyInviteLink = (link: string) => {
     navigator.clipboard.writeText(link)
-   showToast("Lien copié", "Le lien d'invitation a été copié dans le presse-papiers.", "success")
+    showToast(
+      t('toast.linkCopied.title'), 
+      t('toast.linkCopied.description'), 
+      "success"
+    )
   }
 
+
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Examens</h1>
+    <>
+      <div className="px-0 md:px-4 lg:px-8 xl:px-12 pt-10 pb-4 dark:bg-zinc-950 mb-10">
+        <SimpleHeaderTitle 
+          title="exams-component.title" 
+          Icon={<FileText className="h-5 w-5 text-primary" />} 
+        />
       </div>
 
-      <Tabs defaultValue="calendar" className="mb-6">
-        <TabsList>
-          <TabsTrigger value="list">Liste</TabsTrigger>
-          <TabsTrigger value="calendar">Calendrier</TabsTrigger>
-        </TabsList>
+      <div className="px-0 md:px-4 lg:px-8 xl:px-12 dark:bg-zinc-950">
+        <Tabs defaultValue="calendar" className="mb-6">
+          <TabsList>
+            <TabsTrigger value="list">{t('tabs.list')}</TabsTrigger>
+            <TabsTrigger value="calendar">{t('tabs.calendar')}</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="list" className="space-y-4">
-          {!showAssignmentDetails ? (
-            <AssignmentList
-              assignments={assignments}
-              onViewDetails={(id) => {
-                setSelectedAssignment(id)
-                setShowAssignmentDetails(true)
-              }}
-              onCopyInviteLink={copyInviteLink}
-            />
-          ) : (
-            <AssignmentDetails
-              assignment={assignments.find((a) => a.id === selectedAssignment)!}
-              studentResults={studentResults}
-              onBack={() => setShowAssignmentDetails(false)}
-              onCopyInviteLink={copyInviteLink}
-            />
-          )}
-        </TabsContent>
+          <TabsContent value="list" className="space-y-4">
+            {!showAssignmentDetails ? (
+              <AssignmentList
+                user={user}
+                assignments={assignments}
+                onViewDetails={(id) => {
+                  setSelectedAssignment(id)
+                  setShowAssignmentDetails(true)
+                }}
+                onCopyInviteLink={copyInviteLink}
+              />
+            ) : (
+              <AssignmentDetails
+                assignment={assignments.find((a) => a.id === selectedAssignment)!}
+                onBack={() => setShowAssignmentDetails(false)}
+                onCopyInviteLink={copyInviteLink}
+              />
+            )}
+          </TabsContent>
 
-        <TabsContent value="calendar">
-          <div className="flex flex-col h-[calc(100vh-12rem)]">
-            <Calendar user={user} initialExams={exams} />
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="calendar">
+            <div className="flex flex-col h-[calc(100vh-12rem)]">
+              <Calendar user={user} initialExams={exams as never} />
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
   )
 }
 
@@ -124,67 +181,110 @@ interface AssignmentListProps {
   assignments: Assignment[]
   onViewDetails: (id: string) => void
   onCopyInviteLink: (link: string) => void
+  user: User
+}
+const getStatusBadge = (status: ExamStatus) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const t = useTranslations('calendar.details.status')
+  
+  switch (status) {
+    case "PENDING":
+      return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">{t('PENDING')}</Badge>
+    case "ACTIVE":
+      return <Badge variant="outline" className="bg-green-100 text-green-800">{t('ACTIVE')}</Badge>
+    case "COMPLETED":
+      return <Badge variant="outline" className="bg-blue-100 text-blue-800">{t('COMPLETED')}</Badge>
+  }
 }
 
-function AssignmentList({ assignments, onViewDetails, onCopyInviteLink }: AssignmentListProps) {
+const formatDuration = (startDate: Date | null | undefined, endDate: Date | null | undefined): string => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const t = useTranslations('exams-component.duration')
+  
+  if (!startDate || !endDate) return t('undefined')
+
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const diffInMinutes = Math.round((end.getTime() - start.getTime()) / (1000 * 60))
+
+  const days = Math.floor(diffInMinutes / (24 * 60))
+  const hours = Math.floor((diffInMinutes % (24 * 60)) / 60)
+  const minutes = diffInMinutes % 60
+
+  const parts = []
+  if (days > 0) parts.push(`${days} ${days > 1 ? t('days') : t('day')}`)
+  if (hours > 0) parts.push(`${hours} ${hours > 1 ? t('hours') : t('hour')}`)
+  if (minutes > 0) parts.push(`${minutes} ${minutes > 1 ? t('minutes') : t('minute')}`)
+
+  return parts.join(' ')
+}
+function  AssignmentList({ assignments, onViewDetails, onCopyInviteLink,user }: AssignmentListProps) {
+  const t = useTranslations('exams-component')
+
   return (
     <div className="space-y-4">
       {assignments.map((assignment) => (
-        <Card className="bg-zinc-900"  key={assignment.id}>
+        <Card className="bg-zinc-900" key={assignment.id}>
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle>{assignment.title}</CardTitle>
-                <CardDescription>Date limite: {assignment.dueDate}</CardDescription>
+                <CardDescription>
+                  {t('assignment.deadline')}: {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : "Non définie"}
+                </CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button
-                className="dark:bg-zinc-800 hover:dark:bg-zinc-800" 
+                  className="dark:bg-zinc-800 hover:dark:bg-zinc-800" 
                   variant="outline"
                   size="sm"
                   onClick={() => onViewDetails(assignment.id)}
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  Voir les détails
+                  {t('assignment.viewDetails')}
                 </Button>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button className="dark:bg-zinc-800 hover:dark:bg-zinc-800" variant="outline" size="sm">
-                      <LinkIcon className="mr-2 h-4 w-4" />
-                      Inviter
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80">
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Lien d&apos;invitation</h4>
-                      <div className="flex items-center space-x-2">
-                        <Input value={assignment.inviteLink} readOnly />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onCopyInviteLink(assignment.inviteLink)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
+                {user?.role === "TEACHER" && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button className="dark:bg-zinc-800 hover:dark:bg-zinc-800" variant="outline" size="sm">
+                        <LinkIcon className="mr-2 h-4 w-4" />
+                        {t('assignment.invite')}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-4">
+                        <h4 className="font-medium">{t('assignment.inviteLink.title')}</h4>
+                        <div className="flex items-center space-x-2">
+                          <Input value={assignment.inviteLink} readOnly />
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => onCopyInviteLink(assignment.inviteLink)}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {t('assignment.inviteLink.description')}
+                        </p>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Partagez ce lien avec vos étudiants pour qu&apos;ils puissent rejoindre ce devoir.
-                      </p>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverContent>
+                  </Popover>
+                )}
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
               <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                {assignment.language}
+                {assignment.type}
               </span>
-              <span className="text-xs">{assignment.questions} questions</span>
-              <span className="text-xs">{assignment.duration} minutes</span>
+              <span className="text-xs">{assignment.questions.length} {t('assignment.questions')}</span>
+              <span className="text-xs">
+                {formatDuration(assignment.startDate, assignment.endDate)}
+              </span>
               <span className="text-xs ml-auto">
-                {assignment.submissions} soumissions / {assignment.totalStudents} étudiants
+                {assignment.submissions.total} {t('assignment.submissions')} / {assignment.totalStudents} {t('assignment.students')}
               </span>
             </div>
           </CardContent>
@@ -196,20 +296,56 @@ function AssignmentList({ assignments, onViewDetails, onCopyInviteLink }: Assign
 
 interface AssignmentDetailsProps {
   assignment: Assignment
-  studentResults: StudentResult[]
   onBack: () => void
   onCopyInviteLink: (link: string) => void
 }
 
-function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLink }: AssignmentDetailsProps) {
+function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentDetailsProps) {
+  const studentsResults = assignment.participants.map(participant => {
+    const answer = assignment.answers.find(a => a.student.id === participant.user.id)
+    
+    return {
+      id: participant.user.id,
+      name: participant.user.name || "Anonyme",
+      email: participant.user.email,
+      status: answer ? ParticipantStatus.COMPLETED : participant.status,
+      submissionDate: answer?.createdAt || null,
+      score: answer?.grade?.finalScore || null
+    }
+  })
+
+  const { showToast } = useCustomToast()
+  const [studentResults, setStudentResults] = useState(studentsResults)
+  const t = useTranslations('exams-component')
+
+  const handleStatusUpdate = async (participantId: string, newStatus: ParticipantStatus) => {
+    try {
+      const result = await updateParticipantStatus(participantId, newStatus)
+      
+      if (result.success) {
+        showToast("Succès", t('toast.statusUpdate.success'), "success")
+        const updatedResults = studentResults.map(student => 
+          student.id === participantId 
+            ? { ...student, status: newStatus }
+            : student
+        )
+        setStudentResults(updatedResults)
+      } else {
+        throw new Error(result.error)
+      }
+    } catch {
+      showToast("Erreur", t('toast.statusUpdate.error'), "error")
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="sm" onClick={onBack} className="mr-4">
           <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
-          Retour
+          {t('details.back')}
         </Button>
-        <h1 className="text-2xl font-bold">Détails du devoir</h1>
+        <h1 className="text-2xl font-bold">{t('details.title')}</h1>
       </div>
 
       <Card className="mb-6">
@@ -217,18 +353,18 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
           <div className="flex justify-between items-start">
             <div>
               <CardTitle>{assignment.title}</CardTitle>
-              <CardDescription>Date limite: {assignment.dueDate}</CardDescription>
+              <CardDescription>{t('assignment.deadline')}: {assignment.endDate ? assignment.endDate.toLocaleDateString() : "Non défini"}</CardDescription>
             </div>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm">
                   <LinkIcon className="mr-2 h-4 w-4" />
-                  Lien d&apos;invitation
+                  {t('inviteLink.button')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
                 <div className="space-y-4">
-                  <h4 className="font-medium">Lien d&apos;invitation</h4>
+                  <h4 className="font-medium">{t('inviteLink.title')}</h4>
                   <div className="flex items-center space-x-2">
                     <Input value={assignment.inviteLink} readOnly />
                     <Button
@@ -237,10 +373,11 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
                       onClick={() => onCopyInviteLink(assignment.inviteLink)}
                     >
                       <Copy className="h-4 w-4" />
+                      <span className="sr-only">{t('inviteLink.copy')}</span>
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Partagez ce lien avec vos étudiants pour qu&apos;ils puissent rejoindre ce devoir.
+                    {t('inviteLink.description')}
                   </p>
                 </div>
               </PopoverContent>
@@ -250,37 +387,30 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <h3 className="font-medium mb-2">Informations</h3>
+              <h3 className="font-medium mb-2">{t('details.information.title')}</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Langage:</span>
-                  <span className="text-sm font-medium">{assignment.language}</span>
+                  <span className="text-sm text-muted-foreground">{t('details.information.type')}:</span>
+                  <span className="text-sm font-medium">{assignment.type}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Questions:</span>
-                  <span className="text-sm font-medium">{assignment.questions}</span>
+                  <span className="text-sm text-muted-foreground">{t('details.information.questions')}:</span>
+                  <span className="text-sm font-medium">{assignment.questions.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Durée:</span>
-                  <span className="text-sm font-medium">{assignment.duration} minutes</span>
+                  <span className="text-sm text-muted-foreground">{t('details.information.duration')}:</span>
+                  <span className="text-sm font-medium">
+                    {formatDuration(assignment.startDate, assignment.endDate)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Statut:</span>
-                  <Badge
-                    variant="outline"
-                    className={
-                      assignment.status === "active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-blue-100 text-blue-800"
-                    }
-                  >
-                    {assignment.status === "active" ? "Actif" : "Terminé"}
-                  </Badge>
+                  <span className="text-sm text-muted-foreground">{t('details.information.status')}:</span>
+                  {getStatusBadge(assignment.status)}
                 </div>
               </div>
             </div>
             <div>
-              <h3 className="font-medium mb-2">Description</h3>
+              <h3 className="font-medium mb-2">{t('details.information.description')}</h3>
               <p className="text-sm">{assignment.description}</p>
             </div>
           </div>
@@ -290,13 +420,13 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Résultats des étudiants</CardTitle>
+            <CardTitle>{t('details.results.title')}</CardTitle>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                {assignment.submissions} soumissions / {assignment.totalStudents} étudiants
+                {assignment.submissions.total} {t('details.results.submissions')} / {assignment.participants.length} {t('details.results.students')}
               </span>
               <Badge variant="outline" className="bg-primary/10 text-primary">
-                {Math.round((assignment.submissions / assignment.totalStudents) * 100)}% de participation
+                {Math.round((assignment.submissions.total / (assignment.participants.length || 1)) * 100)}% {t('assignment.participation')}
               </Badge>
             </div>
           </div>
@@ -305,11 +435,11 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Étudiant</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Date de soumission</TableHead>
-                <TableHead className="text-right">Score</TableHead>
+                <TableHead>{t('details.results.table.student')}</TableHead>
+                <TableHead>{t('details.results.table.email')}</TableHead>
+                <TableHead>{t('details.results.table.status')}</TableHead>
+                <TableHead>{t('details.results.table.submissionDate')}</TableHead>
+                <TableHead className="text-right">{t('details.results.table.score')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -318,17 +448,58 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
                   <TableCell className="font-medium">{student.name}</TableCell>
                   <TableCell>{student.email}</TableCell>
                   <TableCell>
-                    {student.status === "completed" ? (
-                      <Badge variant="outline" className="bg-green-100 text-green-800">
-                        Complété
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-                        En attente
-                      </Badge>
-                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+                          <Badge 
+                            variant="outline" 
+                            className={cn(
+                              student.status === ParticipantStatus.COMPLETED && "bg-green-100 text-green-800",
+                              student.status === ParticipantStatus.ACCEPTED && "bg-blue-100 text-blue-800",
+                              student.status === ParticipantStatus.DECLINED && "bg-red-100 text-red-800",
+                              student.status === ParticipantStatus.PENDING && "bg-yellow-100 text-yellow-800"
+                            )}
+                          >
+                            {student.status === ParticipantStatus.COMPLETED ? t('details.results.status.completed') :
+                             student.status === ParticipantStatus.ACCEPTED ? t('details.results.status.accepted') :
+                             student.status === ParticipantStatus.DECLINED ? t('details.results.status.declined') :
+                             t('details.results.status.pending')}
+                          </Badge>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem 
+                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.PENDING)}
+                          className="text-yellow-600"
+                        >
+                          {t('details.results.status.pending')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.ACCEPTED)}
+                          className="text-blue-600"
+                        >
+                          {t('details.results.status.accepted')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.DECLINED)}
+                          className="text-red-600"
+                        >
+                          {t('details.results.status.declined')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.COMPLETED)}
+                          className="text-green-600"
+                        >
+                          {t('details.results.status.completed')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
-                  <TableCell>{student.submissionDate || "-"}</TableCell>
+                  <TableCell>
+                    {student.submissionDate 
+                      ? new Date(student.submissionDate).toLocaleDateString()
+                      : "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     {student.score !== null ? (
                       <span
@@ -340,7 +511,7 @@ function AssignmentDetails({ assignment, studentResults, onBack, onCopyInviteLin
                               : "text-red-600"
                         }`}
                       >
-                        {student.score}%
+                        {student.score}{t('score.percentage')}
                       </span>
                     ) : (
                       "-"

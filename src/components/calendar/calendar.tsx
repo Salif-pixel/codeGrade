@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { format, addDays, startOfWeek, isSameDay, addWeeks, subWeeks } from "date-fns"
-import { fr } from "date-fns/locale"
+import { fr, enUS } from "date-fns/locale"
 import {
   Plus,
   Lock,
@@ -24,7 +24,6 @@ import {
   MoreHorizontal,
   Trash2,
   Edit,
-  Play,
   CalendarCheck,
   CalendarClock,
   Repeat,
@@ -48,14 +47,15 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { updateExam, deleteExam } from "@/actions/examActions"
-import type { Exam, User, Question } from "@prisma/client"
+import type {Exam, User, Question, ExamStatus, Answer} from "@prisma/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Link } from "@/i18n/navigation"
+import { useTranslations, useLocale } from 'next-intl'
+
 
 type CalendarView = "day" | "week" | "month"
 
@@ -77,11 +77,18 @@ export interface Assignment {
   submissionType?: string
   language?: string
   tests?: { name: string; description: string }[]
+  status: ExamStatus
+  submissions: {
+    total: number
+    pending: number
+    corrected: number
+    revised: number
+  }
 }
 
 export default function CalendarView({
   initialExams,
-}: { user: User; initialExams: (Exam & { questions: Question[] })[] }) {
+}: { user: User; initialExams: (Exam & { questions: Question[], answers:Answer[] })[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [weekDays, setWeekDays] = useState<Date[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
@@ -108,6 +115,9 @@ export default function CalendarView({
   // Heures de la journée (de 7h à 18h)
   const hours = Array.from({ length: 24 }, (_, i) => i )
 
+  const t = useTranslations('calendar')
+  const locale = useLocale()
+
   // Effect to initialize assignments with provided exams
   useEffect(() => {
     if (initialExams.length > 0) {
@@ -128,6 +138,13 @@ export default function CalendarView({
             name: q.text,
             description: q.correctionAi,
           })) || [],
+        status: exam.status,
+        submissions: {
+          total: exam.answers.length,
+          pending: exam.answers.filter(a => a.status === "PENDING").length,
+          corrected: exam.answers.filter(a => a.status === "CORRECTED").length,
+          revised: exam.answers.filter(a => a.status === "REVISED").length,
+        },
       }))
       setAssignments(formattedAssignments as never)
     }
@@ -392,32 +409,16 @@ export default function CalendarView({
     }
   }
 
+
   return (
     <Card className="bg-background shadow-md border-primary/10">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CalendarCheck className="h-5 w-5 text-primary" />
-            <span>Calendrier des évaluations</span>
+            <span>{t('title')}</span>
           </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={cn(
-                    "h-8 w-8 rounded-full transition-all",
-                    editMode ? "bg-primary text-primary-foreground animate-pulse" : "",
-                  )}
-                  onClick={() => setEditMode(!editMode)}
-                >
-                  {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{editMode ? "Désactiver le mode édition" : "Activer le mode édition"}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -439,7 +440,7 @@ export default function CalendarView({
                         <ChevronLeft className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Précédent</TooltipContent>
+                    <TooltipContent>{t('navigation.previous')}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
@@ -455,7 +456,7 @@ export default function CalendarView({
                         <ChevronRight className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Suivant</TooltipContent>
+                    <TooltipContent>{t('navigation.next')}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
@@ -471,15 +472,15 @@ export default function CalendarView({
                         <CalendarClock className="h-5 w-5 text-primary" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Aujourd&apos;hui</TooltipContent>
+                    <TooltipContent>{t('navigation.today')}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </div>
               <h2 className="ml-3 text-lg font-semibold sm:text-xl flex items-center">
                 <CalendarIcon className="h-5 w-5 mr-2 text-primary hidden sm:inline-block" />
                 {view === "day"
-                  ? format(currentDate, "EEEE d MMMM yyyy", { locale: fr })
-                  : format(weekDays[0] || new Date(), "MMMM yyyy", { locale: fr })}
+                  ? format(currentDate, t('dates.format.full'), { locale: locale === 'fr' ? fr : enUS })
+                  : format(weekDays[0] || new Date(), t('dates.format.monthYear'), { locale: locale === 'fr' ? fr : enUS })}
               </h2>
             </div>
 
@@ -492,7 +493,7 @@ export default function CalendarView({
                     className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
                   >
                     <Calendar className="mr-1 h-4 w-4" />
-                    <span className="hidden sm:inline">Jour</span>
+                    <span className="hidden sm:inline">{t('views.day')}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="week"
@@ -500,7 +501,7 @@ export default function CalendarView({
                     disabled={!isTablet} // Désactiver le bouton semaine sur mobile
                   >
                     <CalendarDays className="mr-1 h-4 w-4" />
-                    <span className="hidden sm:inline">Semaine</span>
+                    <span className="hidden sm:inline">{t('views.week')}</span>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -511,10 +512,10 @@ export default function CalendarView({
                     <TooltipTrigger asChild>
                       <Button size="sm" className="h-9 bg-primary hover:bg-primary/90">
                         <Plus className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">Ajouter</span>
+                        <span className="hidden sm:inline">{t('assignment.add')}</span>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Ajouter une évaluation</TooltipContent>
+                    <TooltipContent>{t('assignment.add')}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
@@ -534,7 +535,7 @@ export default function CalendarView({
               <div className="border-r border-border p-2 text-center font-medium text-muted-foreground bg-muted/30 dark:bg-zinc-900"></div>
               {visibleDays.map((day, index) => {
                 const dayNumber = format(day, "d")
-                const dayName = format(day, "EEE", { locale: fr })
+                const dayName = format(day, "EEE", { locale: locale === 'fr' ? fr : enUS })
                 const isToday = isSameDay(day, new Date())
 
                 return (
@@ -629,18 +630,12 @@ export default function CalendarView({
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => openAssignmentDetails(assignment)}>
                                     <Edit className="h-4 w-4 mr-2" />
-                                    Détails
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem >
-                                    <Link href={"/exams"} className="flex flex-row">
-                                    <Play className="h-4 w-4 mr-2" />
-                                    Commencer
-                                    </Link>
+                                    {t('assignment.details')}
                                   </DropdownMenuItem>
                                   {editMode && (
                                     <DropdownMenuItem className="text-destructive">
                                       <Trash2 className="h-4 w-4 mr-2" />
-                                      Supprimer
+                                      {t('assignment.delete')}
                                     </DropdownMenuItem>
                                   )}
                                 </DropdownMenuContent>
@@ -666,11 +661,11 @@ export default function CalendarView({
         </div>
 
         {/* Sheet pour afficher les détails d'un devoir */}
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <Sheet open={isSheetOpen}  onOpenChange={setIsSheetOpen}>
           <SheetTitle>
             
           </SheetTitle>
-          <SheetContent side={sheetSide} className="sm:max-w-md p-0 border-l border-primary/10">
+          <SheetContent side={sheetSide} className="sm:max-w-md p-0 border-l border-primary/10 dark:bg-zinc-900">
             {selectedAssignment && (
               <ScrollArea className="h-full">
                 <div className="p-6">
@@ -728,14 +723,14 @@ export default function CalendarView({
                         <Input
                           type="datetime-local"
                           value={
-                            typeof selectedAssignment.date === "string"
-                              ? new Date(selectedAssignment.date).toISOString().slice(0, 16)
-                              : selectedAssignment.date.toISOString().slice(0, 16)
+                            typeof selectedAssignment.startDate === "string"
+                              ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
+                              : selectedAssignment.startDate?.toISOString().slice(0, 16 )
                           }
                           onChange={(e) =>
                             setSelectedAssignment({
                               ...selectedAssignment,
-                              date: new Date(e.target.value),
+                              startDate: new Date(e.target.value),
                             })
                           }
                           className="py-1 px-2 text-xs rounded border-input focus-visible:ring-primary"
@@ -743,9 +738,9 @@ export default function CalendarView({
                       ) : (
                         <Badge variant="outline" className="flex items-center gap-1">
                           <CalendarClock className="h-3 w-3" />
-                          {typeof selectedAssignment.date === "string"
-                            ? format(new Date(selectedAssignment.date), "dd MMMM yyyy à HH:mm", { locale: fr })
-                            : format(selectedAssignment.date, "dd MMMM yyyy à HH:mm", { locale: fr })}
+                          {typeof selectedAssignment.startDate === "string"
+                            ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
+                            : format(selectedAssignment.startDate ?? new Date(), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })}
                         </Badge>
                       )}
                     </div>
@@ -777,7 +772,7 @@ export default function CalendarView({
                       <div>
                         <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
                           <FileText className="h-4 w-4 text-primary" />
-                          Format de soumission
+                          {t('sheet.format')}
                         </h3>
                         {editMode ? (
                           <Input
@@ -801,7 +796,7 @@ export default function CalendarView({
                       <div>
                         <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
                           <Repeat className="h-4 w-4 text-primary" />
-                          Tentatives maximum
+                          {t('sheet.maxAttempts')}
                         </h3>
                         {editMode ? (
                           <Input
@@ -822,43 +817,11 @@ export default function CalendarView({
                           </Badge>
                         )}
                       </div>
+
                       <div>
                         <h3 className="text-sm font-semibold mb-1 flex items-center gap-2 text-destructive">
                           <AlertCircle className="h-4 w-4" />
-                          Date de debut
-                        </h3>
-                        {editMode ? (
-                          <Input
-                            type="datetime-local"
-                            value={
-                              selectedAssignment.startDate
-                                ? typeof selectedAssignment.startDate === "string"
-                                  ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
-                                  : selectedAssignment.startDate.toISOString().slice(0, 16)
-                                : ""
-                            }
-                            onChange={(e) =>
-                              setSelectedAssignment({
-                                ...selectedAssignment,
-                                startDate: e.target.value ? new Date(e.target.value) : undefined,
-                              })
-                            }
-                            className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
-                          />
-                        ) : selectedAssignment.startDate ? (
-                          <Badge variant="destructive" className="text-sm">
-                            {typeof selectedAssignment.startDate === "string"
-                              ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", { locale: fr })
-                              : format(selectedAssignment.startDate, "dd MMMM yyyy à HH:mm", { locale: fr })}
-                          </Badge>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">Date de debut</p>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2 text-destructive">
-                          <AlertCircle className="h-4 w-4" />
-                          Date limite
+                          {t('sheet.deadline')}
                         </h3>
                         {editMode ? (
                           <Input
@@ -881,15 +844,15 @@ export default function CalendarView({
                         ) : selectedAssignment.endDate ? (
                           <Badge variant="destructive" className="text-sm">
                             {typeof selectedAssignment.endDate === "string"
-                              ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", { locale: fr })
-                              : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", { locale: fr })}
+                              ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
+                              : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })}
                           </Badge>
                         ) : (
                           <p className="text-sm text-muted-foreground">Aucune date limite</p>
                         )}
                       </div>
 
-                      {(selectedAssignment.type === "CODE" || editMode) && (
+                      {(selectedAssignment.type === "CODE" && editMode) && (
                         <div>
                           <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
                             <CodeIcon className="h-4 w-4 text-primary" />
@@ -1033,6 +996,7 @@ export default function CalendarView({
                               type: selectedAssignment.type as ExamType,
                               format: selectedAssignment.format,
                               maxAttempts: selectedAssignment.maxAttempts,
+                              startDate: selectedAssignment.startDate,
                               endDate: selectedAssignment.endDate,
                               questions:
                                 selectedAssignment.tests?.map((test) => ({
@@ -1057,66 +1021,51 @@ export default function CalendarView({
                                     : a,
                                 ),
                               )
-                              showToast("Succès", "L'évaluation a été mise à jour avec succès.", "success")
+                              showToast("Succès", t('toast.updateSuccess'), "success")
                               setEditMode(false)
                             } else {
-                              showToast(
-                                "Erreur",
-                                "Une erreur est survenue lors de la mise à jour de l'évaluation.",
-                                "error",
-                              )
+                              showToast("Erreur", t('toast.updateError'), "error")
                             }
                           }}
                         >
                           <Save className="h-4 w-4 mr-2" />
-                          Enregistrer
+                          {t('edit.save')}
                         </Button>
                         <Button
                           variant="destructive"
                           className="w-full sm:w-auto"
                           onClick={async () => {
-                            if (confirm("Êtes-vous sûr de vouloir supprimer cette évaluation ?")) {
+                            if (confirm(t('sheet.deleteConfirm'))) {
                               const result = await deleteExam(selectedAssignment.id)
 
                               if (result.success) {
-                                // Remove from local state
                                 setAssignments(assignments.filter((a) => a.id !== selectedAssignment.id))
-                                showToast("Succès", "L'évaluation a été supprimée avec succès.", "success")
+                                showToast("Succès", t('toast.deleteSuccess'), "success")
                                 setIsSheetOpen(false)
                               } else {
-                                showToast(
-                                  "Erreur",
-                                  "Une erreur est survenue lors de la suppression de l'évaluation.",
-                                  "error",
-                                )
+                                showToast("Erreur", t('toast.deleteError'), "error")
                               }
                             }
                           }}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Supprimer
+                          {t('assignment.delete')}
                         </Button>
                         <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(false)}>
                           <X className="h-4 w-4 mr-2" />
-                          Annuler
+                          {t('edit.cancel')}
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Link href={`/exams/${selectedAssignment.id}`}>
-                          <Button variant="default" className="w-full sm:w-auto bg-primary hover:bg-primary/90">
-                            <Play className="h-4 w-4 mr-2" />
-                            Commencer le devoir
-                          </Button>
-                        </Link>
                         <Button variant="outline" className="w-full sm:w-auto" onClick={() => setEditMode(true)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          Modifier
+                          {t('edit.enable')}
                         </Button>
                         <SheetClose asChild>
                           <Button variant="outline" className="w-full sm:w-auto">
                             <X className="h-4 w-4 mr-2" />
-                            Fermer
+                            {t('assignment.close')}
                           </Button>
                         </SheetClose>
                       </>
@@ -1131,4 +1080,96 @@ export default function CalendarView({
     </Card>
   )
 }
-
+//
+// function ExamSheet({ exam, user, onClose }: { exam: Assignment; user: User; onClose: () => void }) {
+//   const canStartExam = user.role === "STUDENT" && exam.status === "ACTIVE"
+//   const getStatusMessage = (status: ExamStatus) => {
+//     switch (status) {
+//       case "PENDING":
+//         return "L'examen n'a pas encore commencé"
+//       case "ACTIVE":
+//         return "L'examen est en cours"
+//       case "COMPLETED":
+//         return "L'examen est terminé"
+//     }
+//   }
+//
+//   const router = useRouter()
+//
+//   return (
+//     <SheetContent>
+//       <SheetHeader>
+//         <SheetTitle>{exam.title}</SheetTitle>
+//         <SheetDescription>{exam.description}</SheetDescription>
+//       </SheetHeader>
+//
+//       <div className="py-4">
+//         <div className="space-y-4">
+//           {/* Informations de l'examen */}
+//           <div>
+//             <h3 className="font-medium mb-2">Détails</h3>
+//             <div className="space-y-2">
+//               <div className="flex justify-between">
+//                 <span>Type:</span>
+//                 <span>{exam.type}</span>
+//               </div>
+//               <div className="flex justify-between">
+//                 <span>Date de début:</span>
+//                 <span>{exam.startDate ? new Date(exam.startDate).toLocaleDateString() : "Non définie"}</span>
+//               </div>
+//               <div className="flex justify-between">
+//                 <span>Date de fin:</span>
+//                 <span>{exam.endDate ? new Date(exam.endDate).toLocaleDateString() : "Non définie"}</span>
+//               </div>
+//               <div className="flex justify-between">
+//                 <span>Statut:</span>
+//                 <span>{getStatusMessage(exam.status)}</span>
+//               </div>
+//             </div>
+//           </div>
+//
+//           {/* Actions spécifiques au rôle */}
+//           {user.role === "STUDENT" ? (
+//             <div className="space-y-2">
+//               {canStartExam ? (
+//                 <Button
+//                   className="w-full"
+//                   onClick={() => router.push(`/exams/${exam.id}/take`)}
+//                 >
+//                   Commencer l&apos;examen
+//                 </Button>
+//               ) : (
+//                 <Button disabled className="w-full">
+//                   {exam.status === "PENDING" ? "Pas encore disponible" : "Examen terminé"}
+//                 </Button>
+//               )}
+//             </div>
+//           ) : (
+//             <div className="space-y-2">
+//               <Button
+//                 className="w-full"
+//                 onClick={() => router.push(`/exams/${exam.id}/results`)}
+//               >
+//                 Voir les résultats
+//               </Button>
+//               <Button
+//                 variant="outline"
+//                 className="w-full"
+//                 onClick={() => router.push(`/exams/${exam.id}/edit`)}
+//               >
+//                 Modifier l&apos;examen
+//               </Button>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//
+//       <SheetFooter>
+//         <SheetClose asChild>
+//           <Button variant="outline">Fermer</Button>
+//         </SheetClose>
+//       </SheetFooter>
+//     </SheetContent>
+//   )
+// }
+//

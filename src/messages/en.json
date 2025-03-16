@@ -594,9 +594,9 @@
     "basicInfo": "Basic Information",
     "formatSettings": "Format Settings",
     "questions": "Questions",
-    "review": "Review & Submit",
+    "review": "Review",
     "title": "Title",
-    "titlePlaceholder": "Enter a title for your exam",
+    "titlePlaceholder": "Enter exam title",
     "description": "Description",
     "descriptionPlaceholder": "Provide details about this exam",
     "type": "Type",
@@ -606,17 +606,17 @@
     "typeProject": "Project",
     "deadline": "Deadline",
     "format": "Format",
-    "qcm": "Multiple Choice",
-    "qcmDescription": "Create multiple choice questions",
-    "pdf": "PDF Upload",
-    "pdfDescription": "Students upload PDF files",
-    "code": "Code Submission",
-    "codeDescription": "Students submit code files",
+    "qcm": "MCQ",
+    "qcmDescription": "Multiple Choice Questions",
+    "pdf": "PDF",
+    "pdfDescription": "PDF Document to fill",
+    "code": "Code",
+    "codeDescription": "Programming Exercise",
     "maxAttempts": "Maximum Attempts",
-    "maxAttemptsDescription": "Number of times students can attempt this exam",
-    "uploadFile": "Upload Exam Document",
-    "chooseFile": "Choose file",
-    "fileAdded": "File successfully added",
+    "maxAttemptsDescription": "Number of times a student can attempt the exam",
+    "uploadFile": "Upload File",
+    "chooseFile": "Choose File",
+    "fileAdded": "File added successfully",
     "addQuestion": "Add Question",
     "question": "Question",
     "remove": "Remove",
@@ -627,31 +627,32 @@
     "maxPoints": "Maximum Points",
     "attachedFile": "Attached File",
     "questionCount": "Question Count",
-    "finalConfirmation": "Please review all information before creating the exam. Once created, you can still edit it later.",
+    "finalConfirmation": "Please review all information before creating the exam",
     "saveExam": "Save Exam",
     "next": "Next",
     "back": "Back",
-    "step1": "Basic Info",
+    "step1": "Information",
     "step2": "Format",
     "step3": "Questions",
     "step4": "Review",
     "warning": "Warning",
-    "needOneQuestion": "You need at least one question",
+    "needOneQuestion": "You must have at least one question",
     "error": "Error",
     "titleRequired": "Title is required",
-    "fileRequired": "File upload is required",
-    "questionsIncomplete": "All questions must have text",
+    "fileRequired": "File is required",
+    "questionsIncomplete": "All questions must be completed",
     "createFailed": "Failed to create exam",
     "unknownError": "An unknown error occurred",
     "success": "Success",
     "examCreated": "Exam created successfully",
-    "required":"Required",
-    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers",
+    "required": "Required",
+    "deadlineHelp": "The deadline determines when students will no longer be able to submit their answers",
     "selectFormat": "Please select an exam format",
     "formatDescription": "Choose the format that best suits your assessment needs",
     "selected": "Format selected successfully",
     "startDate": "Start Date",
-    "endDate": "End Date"
+    "endDate": "End Date",
+    "endDateHelp": "The deadline determines when students will no longer be able to submit their answers"
   },
   "settings": {
     "title": "Settings",
@@ -692,6 +693,156 @@
       "description": "Choose how you want the application to be displayed",
       "sidebar": "Sidebar Navigation",
       "topnav": "Top Navigation"
+    }
+  },
+  "calendar": {
+    "title": "Assessment Calendar",
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "today": "Today"
+    },
+    "views": {
+      "day": "Day",
+      "week": "Week"
+    },
+    "assignment": {
+      "add": "Add Assessment",
+      "details": "Details",
+      "delete": "Delete",
+      "close": "Close",
+      "type": {
+        "QCM": "MCQ",
+        "CODE": "Code",
+        "DOCUMENT": "Document"
+      }
+    },
+    "edit": {
+      "enable": "Enable edit mode",
+      "disable": "Disable edit mode",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "details": {
+      "title": "Assessment Details",
+      "info": {
+        "type": "Type",
+        "questions": "Questions",
+        "duration": "Duration",
+        "status": "Status",
+        "description": "Description"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "ACTIVE": "Active",
+        "COMPLETED": "Completed"
+      },
+      "close": "Close"
+    },
+    "sheet": {
+      "format": "Submission format",
+      "deadline": "Deadline",
+      "maxAttempts": "Maximum attempts",
+      "deleteConfirm": "Are you sure you want to delete this assessment?",
+      "type": "Type",
+      "questions": "Questions",
+      "duration": "Duration",
+      "status": "Status"
+    },
+    "toast": {
+      "updateSuccess": "Assessment updated successfully",
+      "updateError": "An error occurred while updating the assessment",
+      "deleteSuccess": "Assessment deleted successfully",
+      "deleteError": "An error occurred while deleting the assessment"
+    },
+    "dates": {
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      },
+      "format": {
+        "full": "EEEE, MMMM d, yyyy",
+        "monthYear": "MMMM yyyy"
+      }
+    }
+  },
+  "exams-component": {
+    "title": "Exams",
+    "tabs": {
+      "list": "List",
+      "calendar": "Calendar"
+    },
+    "assignment": {
+      "deadline": "Deadline",
+      "viewDetails": "View details",
+      "invite": "Invite",
+      "inviteLink": {
+        "title": "Invitation Link",
+        "description": "Share this link with your students so they can join this assignment."
+      },
+      "type": "Type",
+      "questions": "questions",
+      "submissions": "submissions",
+      "students": "students",
+      "participation": "participation"
+    },
+    "details": {
+      "title": "Assignment Details",
+      "back": "Back",
+      "information": {
+        "title": "Information",
+        "type": "Type",
+        "questions": "Questions",
+        "duration": "Duration",
+        "status": "Status",
+        "description": "Description"
+      },
+      "results": {
+        "title": "Student Results",
+        "submissions": "submissions",
+        "students": "students",
+        "table": {
+          "student": "Student",
+          "email": "Email",
+          "status": "Status",
+          "submissionDate": "Submission Date",
+          "score": "Score"
+        },
+        "status": {
+          "completed": "Completed",
+          "accepted": "Accepted",
+          "declined": "Declined",
+          "pending": "Pending"
+        }
+      }
+    },
+    "duration": {
+      "day": "day",
+      "days": "days",
+      "hour": "hour",
+      "hours": "hours",
+      "minute": "minute",
+      "minutes": "minutes",
+      "undefined": "Duration undefined"
     }
   }
 }

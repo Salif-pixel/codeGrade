@@ -22,23 +22,43 @@ enum ExamType {
   CODE
 }
 
+enum ExamStatus {
+  PENDING    // En attente de la date de début
+  ACTIVE     // En cours
+  COMPLETED  // Terminé (date de fin dépassée)
+}
+
+enum SubmissionStatus {
+  PENDING    // En attente de correction
+  CORRECTED  // Corrigé
+  REVISED    // Révisé après correction
+}
+
+enum ParticipantStatus {
+  PENDING    // En attente de réponse
+  ACCEPTED   // A accepté l'invitation
+  DECLINED   // A refusé l'invitation
+  COMPLETED  // A terminé l'examen
+}
+
 model User {
-  id               String       @id
-  email            String       @unique
-  name             String?
-  profileCompleted Boolean      @default(false)
-  emailVerified    Boolean
-  image            String?
-  background       String?
-  role             Role         @default(STUDENT)
-  createdAt        DateTime
-  updatedAt        DateTime
-  sessions         Session[]
-  accounts         Account[]
-  exams            Exam[]       @relation("ExamsCreated")
-  answers          Answer[]
-  grades           Grade[]
-  Correction       Correction[]
+  id            String       @id
+  email         String       @unique
+  name          String?
+  profileCompleted Boolean  @default(false)
+  emailVerified Boolean
+  image         String?
+  background    String?
+  role          Role         @default(STUDENT)
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  exams         Exam[]       @relation("ExamsCreated")
+  answers       Answer[]
+  grades        Grade[]
+  Correction    Correction[]
+  participatingExams ExamParticipant[]
 
   @@map("user")
 }
@@ -100,12 +120,14 @@ model Exam {
   updatedAt   DateTime  @updatedAt
   startDate   DateTime?
   endDate     DateTime?
+  status      ExamStatus @default(PENDING)
 
-  questions   Question[] @relation("ExamQuestions")
+  questions   Question[]  @relation("ExamQuestions")
   createdBy   User       @relation("ExamsCreated", fields: [createdById], references: [id])
   createdById String
   answers     Answer[]   @relation("ExamAnswers")
   grades      Grade[]    @relation("ExamGrades")
+  participants ExamParticipant[]
 }
 
 model Question {
@@ -125,6 +147,7 @@ model Answer {
   attemptNumber Int      @default(1)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  status        SubmissionStatus @default(PENDING)
 
   student   User   @relation(fields: [studentId], references: [id])
   studentId String
@@ -132,7 +155,7 @@ model Answer {
   examId    String
 
   corrections Correction[] @relation("AnswerCorrections")
-  grade       Grade? // Relation inverse, pas besoin de champs supplémentaires
+  grade      Grade?      // Relation inverse, pas besoin de champs supplémentaires
 
   @@unique([studentId, examId, attemptNumber])
 }
@@ -165,7 +188,19 @@ model Grade {
   correction   Correction @relation(fields: [correctionId], references: [id], onDelete: Cascade)
   correctionId String
   answer       Answer     @relation(fields: [answerId], references: [id])
-  answerId     String     @unique // Ajout de @unique pour répondre à l'erreur
+  answerId     String     @unique  // Ajout de @unique pour répondre à l'erreur
 
   @@unique([studentId, examId])
+}
+
+model ExamParticipant {
+  id        String   @id @default(uuid())
+  examId    String
+  userId    String
+  status    ParticipantStatus @default(PENDING)
+  joinedAt  DateTime @default(now())
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, userId])
 }

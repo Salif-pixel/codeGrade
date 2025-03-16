@@ -9,6 +9,7 @@ interface NavItem {
   icon: React.ReactNode;
   roles: Role[];
   badge?: number;
+  isProtectedRoute?: boolean;
 }
 
 export const navigationConfig = () => {
@@ -101,6 +102,7 @@ export const navigationConfigForMiddleware = () => {
       icon: <Plus className="w-5 h-5" />,
       roles: [Role.TEACHER, Role.SUPERADMIN],
     },
+
     {
       id: "my-exams",
       title: "My Exams",
@@ -124,6 +126,14 @@ export const navigationConfigForMiddleware = () => {
       href: "/available-exams",
       icon: <FileText className="w-5 h-5" />,
       roles: [Role.STUDENT, Role.SUPERADMIN],
+    },
+    {
+      id: "exam-take",
+      title: "Take Exam",
+      href: "exams/[id]",
+      icon: <FileText className="w-5 h-5" />,
+      roles: [Role.STUDENT, Role.SUPERADMIN],
+      isProtectedRoute: true,
     },
     {
       id: "results",
