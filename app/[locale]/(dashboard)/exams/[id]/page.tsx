@@ -64,18 +64,18 @@ export default async function ExamPage({ params }: { params: { id: string } }) {
 
   // Si l'utilisateur est le créateur de l'examen, rediriger vers le dashboard
   if (exam.createdById === session?.user.id) {
-    redirect(`/${local}/exams/`)
+    redirect(`/${local}/available-exams/`)
   }
 
   // Si l'utilisateur est déjà participant et a accepté, rediriger vers l'examen
   if (existingParticipant?.status === ParticipantStatus.ACCEPTED) {
-    redirect(`/${local}/exams/`)
+    redirect(`/${local}/available-exams/`)
   }
 
   // Vérifier si l'examen est encore ouvert aux inscriptions
   const now = new Date()
   if (exam.endDate && new Date(exam.endDate) < now) {
-    redirect("/exams/expired")
+    redirect("/${local}/available-exams/expired")
   }
 
   return (

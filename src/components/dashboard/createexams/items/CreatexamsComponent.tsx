@@ -1,12 +1,11 @@
 "use client"
 
-import React, { useState, useRef, type ChangeEvent, useTransition } from "react"
+import React, { useState, type ChangeEvent, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import {
   ArrowLeft,
   ArrowRight,
-  Save,
   Upload,
   FileText,
   Code,
@@ -19,7 +18,6 @@ import {
   BookOpen,
   HelpCircle,
   AlertCircle,
-  Award,
   Clock,
   Repeat,
   Notebook,
@@ -98,10 +96,10 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   }])
   const [showAnswers, setShowAnswers] = useState(false)
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false)
-  const [selectedModel, setSelectedModel] = useState("deepseek-chat")
+  const [selectedModel, ] = useState("deepseek-chat")
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [examCreated, setExamCreated] = useState(false)
-  const [createdExamId, setCreatedExamId] = useState<string | null>(null)
+  const [, setCreatedExamId] = useState<string | null>(null)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -246,7 +244,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               const questionsWithAnswers = await Promise.all(
                 answersResult.questions.map(async (q, index) => ({
                   ...q,
-                  id: result.data!.questions[index].id,
+                  id: result.data!.questions[index].id ,
                   examId: result.data!.id,
                   answer: await q.answer,
                   isEditingAnswer: false

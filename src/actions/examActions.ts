@@ -1,13 +1,15 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import {ExamType, ParticipantStatus} from '@prisma/client'
+import {ExamType, ParticipantStatus, SubmissionStatus} from '@prisma/client'
 import {prisma} from '@/lib/prisma'
 
 interface QuestionData {
+  id?: string
   text: string
   maxPoints: number
   choices: string[]
+  answer?: string
   programmingLanguage?: string
 }
 
@@ -338,9 +340,10 @@ Question: ${question.text}
 Choix disponibles: ${question.choices.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 
 Retourne ta réponse sous ce format JSON exact:
+(ne pas inclure les parenthèses les  backticks \`\`\`json et les commentaires)
 {
   "type": "single" OU "multiple",
-  "correctAnswers": [numéro(s) de(s) réponse(s) correcte(s)],
+  "correctAnswers": [contenu(s) de(s) réponse(s) correcte(s) sans les numero(s) de choix],
   "explanation": "Explication détaillée du choix",
   "feedback": {
     "correct": "Message à afficher si l'étudiant choisit la bonne réponse",
@@ -364,7 +367,7 @@ Important:
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct",
+        model: "deepseek/deepseek-chat:free",
         messages: [{ role: 'user', content: prompt }],
         response_format: question.choices?.length ? { type: "json_object" } : undefined
       })
@@ -416,5 +419,168 @@ export async function updateExamAnswers(examId: string, questions: QuestionData[
   } catch (error) {
     console.error('Error updating exam answers:', error);
     return { success: false, error: 'Failed to update exam answers' };
+  }
+}
+
+export async function submitExamAnswers(
+  examId: string,
+  studentId: string,
+  answers: { questionId: string; content: string }[],
+  isSubmission: boolean,
+) {
+  try {
+    const exam = await prisma.exam.findUnique({
+      where: { id: examId },
+      include: { questions: true }
+    });
+
+    if (!exam) throw new Error("Exam not found");
+
+    let totalScore = 0;
+    const maxPossibleScore = exam.questions.reduce((sum, q) => sum + q.maxPoints, 0);
+    const formattedAnswers = [];
+
+    // Fonction utilitaire pour normaliser les chaînes
+    const normalizeString = (str: string) => {
+      if (typeof str !== 'string') return '';
+      return str
+        .toLowerCase()
+        .normalize('NFD')                    // Décomposer les caractères accentués
+        .replace(/[\u0300-\u036f]/g, '')    // Supprimer les diacritiques
+        .replace(/[^a-z0-9\s]/g, '')        // Garder uniquement lettres, chiffres et espaces
+        .trim()                             // Supprimer les espaces début/fin
+        .replace(/\s+/g, ' ');              // Normaliser les espaces multiples
+    };
+
+    for (const answer of answers) {
+      const question = exam.questions.find(q => q.id === answer.questionId);
+      if (!question || !question.answer) continue;
+
+      const correctAnswerData = JSON.parse(question.answer);
+      const studentAnswer = JSON.parse(answer.content);
+      
+      console.log('Question:', question.text);
+      console.log('Max points:', question.maxPoints);
+      console.log('Student answer:', studentAnswer);
+      console.log('Correct answer:', correctAnswerData);
+      
+      let isCorrect = false;
+      
+      if (correctAnswerData.type === "single") {
+        // Normaliser et comparer la réponse unique
+        const studentAnswerText = typeof studentAnswer.correctAnswers === 'string' 
+          ? studentAnswer.correctAnswers 
+          : studentAnswer.correctAnswers[0];
+        
+        const correctAnswerText = Array.isArray(correctAnswerData.correctAnswers)
+          ? correctAnswerData.correctAnswers[0]
+          : correctAnswerData.correctAnswers;
+
+        const normalizedStudentAnswer = normalizeString(studentAnswerText);
+        const normalizedCorrectAnswer = normalizeString(correctAnswerText);
+        
+        console.log('Normalized student answer:', normalizedStudentAnswer);
+        console.log('Normalized correct answer:', normalizedCorrectAnswer);
+        
+        isCorrect = normalizedStudentAnswer === normalizedCorrectAnswer;
+      } else {
+        // Pour les réponses multiples, normaliser toutes les réponses
+        const normalizedStudentAnswers = new Set(
+          studentAnswer.correctAnswers.map(normalizeString)
+        );
+        const normalizedCorrectAnswers = new Set(
+          correctAnswerData.correctAnswers.map(normalizeString)
+        );
+        
+        console.log('Normalized student answers:', [...normalizedStudentAnswers]);
+        console.log('Normalized correct answers:', [...normalizedCorrectAnswers]);
+        
+        // Vérifier que les ensembles sont identiques
+        isCorrect = normalizedStudentAnswers.size === normalizedCorrectAnswers.size &&
+                   [...normalizedStudentAnswers].every(answer => 
+                     normalizedCorrectAnswers.has(answer)
+                   );
+      }
+
+      // Attribution des points de la question si la réponse est correcte
+      if (isCorrect) {
+        console.log('Correct answer!')
+        totalScore += question.maxPoints;
+      }
+
+      formattedAnswers.push({
+        questionId: answer.questionId,
+        content: JSON.stringify({
+          type: correctAnswerData.type,
+          correctAnswers: studentAnswer.correctAnswers,
+          isCorrect: isCorrect,
+          score: isCorrect ? question.maxPoints : 0,
+          maxPoints: question.maxPoints
+        })
+      });
+    }
+
+    console.log('Total score:', totalScore);
+    console.log('Max possible score:', maxPossibleScore);
+
+    // Créer une nouvelle réponse avec les réponses aux questions
+    const examAnswer = await prisma.answer.create({
+      data: {
+        filePath: "exam_submission",
+        attemptNumber: 1,
+        status: isSubmission ? SubmissionStatus.REVISED : SubmissionStatus.PENDING,
+        student: { connect: { id: studentId } },
+        exam: { connect: { id: examId } },
+        questionAnswers: {
+          create: formattedAnswers.map(answer => ({
+            question: { connect: { id: answer.questionId } },
+            content: answer.content
+          }))
+        }
+      }
+    });
+ console.log(formattedAnswers ,totalScore)
+
+    if (isSubmission) {
+      // Mettre à jour le statut du participant
+      await prisma.examParticipant.update({
+        where: {
+          examId_userId: {
+            examId,
+            userId: studentId
+          }
+        },
+        data: {
+          status: ParticipantStatus.COMPLETED
+        }
+      });
+
+      // Créer une correction automatique
+      const correction = await prisma.correction.create({
+        data: {
+          aiFeedback: "Correction automatique du QCM",
+          autoScore: totalScore,
+          answer: { connect: { id: examAnswer.id } }
+        }
+      });
+
+      // Créer la note finale
+      await prisma.grade.create({
+        data: {
+          finalScore: totalScore,
+          comments: "Notation automatique basée sur les réponses au QCM",
+          student: { connect: { id: studentId } },
+          exam: { connect: { id: examId } },
+          correction: { connect: { id: correction.id } },
+          answer: { connect: { id: examAnswer.id } }
+        }
+      });
+    }
+
+    revalidatePath(`/available-exams/${examId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error submitting exam answers:', error);
+    return { success: false, error: 'Failed to submit answers' };
   }
 }

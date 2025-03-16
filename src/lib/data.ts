@@ -38,7 +38,14 @@ export const getExams = async () => {
                     user: true
                 }
             },
-            answers: true,
+            answers: {
+                include: {
+                    student: true,
+                    grade: true,
+                    corrections: true
+                }
+            },
+            createdBy: true
         }
     });
     return exams;

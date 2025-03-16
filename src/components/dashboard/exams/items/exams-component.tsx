@@ -22,37 +22,30 @@ import {
 import { cn } from "@/lib/utils"
 import { updateParticipantStatus } from "@/actions/examActions"
 import { SimpleHeaderTitle } from "@/components/dashboard/header/header-title"
+import { log } from "console"
 
 
 interface Assignment extends Exam {
   questions: Question[]
   participants: {
-    user: {
-      id: string
-      name: string | null
-      email: string
-    }
-    status: string
+    id: string
+    userId: string
+    status: ParticipantStatus
     joinedAt: Date
+    user: User
   }[]
   answers: {
     id: string
     createdAt: Date
-    student: {
-      id: string
-      name: string | null
-      email: string
-    }
+    studentId: string
+    student: User
     grade?: {
+      id: string
       finalScore: number
     }
     status: SubmissionStatus
   }[]
-  createdBy: {
-    id: string
-    name: string | null
-    email: string
-  }
+  createdBy: User
   inviteLink: string
   status: ExamStatus
   submissions: {
@@ -310,22 +303,38 @@ interface AssignmentDetailsProps {
 }
 
 function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentDetailsProps) {
-  const studentsResults = assignment.participants.map(participant => {
-    const answer = assignment.answers.find(a => a.student.id === participant.user.id)
+  const studentsResults = assignment.participants?.map(participant => {
+    if (!participant?.user) return null;
+
+    // Trouver toutes les réponses de l'étudiant pour cet examen
+    const studentAnswers = assignment.answers?.filter(a => a.studentId === participant.userId);
+    
+    // Prendre la dernière réponse (la plus récente) si elle existe
+    const latestAnswer = studentAnswers?.length 
+      ? studentAnswers.reduce((latest, current) => 
+          latest.createdAt > current.createdAt ? latest : current
+        ) 
+      : null;
 
     return {
-      id: participant.user.id,
+      id: participant.userId,
       name: participant.user.name || "Anonyme",
-      email: participant.user.email,
-      status: answer ? ParticipantStatus.COMPLETED : participant.status,
-      submissionDate: answer?.createdAt || null,
-      score: answer?.grade?.finalScore || null
-    }
-  })
+      email: participant.user.email || "",
+      status: participant.status,
+      submissionDate: latestAnswer?.createdAt || null,
+      score: latestAnswer?.grade?.finalScore || null
+    };
+  }).filter(Boolean);
 
-  const { showToast } = useCustomToast()
-  const [studentResults, setStudentResults] = useState(studentsResults)
-  const t = useTranslations('exams-component')
+  console.log("studentsResults", studentsResults);
+
+  const { showToast } = useCustomToast();
+  const [studentResults, setStudentResults] = useState(studentsResults || []);
+  const t = useTranslations('exams-component');
+
+  if (!assignment) {
+    return <div>Examen non trouvé</div>;
+  }
 
   const handleStatusUpdate = async (participantId: string, newStatus: ParticipantStatus) => {
     try {
@@ -334,7 +343,7 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
       if (result.success) {
         showToast("Succès", t('toast.statusUpdate.success'), "success")
         const updatedResults = studentResults.map(student =>
-          student.id === participantId
+          student?.id === participantId
             ? { ...student, status: newStatus }
             : student
         )
@@ -453,9 +462,9 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
             </TableHeader>
             <TableBody>
               {studentResults.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-medium">{student.name}</TableCell>
-                  <TableCell>{student.email}</TableCell>
+                <TableRow key={student?.id}>
+                  <TableCell className="font-medium">{student?.name}</TableCell>
+                  <TableCell>{student?.email}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -463,40 +472,40 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                           <Badge
                             variant="outline"
                             className={cn(
-                              student.status === ParticipantStatus.COMPLETED && "bg-green-100 text-green-800",
-                              student.status === ParticipantStatus.ACCEPTED && "bg-blue-100 text-blue-800",
-                              student.status === ParticipantStatus.DECLINED && "bg-red-100 text-red-800",
-                              student.status === ParticipantStatus.PENDING && "bg-yellow-100 text-yellow-800"
+                              student?.status === ParticipantStatus.COMPLETED && "bg-green-100 text-green-800",
+                              student?.status === ParticipantStatus.ACCEPTED && "bg-blue-100 text-blue-800",
+                              student?.status === ParticipantStatus.DECLINED && "bg-red-100 text-red-800",
+                              student?.status === ParticipantStatus.PENDING && "bg-yellow-100 text-yellow-800"
                             )}
                           >
-                            {student.status === ParticipantStatus.COMPLETED ? t('details.results.status.completed') :
-                              student.status === ParticipantStatus.ACCEPTED ? t('details.results.status.accepted') :
-                                student.status === ParticipantStatus.DECLINED ? t('details.results.status.declined') :
+                            {student?.status === ParticipantStatus.COMPLETED ? t('details.results.status.completed') :
+                              student?.status === ParticipantStatus.ACCEPTED ? t('details.results.status.accepted') :
+                                student?.status === ParticipantStatus.DECLINED ? t('details.results.status.declined') :
                                   t('details.results.status.pending')}
                           </Badge>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.PENDING)}
+                          onClick={() => handleStatusUpdate(student?.id ?? "", ParticipantStatus.PENDING)}
                           className="text-yellow-600"
                         >
                           {t('details.results.status.pending')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.ACCEPTED)}
+                          onClick={() => handleStatusUpdate(student?.id ?? "", ParticipantStatus.ACCEPTED)}
                           className="text-blue-600"
                         >
                           {t('details.results.status.accepted')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.DECLINED)}
+                          onClick={() => handleStatusUpdate(student?.id ?? "", ParticipantStatus.DECLINED)}
                           className="text-red-600"
                         >
                           {t('details.results.status.declined')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleStatusUpdate(student.id, ParticipantStatus.COMPLETED)}
+                          onClick={() => handleStatusUpdate(student?.id ?? "", ParticipantStatus.COMPLETED)}
                           className="text-green-600"
                         >
                           {t('details.results.status.completed')}
@@ -505,21 +514,21 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                     </DropdownMenu>
                   </TableCell>
                   <TableCell>
-                    {student.submissionDate
-                      ? new Date(student.submissionDate).toLocaleDateString()
+                    {student?.submissionDate
+                      ? new Date(student?.submissionDate).toLocaleDateString()
                       : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {student.score !== null ? (
+                    {student?.score !== null ? (
                       <span
-                        className={`font-medium ${student.score >= 80
-                          ? "text-green-600"
-                          : student.score >= 60
+                        className={`font-medium ${student?.score && student?.score < assignment.questions.reduce((acc, q) => acc + q.maxPoints, 0) * 0.6
+                          ? "text-red-600"
+                          : student?.score && student?.score < assignment.questions.reduce((acc, q) => acc + q.maxPoints, 0) * 0.8
                             ? "text-yellow-600"
-                            : "text-red-600"
+                            : "text-green-600"
                           }`}
                       >
-                        {student.score}{t('score.percentage')}
+                        {student?.score} / {assignment.questions.reduce((acc, q) => acc + q.maxPoints, 0)}
                       </span>
                     ) : (
                       "-"

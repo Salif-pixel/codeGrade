@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import {auth} from "@/lib/auth";
+import {ParticipantStatus} from "@prisma/client";
 
 async function getExamWithDetails(examId: string) {
   try {
@@ -64,7 +65,7 @@ export default async function ExamPage({ params }: { params: { id: string } }) {
   }
 
   // Si l'utilisateur est déjà participant et a accepté, rediriger vers l'examen
-  if (existingParticipant?.status === "accepted") {
+  if (existingParticipant?.status === ParticipantStatus.ACCEPTED) {
     redirect(`${local}/exams/${params.id}`)
   }
 

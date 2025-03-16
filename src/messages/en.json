@@ -91,6 +91,7 @@
     }
   },
   "exam": {
+    "deadline": "Deadline",
     "create": {
       "title": "Create New Exam"
     },
@@ -824,6 +825,10 @@
   },
   "exams-component": {
     "title": "Exams",
+    "noExams": {
+        "title": "No exams available",
+        "description": "You don't have any assigned exams yet."
+    },
     "tabs": {
       "list": "List",
       "calendar": "Calendar"
@@ -832,15 +837,36 @@
       "deadline": "Deadline",
       "viewDetails": "View details",
       "invite": "Invite",
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "completed": "Completed"
+      },
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Code",
+        "DOCUMENT": "Document"
+      },
       "inviteLink": {
         "title": "Invitation Link",
-        "description": "Share this link with your students so they can join this assignment."
+        "description": "Share this link with your students so they can join this assignment.",
+        "copy": "Copy Link",
+        "button": "invited students"
       },
-      "type": "Type",
       "questions": "questions",
       "submissions": "submissions",
       "students": "students",
-      "participation": "participation"
+      "participation": "participation",
+      "upcoming": "Upcoming",
+      "expired": "Expired",
+      "notStarted": "Not started yet",
+      "starts": "Starts on",
+      "grade": "Grade",
+      "loading": "Loading...",
+      "viewResults": "View results",
+      "takeQuiz": "Take quiz",
+      "uploadFile": "Upload file",
+      "writeCode": "Write code"
     },
     "details": {
       "title": "Assignment Details",
@@ -880,6 +906,10 @@
       "minute": "minute",
       "minutes": "minutes",
       "undefined": "Duration undefined"
+    },
+    "noExams": {
+      "title": "No exams available",
+      "description": "You don't have any assigned exams yet."
     }
   },
   "dashboard": {
@@ -938,5 +968,49 @@
         "view_results_description": "Check your performance"
       }
     }
+  },
+  "exam-taking": {
+    "instructions": {
+      "title": "Instructions",
+      "qcm": "Select the correct answer for each question.",
+      "code": "Write your code in the provided space.",
+      "document": "Answer the questions in the provided text areas."
+    },
+    "maxPoints": "Maximum points",
+    "answerPlaceholder": "Write your answer here...",
+    "codePlaceholder": "Write your {language} code here...",
+    "save": "Save",
+    "saving": "Saving...",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "autoSaving": "Auto-saving...",
+    "autoSaved": "Auto-saved",
+    "allQuestionsAnswered": "All questions have been answered",
+    "notAllQuestionsAnswered": "Some questions have not been answered yet",
+    "timeUp": {
+      "title": "Time's up!",
+      "description": "Your time is up. Your answers are being submitted."
+    },
+    "timeWarning": {
+      "title": "Warning!",
+      "description": "You have less than 5 minutes left to complete the exam."
+    },
+    "saveSuccess": {
+      "title": "Saved",
+      "description": "Your answers have been saved successfully."
+    },
+    "saveError": {
+      "title": "Error",
+      "description": "An error occurred while saving your answers."
+    },
+    "submitSuccess": {
+      "title": "Submitted",
+      "description": "Your exam has been submitted successfully."
+    },
+    "submitError": {
+      "title": "Error",
+      "description": "An error occurred while submitting your exam."
+    },
+    "confirmSubmitIncomplete": "Some questions have not been answered. Do you still want to submit the exam?"
   }
 }

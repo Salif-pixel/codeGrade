@@ -91,6 +91,7 @@
     }
   },
   "exam": {
+    "deadline": "Date limite",
     "create": {
       "title": "Créer un nouvel examen"
     },
@@ -825,6 +826,10 @@
   },
   "exams-component": {
     "title": "Examens",
+    "noExams": {
+      "title": "No exams available",
+      "description": "You don't have any assigned exams yet."
+    },
     "tabs": {
       "list": "Liste",
       "calendar": "Calendrier"
@@ -833,17 +838,36 @@
       "deadline": "Date limite",
       "viewDetails": "Voir les détails",
       "invite": "Inviter",
+      "status": {
+        "pending": "En attente",
+        "active": "Actif",
+        "completed": "Terminé"
+      },
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Code",
+        "DOCUMENT": "Document"
+      },
       "inviteLink": {
         "title": "Lien d'invitation",
         "description": "Partagez ce lien avec vos étudiants pour qu'ils puissent rejoindre ce devoir.",
         "button": "Lien d'invitation",
         "copy": "Copier"
       },
-      "type": "Type",
       "questions": "questions",
       "submissions": "soumissions",
       "students": "étudiants",
-      "participation": "de participation"
+      "participation": "participation",
+      "upcoming": "À venir",
+      "expired": "Expiré",
+      "notStarted": "Pas encore commencé",
+      "starts": "Commence le",
+      "grade": "Note",
+      "loading": "Chargement...",
+      "viewResults": "Voir les résultats",
+      "takeQuiz": "Passer le quiz",
+      "uploadFile": "Télécharger le fichier",
+      "writeCode": "Écrire du code"
     },
     "details": {
       "title": "Détails du devoir",
@@ -957,5 +981,49 @@
         "view_results_description": "Consultez vos performances"
       }
     }
+  },
+  "exam-taking": {
+    "instructions": {
+      "title": "Instructions",
+      "qcm": "Sélectionnez la réponse correcte pour chaque question.",
+      "code": "Écrivez votre code dans l'espace prévu.",
+      "document": "Répondez aux questions dans les zones de texte fournies."
+    },
+    "maxPoints": "Points maximum",
+    "answerPlaceholder": "Écrivez votre réponse ici...",
+    "codePlaceholder": "Écrivez votre code {language} ici...",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "submit": "Soumettre",
+    "submitting": "Soumission...",
+    "autoSaving": "Enregistrement automatique...",
+    "autoSaved": "Enregistré automatiquement",
+    "allQuestionsAnswered": "Toutes les questions ont été répondues",
+    "notAllQuestionsAnswered": "Certaines questions n'ont pas encore de réponse",
+    "timeUp": {
+      "title": "Temps écoulé !",
+      "description": "Votre temps est écoulé. Vos réponses sont en cours de soumission."
+    },
+    "timeWarning": {
+      "title": "Attention !",
+      "description": "Il vous reste moins de 5 minutes pour terminer l'examen."
+    },
+    "saveSuccess": {
+      "title": "Enregistré",
+      "description": "Vos réponses ont été enregistrées avec succès."
+    },
+    "saveError": {
+      "title": "Erreur",
+      "description": "Une erreur est survenue lors de l'enregistrement de vos réponses."
+    },
+    "submitSuccess": {
+      "title": "Soumis",
+      "description": "Votre examen a été soumis avec succès."
+    },
+    "submitError": {
+      "title": "Erreur",
+      "description": "Une erreur est survenue lors de la soumission de votre examen."
+    },
+    "confirmSubmitIncomplete": "Certaines questions n'ont pas été répondues. Voulez-vous quand même soumettre l'examen ?"
   }
 }
