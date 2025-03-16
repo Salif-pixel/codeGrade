@@ -122,7 +122,11 @@ export default function ExamsComponent({user, exams}:{user:User, exams: Assignme
 
   const copyInviteLink = (link: string) => {
     navigator.clipboard.writeText(link)
-   showToast("Lien copié", "Le lien d'invitation a été copié dans le presse-papiers.", "success")
+    showToast(
+      t('toast.linkCopied.title'), 
+      t('toast.linkCopied.description'), 
+      "success"
+    )
   }
 
 
@@ -319,8 +323,7 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
       const result = await updateParticipantStatus(participantId, newStatus)
       
       if (result.success) {
-        showToast("Succès", "Le statut a été mis à jour", "success")
-        // Mettre à jour l'état local
+        showToast("Succès", t('toast.statusUpdate.success'), "success")
         const updatedResults = studentResults.map(student => 
           student.id === participantId 
             ? { ...student, status: newStatus }
@@ -331,7 +334,7 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
         throw new Error(result.error)
       }
     } catch {
-      showToast("Erreur", "Impossible de mettre à jour le statut", "error")
+      showToast("Erreur", t('toast.statusUpdate.error'), "error")
     }
   }
 
@@ -356,12 +359,12 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm">
                   <LinkIcon className="mr-2 h-4 w-4" />
-                  Lien d&apos;invitation
+                  {t('inviteLink.button')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
                 <div className="space-y-4">
-                  <h4 className="font-medium">Lien d&apos;invitation</h4>
+                  <h4 className="font-medium">{t('inviteLink.title')}</h4>
                   <div className="flex items-center space-x-2">
                     <Input value={assignment.inviteLink} readOnly />
                     <Button
@@ -370,10 +373,11 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                       onClick={() => onCopyInviteLink(assignment.inviteLink)}
                     >
                       <Copy className="h-4 w-4" />
+                      <span className="sr-only">{t('inviteLink.copy')}</span>
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Partagez ce lien avec vos étudiants pour qu&apos;ils puissent rejoindre ce devoir.
+                    {t('inviteLink.description')}
                   </p>
                 </div>
               </PopoverContent>
@@ -507,7 +511,7 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                               : "text-red-600"
                         }`}
                       >
-                        {student.score}%
+                        {student.score}{t('score.percentage')}
                       </span>
                     ) : (
                       "-"

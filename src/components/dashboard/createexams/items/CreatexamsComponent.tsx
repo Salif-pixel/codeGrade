@@ -54,7 +54,7 @@ interface ExamCreatorProps {
 }
 
 const ExamCreator = ({ userId }: ExamCreatorProps) => {
-  const t = useTranslations()
+  const t = useTranslations('exams')
   const router = useRouter()
   const { showToast } = useCustomToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -107,7 +107,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     if (questions.length > 1) {
       setQuestions(questions.filter((q) => q.id !== id))
     } else {
-      showToast(t("exams.warning"), t("exams.needOneQuestion"), "warning")
+      showToast(t("warning"), t("needOneQuestion"), "warning")
     }
   }
 
@@ -119,7 +119,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
   const nextStep = () => {
     if (currentStep === 1 && !title) {
-      showToast(t("exams.error"), t("exams.titleRequired"), "error")
+      showToast(t("error"), t("titleRequired"), "error")
       return
     }
 
@@ -138,20 +138,20 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     try {
       // Validations
       if (!title) {
-        showToast(t("exams.error"), t("exams.titleRequired"), "error")
+        showToast(t("error"), t("titleRequired"), "error")
         setCurrentStep(1)
         return
       }
 
       if (!filePath) {
-        showToast(t("exams.error"), t("exams.fileRequired"), "error")
+        showToast(t("error"), t("fileRequired"), "error")
         setCurrentStep(2)
         return
       }
 
       const questionsMissing = questions.some((q) => !q.text)
       if (questionsMissing) {
-        showToast(t("exams.error"), t("exams.questionsIncomplete"), "error")
+        showToast(t("error"), t("questionsIncomplete"), "error")
         setCurrentStep(3)
         return
       }
@@ -172,15 +172,15 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
       const result = await createExam(examData, userId)
 
       if (result.success) {
-        showToast(t("exams.success"), t("exams.examCreated"), "success")
+        showToast(t("success"), t("examCreated"), "success")
 
         router.push(`/${local}/my-exams`)
       } else {
-        showToast(t("exams.error"), result.error || t("exams.createFailed"), "error")
+        showToast(t("error"), result.error || t("createFailed"), "error")
       }
     } catch (error) {
       console.error("Error submitting exam:", error)
-      showToast(t("exams.error"), t("exams.unknownError"), "error")
+      showToast(t("error"), t("unknownError"), "error")
     }
   }
 
@@ -191,7 +191,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">{t("exams.basicInfo")}</h2>
+              <h2 className="text-xl font-semibold">{t("basicInfo")}</h2>
             </div>
 
             <Card>
@@ -200,16 +200,16 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <div className="space-y-2">
                     <Label htmlFor="title" className="flex items-center gap-2">
                       <ClipboardList className="h-4 w-4 text-primary" />
-                      {t("exams.title")}
+                      {t("title")}
                       <Badge variant="outline" className="ml-2 text-xs">
-                        {t("exams.required")}
+                        {t("required")}
                       </Badge>
                     </Label>
                     <Input
                       id="title"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder={t("exams.titlePlaceholder")}
+                      placeholder={t("titlePlaceholder")}
                       className="transition-all focus-visible:ring-primary"
                       required
                     />
@@ -218,13 +218,13 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <div className="space-y-2">
                     <Label htmlFor="description" className="flex items-center gap-2">
                       <Info className="h-4 w-4 text-primary" />
-                      {t("exams.description")}
+                      {t("description")}
                     </Label>
                     <Textarea
                       id="description"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t("exams.descriptionPlaceholder")}
+                      placeholder={t("descriptionPlaceholder")}
                       rows={3}
                       className="resize-none transition-all focus-visible:ring-primary"
                     />
@@ -233,7 +233,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <div className="space-y-2">
                     <Label htmlFor="startDate" className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      {t("exams.startDate")}
+                      {t("startDate")}
                     </Label>
                     <div className="relative">
                       <Input
@@ -256,7 +256,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <div className="space-y-2">
                     <Label htmlFor="endDate" className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      {t("exams.endDate")}
+                      {t("endDate")}
                     </Label>
                     <div className="relative">
                       <Input
@@ -269,7 +269,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       />
                       <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{t("exams.endDateHelp")}</p>
+                    <p className="text-sm text-muted-foreground">{t("endDateHelp")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -282,13 +282,13 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">{t("exams.formatSettings")}</h2>
+              <h2 className="text-xl font-semibold">{t("formatSettings")}</h2>
             </div>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{t("exams.selectFormat")}</CardTitle>
-                <CardDescription>{t("exams.formatDescription")}</CardDescription>
+                <CardTitle className="text-base">{t("selectFormat")}</CardTitle>
+                <CardDescription>{t("formatDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -303,9 +303,9 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <CheckSquare className="h-6 w-6" />
                       </div>
-                      <h3 className="font-medium">{t("exams.qcm")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{t("exams.qcmDescription")}</p>
-                      {format === "QCM" && <Badge className="mt-3 bg-primary">{t("exams.selected")}</Badge>}
+                      <h3 className="font-medium">{t("qcm")}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{t("qcmDescription")}</p>
+                      {format === "QCM" && <Badge className="mt-3 bg-primary">{t("selected")}</Badge>}
                     </CardContent>
                   </Card>
 
@@ -320,9 +320,9 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <FileText className="h-6 w-6" />
                       </div>
-                      <h3 className="font-medium">{t("exams.pdf")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{t("exams.pdfDescription")}</p>
-                      {format === "PDF" && <Badge className="mt-3 bg-primary">{t("exams.selected")}</Badge>}
+                      <h3 className="font-medium">{t("pdf")}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{t("pdfDescription")}</p>
+                      {format === "PDF" && <Badge className="mt-3 bg-primary">{t("selected")}</Badge>}
                     </CardContent>
                   </Card>
 
@@ -337,9 +337,9 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <Code className="h-6 w-6" />
                       </div>
-                      <h3 className="font-medium">{t("exams.code")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{t("exams.codeDescription")}</p>
-                      {format === "CODE" && <Badge className="mt-3 bg-primary">{t("exams.selected")}</Badge>}
+                      <h3 className="font-medium">{t("code")}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{t("codeDescription")}</p>
+                      {format === "CODE" && <Badge className="mt-3 bg-primary">{t("selected")}</Badge>}
                     </CardContent>
                   </Card>
                 </div>
@@ -351,7 +351,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Repeat className="h-4 w-4 text-primary" />
-                    {t("exams.maxAttempts")}
+                    {t("maxAttempts")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -363,7 +363,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                     onChange={(e) => setMaxAttempts(Number(e.target.value))}
                     className="transition-all focus-visible:ring-primary"
                   />
-                  <p className="text-sm text-muted-foreground mt-2">{t("exams.maxAttemptsDescription")}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{t("maxAttemptsDescription")}</p>
                 </CardContent>
               </Card>
 
@@ -371,7 +371,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Upload className="h-4 w-4 text-primary" />
-                    {t("exams.uploadFile")}
+                    {t("uploadFile")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -384,14 +384,14 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       className="transition-all hover:border-primary hover:text-primary"
                     >
                       <Upload className="mr-2 h-4 w-4" />
-                      {t("exams.chooseFile")}
+                      {t("chooseFile")}
                     </Button>
                     {file && <span className="text-sm text-muted-foreground truncate max-w-[200px]">{file.name}</span>}
                   </div>
                   {filePath && (
                     <div className="mt-3 flex items-center rounded-md bg-primary/10 p-2 text-sm text-primary">
                       <FileText className="mr-2 h-4 w-4" />
-                      {t("exams.fileAdded")}
+                      {t("fileAdded")}
                     </div>
                   )}
                 </CardContent>
@@ -406,7 +406,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileQuestion className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">{t("exams.questions")}</h2>
+                <h2 className="text-xl font-semibold">{t("questions")}</h2>
               </div>
               <Button
                 type="button"
@@ -416,7 +416,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                 className="transition-all hover:border-primary hover:text-primary"
               >
                 <Plus className="h-4 w-4 mr-1" />
-                {t("exams.addQuestion")}
+                {t("addQuestion")}
               </Button>
             </div>
 
@@ -431,7 +431,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       >
                         {index + 1}
                       </Badge>
-                      {t("exams.question")} #{index + 1}
+                      {t("question")} #{index + 1}
                     </CardTitle>
                     {questions.length > 1 && (
                       <Button
@@ -442,7 +442,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                         onClick={() => removeQuestion(question.id)}
                       >
                         <Trash className="h-4 w-4 mr-1" />
-                        {t("exams.remove")}
+                        {t("remove")}
                       </Button>
                     )}
                   </CardHeader>
@@ -450,7 +450,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                     <div className="space-y-2">
                       <Label htmlFor={`question-${index}`} className="text-sm flex items-center gap-2">
                         <HelpCircle className="h-4 w-4 text-primary" />
-                        {t("exams.questionText")}
+                        {t("questionText")}
                       </Label>
                       <Textarea
                         id={`question-${index}`}
@@ -458,14 +458,14 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                         onChange={(e) => updateQuestion(question.id, "text", e.target.value)}
                         rows={2}
                         className="resize-none transition-all focus-visible:ring-primary"
-                        placeholder={t("exams.questionTextPlaceholder")}
+                        placeholder={t("questionTextPlaceholder")}
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor={`correction-${index}`} className="text-sm flex items-center gap-2">
                         <AlertCircle className="h-4 w-4 text-primary" />
-                        {t("exams.correctionAi")}
+                        {t("correctionAi")}
                       </Label>
                       <Textarea
                         id={`correction-${index}`}
@@ -473,14 +473,14 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                         onChange={(e) => updateQuestion(question.id, "correctionAi", e.target.value)}
                         rows={2}
                         className="resize-none transition-all focus-visible:ring-primary"
-                        placeholder={t("exams.correctionAiPlaceholder")}
+                        placeholder={t("correctionAiPlaceholder")}
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor={`points-${index}`} className="text-sm flex items-center gap-2">
                         <Award className="h-4 w-4 text-primary" />
-                        {t("exams.maxPoints")}
+                        {t("maxPoints")}
                       </Label>
                       <Input
                         id={`points-${index}`}
@@ -503,7 +503,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle2 className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">{t("exams.review")}</h2>
+              <h2 className="text-xl font-semibold">{t("review")}</h2>
             </div>
 
             <Card className="border-primary/20 shadow-md">
@@ -517,7 +517,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <FileText className="h-4 w-4 text-primary" />
-                        {t("exams.type")}
+                        {t("type")}
                       </p>
                       <p className="font-medium">{type}</p>
                     </div>
@@ -525,7 +525,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <Code className="h-4 w-4 text-primary" />
-                        {t("exams.format")}
+                        {t("format")}
                       </p>
                       <p className="font-medium flex items-center gap-2">
                         {format === "QCM" && <CheckSquare className="h-4 w-4 text-primary" />}
@@ -538,7 +538,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <Repeat className="h-4 w-4 text-primary" />
-                        {t("exams.maxAttempts")}
+                        {t("maxAttempts")}
                       </p>
                       <p className="font-medium">{maxAttempts}</p>
                     </div>
@@ -546,7 +546,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-primary" />
-                        {t("exams.deadline")}
+                        {t("deadline")}
                       </p>
                       <p className="font-medium">{new Date(deadline).toLocaleString()}</p>
                     </div>
@@ -557,7 +557,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Upload className="h-4 w-4 text-primary" />
-                      {t("exams.attachedFile")}
+                      {t("attachedFile")}
                     </p>
                     <div className="flex items-center gap-2 mt-1 p-2 bg-primary/5 rounded-md">
                       <FileText className="h-4 w-4 text-primary" />
@@ -568,13 +568,13 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <FileQuestion className="h-4 w-4 text-primary" />
-                      {t("exams.questionCount")}
+                      {t("questionCount")}
                     </p>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="font-medium">
                         {questions.length}
                       </Badge>
-                      <p>{t("exams.questions").toLowerCase()}</p>
+                      <p>{t("questions").toLowerCase()}</p>
                     </div>
                   </div>
                 </div>
@@ -582,7 +582,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               <CardFooter className="bg-primary/5 border-t">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="h-5 w-5 text-primary mt-0.5" />
-                  <p className="text-sm">{t("exams.finalConfirmation")}</p>
+                  <p className="text-sm">{t("finalConfirmation")}</p>
                 </div>
               </CardFooter>
             </Card>
@@ -596,8 +596,11 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
   return (
     <>
-      <SimpleHeaderTitle title={t("exams.createNew")} icon={Notebook} />
-      <div className="container  py-10">
+      <SimpleHeaderTitle 
+        title={'exams.createNew'} 
+        Icon={<Notebook className="h-5 w-5"/>} 
+      />
+      <div className="container py-10">
         <Card className="mb-8 shadow-md border-zinc-200 dark:border-primary/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -631,10 +634,10 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       )}
                     </div>
                     <span className="text-xs font-medium">
-                      {step === 1 && t("exams.step1")}
-                      {step === 2 && t("exams.step2")}
-                      {step === 3 && t("exams.step3")}
-                      {step === 4 && t("exams.step4")}
+                      {step === 1 && t('step1')}
+                      {step === 2 && t('step2')}
+                      {step === 3 && t('step3')}
+                      {step === 4 && t('step4')}
                     </span>
                   </div>
 
@@ -662,18 +665,18 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                 className="transition-all hover:border-primary hover:text-primary"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                {t("exams.back")}
+                {t('back')}
               </Button>
 
               {currentStep < totalSteps ? (
                 <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                  {t("exams.next")}
+                  {t('next')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button type="button" onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
                   <Save className="mr-2 h-4 w-4" />
-                  {t("exams.saveExam")}
+                  {t('saveExam')}
                 </Button>
               )}
             </div>
