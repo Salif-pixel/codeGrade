@@ -368,12 +368,12 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm">
                   <LinkIcon className="mr-2 h-4 w-4" />
-                  {t('inviteLink.button')}
+                  {t('assignment.inviteLink.title')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
                 <div className="space-y-4">
-                  <h4 className="font-medium">{t('inviteLink.title')}</h4>
+                  <h4 className="font-medium">{t('assignment.inviteLink.title')}</h4>
                   <div className="flex items-center space-x-2">
                     <Input value={assignment.inviteLink} readOnly />
                     <Button
@@ -382,11 +382,11 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
                       onClick={() => onCopyInviteLink(assignment.inviteLink)}
                     >
                       <Copy className="h-4 w-4" />
-                      <span className="sr-only">{t('inviteLink.copy')}</span>
+                      <span className="sr-only">{t('assignment.inviteLink.copy')}</span>
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {t('inviteLink.description')}
+                    {t('assignment.inviteLink.description')}
                   </p>
                 </div>
               </PopoverContent>
