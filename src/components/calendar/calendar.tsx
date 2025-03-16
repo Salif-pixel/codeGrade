@@ -48,7 +48,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { updateExam, deleteExam } from "@/actions/examActions"
-import type {Exam, User, Question, ExamStatus, Answer} from "@prisma/client"
+import type { Exam, User, Question, ExamStatus, Answer } from "@prisma/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Input } from "@/components/ui/input"
@@ -99,7 +99,7 @@ interface Assignment {
 
 export default function CalendarView({
   initialExams,
-}: { user: User; initialExams: (Exam & { questions: Question[], answers:Answer[] })[] }) {
+}: { user: User; initialExams: (Exam & { questions: Question[], answers: Answer[] })[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [weekDays, setWeekDays] = useState<Date[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
@@ -124,7 +124,7 @@ export default function CalendarView({
   const { showToast } = useCustomToast()
 
   // Heures de la journée (de 7h à 18h)
-  const hours = Array.from({ length: 24 }, (_, i) => i )
+  const hours = Array.from({ length: 24 }, (_, i) => i)
 
   const t = useTranslations('calendar')
   const locale = useLocale()
@@ -138,7 +138,7 @@ export default function CalendarView({
         description: exam.description ?? "",
         type: exam.type,
         date: new Date(exam.startDate || ""),
-        duration:  1,
+        duration: 1,
         maxAttempts: exam.maxAttempts,
         format: exam.format,
         startDate: exam.startDate,
@@ -201,7 +201,7 @@ export default function CalendarView({
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("calendarView", view)
-      } catch  {
+      } catch {
         // Ignorer les erreurs de localStorage
       }
     }
@@ -675,38 +675,44 @@ export default function CalendarView({
         {/* Sheet pour afficher les détails d'un devoir */}
         <Sheet open={isSheetOpen} onOpenChange={(open) => {
           if (!open) {
-            setEditMode(false); // Réinitialiser le mode édition à la fermeture
+            setEditMode(false);
           }
           setIsSheetOpen(open);
         }}>
-          <SheetTitle>
-            
-          </SheetTitle>
-          <SheetContent side={sheetSide} className="sm:max-w-md p-0 border-l border-primary/10 dark:bg-zinc-900">
-            {selectedAssignment && (
-              <ScrollArea className="h-full">
-                <div className="p-6">
-                  <SheetHeader className="pr-8">
-                    <div className="flex justify-between items-center">
-                      {editMode ? (
-                        <Input
-                          type="text"
-                          value={selectedAssignment.title}
-                          onChange={(e) =>
-                            setSelectedAssignment({
-                              ...selectedAssignment,
-                              title: e.target.value,
-                            })
-                          }
-                          className="text-xl font-semibold w-full border-b border-primary/20 focus-visible:ring-primary"
-                        />
-                      ) : (
-                        <SheetTitle className="text-xl flex items-center gap-2">
-                          {getExamTypeIcon(selectedAssignment.type as ExamType)}
-                          {selectedAssignment.title}
-                        </SheetTitle>
-                      )}
-                      <div className="flex space-x-2">
+          <SheetContent side={sheetSide} className="p-0 border-l border-primary/10 dark:bg-zinc-900">
+            <>
+              {selectedAssignment && (
+                <ScrollArea className="h-full">
+                  <div className={cn("p-6 space-y-6", editMode ? "min-h-[calc(100vh-85px)]" : "min-h-[calc(100vh-129px)]")}>
+                    {/* En-tête */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-4 flex-1">
+                          {editMode ? (
+                            <Input
+                              type="text"
+                              value={selectedAssignment.title}
+                              onChange={(e) =>
+                                setSelectedAssignment({
+                                  ...selectedAssignment,
+                                  title: e.target.value,
+                                })
+                              }
+                              className="text-xl font-semibold border-none bg-muted/30 focus-visible:ring-1"
+                            />
+                          ) : (
+                            <h2 className="text-xl font-semibold flex mb-4 items-center gap-2">
+                              {getExamTypeIcon(selectedAssignment.type as ExamType)}
+                              {selectedAssignment.title}
+                            </h2>
+                          )}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            {getExamTypeBadge(selectedAssignment.type as ExamType)}
+                            <Badge variant="outline" className="font-normal">
+                              {selectedAssignment.maxAttempts} tentative{selectedAssignment.maxAttempts > 1 ? 's' : ''}
+                            </Badge>
+                          </div>
+                        </div>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -726,387 +732,155 @@ export default function CalendarView({
                           {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
                         </Button>
                       </div>
-                    </div>
-                    <div className="flex space-x-2 mt-2">
-                      {editMode ? (
-                        <div className="py-1 px-2 text-xs rounded border border-input focus-visible:ring-primary bg-muted/30">
-                          {selectedAssignment.type}
-                        </div>
-                      ) : (
-                        getExamTypeBadge(selectedAssignment.type as ExamType)
-                      )}
-                      {editMode ? (
-                        <Input
-                          type="datetime-local"
-                          value={
-                            typeof selectedAssignment.startDate === "string"
-                              ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
-                              : selectedAssignment.startDate?.toISOString().slice(0, 16 )
-                          }
-                          onChange={(e) =>
-                            setSelectedAssignment({
-                              ...selectedAssignment,
-                              startDate: new Date(e.target.value),
-                            })
-                          }
-                          className="py-1 px-2 text-xs rounded border-input focus-visible:ring-primary"
-                        />
-                      ) : (
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <CalendarClock className="h-3 w-3" />
-                          {typeof selectedAssignment.startDate === "string"
-                            ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
-                            : format(selectedAssignment.startDate ?? new Date(), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })}
-                        </Badge>
-                      )}
-                    </div>
-                    <SheetDescription className="mt-4 text-sm" asChild>
-                      {editMode ? (
-                        <Textarea
-                          value={selectedAssignment.description}
-                          onChange={(e) =>
-                            setSelectedAssignment({
-                              ...selectedAssignment,
-                              description: e.target.value,
-                            })
-                          }
-                          className="w-full h-20 p-2 border rounded border-input focus-visible:ring-primary resize-none"
-                          placeholder="Description de l'évaluation"
-                        />
-                      ) : (
-                        <div className="bg-muted/30 p-3 rounded-md">
-                          {selectedAssignment.description || "Aucune description"}
-                        </div>
-                      )}
-                    </SheetDescription>
-                  </SheetHeader>
 
-                  <div className="py-6">
-                    <Separator className="my-4" />
-
-                    <div className="space-y-4">
-                      {!editMode && (
-                        <div>
-                          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-primary" />
-                            {t('sheet.format')}
-                          </h3>
-                          <p className="text-sm bg-muted/30 p-2 rounded">
-                            {selectedAssignment.format || selectedAssignment.submissionType || "Non spécifié"}
-                          </p>
-                        </div>
-                      )}
-
-                      <div>
-                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-                          <Repeat className="h-4 w-4 text-primary" />
-                          {t('sheet.maxAttempts')}
-                        </h3>
-                        {editMode ? (
-                          <Input
-                            type="number"
-                            min="1"
-                            value={selectedAssignment.maxAttempts}
-                            onChange={(e) =>
-                              setSelectedAssignment({
-                                ...selectedAssignment,
-                                maxAttempts: Number.parseInt(e.target.value),
-                              })
-                            }
-                            className="w-20 p-1 text-sm border rounded border-input focus-visible:ring-primary"
-                          />
-                        ) : (
-                          <Badge variant="secondary" className="text-sm">
-                            {selectedAssignment.maxAttempts || 1}
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-semibold mb-1 flex items-center gap-2 text-destructive">
-                          <AlertCircle className="h-4 w-4" />
-                          {t('sheet.deadline')}
-                        </h3>
-                        {editMode ? (
-                          <Input
-                            type="datetime-local"
-                            value={
-                              selectedAssignment.endDate
-                                ? typeof selectedAssignment.endDate === "string"
-                                  ? new Date(selectedAssignment.endDate).toISOString().slice(0, 16)
-                                  : selectedAssignment.endDate.toISOString().slice(0, 16)
-                                : ""
-                            }
-                            onChange={(e) =>
-                              setSelectedAssignment({
-                                ...selectedAssignment,
-                                endDate: e.target.value ? new Date(e.target.value) : undefined,
-                              })
-                            }
-                            className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
-                          />
-                        ) : selectedAssignment.endDate ? (
-                          <Badge variant="destructive" className="text-sm">
-                            {typeof selectedAssignment.endDate === "string"
-                              ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
-                              : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })}
-                          </Badge>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">Aucune date limite</p>
-                        )}
-                      </div>
-
-                      {(selectedAssignment.type === "CODE" && editMode) && (
-                        <div>
-                          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-                            <CodeIcon className="h-4 w-4 text-primary" />
-                            Langage de programmation
-                          </h3>
+                      {/* Dates */}
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <CalendarClock className="h-4 w-4 text-primary" />
+                            {t('sheet.startDate')}
+                          </label>
                           {editMode ? (
                             <Input
-                              type="text"
-                              value={selectedAssignment.language || ""}
+                              type="datetime-local"
+                              value={
+                                typeof selectedAssignment.startDate === "string"
+                                  ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
+                                  : selectedAssignment.startDate?.toISOString().slice(0, 16)
+                              }
                               onChange={(e) =>
                                 setSelectedAssignment({
                                   ...selectedAssignment,
-                                  language: e.target.value,
+                                  startDate: new Date(e.target.value),
                                 })
                               }
-                              className="w-full p-1 text-sm border rounded border-input focus-visible:ring-primary"
-                              placeholder="javascript, python, etc."
+                              className="text-sm"
                             />
-                          ) : selectedAssignment.language ? (
-                            <Badge className="bg-indigo-500 text-white">
-                              {selectedAssignment.language.toUpperCase()}
-                            </Badge>
                           ) : (
-                            <p className="text-sm text-muted-foreground">Non spécifié</p>
+                            <p className="text-sm bg-muted/30 p-2 rounded">
+                              {typeof selectedAssignment.startDate === "string"
+                                ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
+                                : format(selectedAssignment.startDate ?? new Date(), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })}
+                            </p>
                           )}
                         </div>
-                      )}
 
-                      {/* {selectedAssignment.tests && (
-                        <div>
-                          <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-                              <BookOpen className="h-4 w-4 text-primary" />
-                              Tests ({selectedAssignment.tests.length})
-                            </h3>
-                            {editMode && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 text-xs border-primary/50 text-primary hover:bg-primary/10"
-                                onClick={() => {
-                                  const newTests = [
-                                    ...(selectedAssignment.tests || []),
-                                    { name: "Nouveau test", description: "Description du test" },
-                                  ]
-                                  setSelectedAssignment({
-                                    ...selectedAssignment,
-                                    tests: newTests,
-                                  })
-                                }}
-                              >
-                                <Plus className="h-3 w-3 mr-1" /> Ajouter un test
-                              </Button>
-                            )}
-                          </div>
-                          <div className="space-y-2 mt-2">
-                            {selectedAssignment.tests.map((test, index) => (
-                              <Card key={index} className="border-border shadow-sm">
-                                <CardContent className="p-3">
-                                  {editMode ? (
-                                    <div className="space-y-2">
-                                      <div className="flex justify-between">
-                                        <Input
-                                          type="text"
-                                          value={test.name}
-                                          onChange={(e) => {
-                                            const updatedTests = [...selectedAssignment.tests ?? []]
-                                            updatedTests[index] = { ...test, name: e.target.value }
-                                            setSelectedAssignment({
-                                              ...selectedAssignment,
-                                              tests: updatedTests,
-                                            })
-                                          }}
-                                          className="text-sm font-medium w-full border-b border-input focus-visible:ring-primary"
-                                        />
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className="h-7 w-7 p-0 rounded-full text-destructive hover:bg-destructive/10"
-                                          onClick={() => {
-                                            const updatedTests = [...selectedAssignment.tests ?? []]
-                                            updatedTests.splice(index, 1)
-                                            setSelectedAssignment({
-                                              ...selectedAssignment,
-                                              tests: updatedTests,
-                                            })
-                                          }}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                      <Textarea
-                                        value={test.description}
-                                        onChange={(e) => {
-                                          const updatedTests = [...selectedAssignment.tests ?? []]
-                                          updatedTests[index] = { ...test, description: e.target.value }
-                                          setSelectedAssignment({
-                                            ...selectedAssignment,
-                                            tests: updatedTests,
-                                          })
-                                        }}
-                                        className="text-xs mt-1 w-full p-1 border rounded border-input focus-visible:ring-primary resize-none"
-                                      />
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <h4 className="text-sm font-medium flex items-center gap-2">
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 w-5 p-0 flex items-center justify-center rounded-full"
-                                        >
-                                          {index + 1}
-                                        </Badge>
-                                        {test.name}
-                                      </h4>
-                                      <p className="text-xs mt-2 text-muted-foreground bg-muted/30 p-2 rounded">
-                                        {test.description}
-                                      </p>
-                                    </>
-                                  )}
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium flex items-center gap-2 text-destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            {t('sheet.deadline')}
+                          </label>
+                          {editMode ? (
+                            <Input
+                              type="datetime-local"
+                              value={
+                                selectedAssignment.endDate
+                                  ? typeof selectedAssignment.endDate === "string"
+                                    ? new Date(selectedAssignment.endDate).toISOString().slice(0, 16)
+                                    : selectedAssignment.endDate.toISOString().slice(0, 16)
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                setSelectedAssignment({
+                                  ...selectedAssignment,
+                                  endDate: e.target.value ? new Date(e.target.value) : undefined,
+                                })
+                              }
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm bg-muted/30 p-2 rounded">
+                              {selectedAssignment.endDate
+                                ? typeof selectedAssignment.endDate === "string"
+                                  ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
+                                  : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
+                                : "Aucune date limite"}
+                            </p>
+                          )}
                         </div>
-                      )} */}
+                      </div>
 
-                      {selectedAssignment.questions && selectedAssignment.questions.length > 0 && (
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-                            <FileQuestion className="h-4 w-4 text-primary" />
-                            Questions
-                          </h3>
-                          <div className="space-y-4">
-                            {selectedAssignment.questions.map((question, index) => (
-                              <Card key={index} className="border-border shadow-sm">
-                                <CardContent className="p-3">
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                      <p className="text-sm font-medium">{question.text}</p>
-                                      {editMode && (
-                                        <Input
-                                          type="number"
-                                          min="0"
-                                          value={question.maxPoints}
-                                          onChange={(e) => {
-                                            const updatedQuestions = [...selectedAssignment.questions ?? []];
-                                            updatedQuestions[index] = {
-                                              ...question,
-                                              maxPoints: Number(e.target.value)
-                                            };
-                                            setSelectedAssignment({
-                                              ...selectedAssignment,
-                                              questions: updatedQuestions
-                                            });
-                                          }}
-                                          className="w-20 text-sm border rounded border-input focus-visible:ring-primary"
-                                        />
-                                      )}
-                                    </div>
-                                    {question.choices && (
-                                      <div className="mt-2 space-y-1">
-                                        {question.choices.map((choice, choiceIndex) => (
-                                          <div key={choiceIndex} className="text-sm text-muted-foreground">
-                                            {choice}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                    {question.programmingLanguage && (
-                                      <div className="mt-2">
-                                        <Badge variant="outline" className="text-xs">
-                                          {question.programmingLanguage}
-                                        </Badge>
-                                      </div>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
+                      {/* Description */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-primary" />
+                          Description
+                        </label>
+                        {editMode ? (
+                          <Textarea
+                            value={selectedAssignment.description}
+                            onChange={(e) =>
+                              setSelectedAssignment({
+                                ...selectedAssignment,
+                                description: e.target.value,
+                              })
+                            }
+                            className="min-h-[100px] text-sm resize-none"
+                            placeholder="Description de l'évaluation"
+                          />
+                        ) : (
+                          <div className="text-sm bg-muted/30 p-3 rounded-md min-h-[100px]">
+                            {selectedAssignment.description || "Aucune description"}
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
+
+                    <Separator />
+
+                    {/* Questions */}
+                    {selectedAssignment.questions && selectedAssignment.questions.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-sm font-medium flex items-center gap-2">
+                          <FileQuestion className="h-4 w-4 text-primary" />
+                          Questions ({selectedAssignment.questions.length})
+                        </h3>
+                        <div className="space-y-3">
+                          {selectedAssignment.questions.map((question, index) => (
+                            <Card key={index} className="border-border">
+                              <CardContent className="p-4 space-y-3">
+                                <div className="flex items-start justify-between gap-4">
+                                  <p className="text-sm flex-1">{question.text}</p>
+                                  <Badge variant="outline" className="shrink-0">
+                                    {question.maxPoints} pt{question.maxPoints > 1 ? 's' : ''}
+                                  </Badge>
+                                </div>
+                                {question.choices && (
+                                  <div className="space-y-2">
+                                    {question.choices.map((choice, choiceIndex) => (
+                                      <div
+                                        key={choiceIndex}
+                                        className="text-sm text-muted-foreground bg-muted/30 p-2 rounded"
+                                      >
+                                        {choice}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {question.programmingLanguage && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    <CodeIcon className="h-3 w-3 mr-1" />
+                                    {question.programmingLanguage}
+                                  </Badge>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <SheetFooter className="sm:justify-start gap-2 flex-wrap">
-                    {editMode ? (
-                      <Button
-                        variant="default"
-                        className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-                        onClick={async () => {
-                          if (!selectedAssignment) return;
+                  {/* Footer */}
+                  <div className="sticky bottom-0 p-6 bg-background border-t">
+                    <div className="flex flex-wrap gap-2">
+                      {editMode ? (
+                        <Button
+                          className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+                          onClick={async () => {
+                            if (!selectedAssignment) return;
 
-                          if (selectedAssignment.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
-                            showToast(
-                              "Erreur",
-                              t('toast.cannotEdit'),
-                              "error"
-                            );
-                            return;
-                          }
-
-                          // Format the assignment data for saving
-                          const examData = {
-                            title: selectedAssignment.title,
-                            description: selectedAssignment.description,
-                            type: selectedAssignment.type as ExamType,
-                            format: selectedAssignment.format,
-                            maxAttempts: selectedAssignment.maxAttempts,
-                            startDate: selectedAssignment.startDate,
-                            endDate: selectedAssignment.endDate,
-                            questions: selectedAssignment.questions ? selectedAssignment.questions.map((q) => ({
-                              id: q.id,
-                              text: q.text,
-                              maxPoints: Number(q.maxPoints),
-                              choices: q.choices || [],
-                              programmingLanguage: q.programmingLanguage,
-                              examId: q.examId
-                            })) : undefined
-                          }
-
-                          // Update the exam
-                          const result = await updateExam(selectedAssignment.id, examData as never)
-
-                          if (result.success) {
-                            setAssignments(
-                              assignments.map((a) =>
-                                a.id === selectedAssignment.id
-                                  ? { ...selectedAssignment }
-                                  : a
-                              )
-                            )
-                            showToast("Succès", t('toast.updateSuccess'), "success")
-                            setEditMode(false)
-                          } else {
-                            showToast("Erreur", result.error || t('toast.updateError'), "error")
-                          }
-                        }}
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        {t('edit.save')}
-                      </Button>
-                    ) : (
-                      <>
-                        <Button 
-                          variant="outline" 
-                          className="w-full sm:w-auto" 
-                          onClick={() => {
-                            if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                            if (selectedAssignment.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
                               showToast(
                                 "Erreur",
                                 t('toast.cannotEdit'),
@@ -1114,24 +888,104 @@ export default function CalendarView({
                               );
                               return;
                             }
-                            setEditMode(true);
+
+                            const examData = {
+                              title: selectedAssignment.title,
+                              description: selectedAssignment.description,
+                              type: selectedAssignment.type as ExamType,
+                              format: selectedAssignment.format,
+                              maxAttempts: selectedAssignment.maxAttempts,
+                              startDate: selectedAssignment.startDate,
+                              endDate: selectedAssignment.endDate,
+                              questions: selectedAssignment.questions ? selectedAssignment.questions.map((q) => ({
+                                id: q.id,
+                                text: q.text,
+                                maxPoints: Number(q.maxPoints),
+                                choices: q.choices || [],
+                                programmingLanguage: q.programmingLanguage,
+                                examId: q.examId
+                              })) : undefined
+                            }
+
+                            const result = await updateExam(selectedAssignment.id, examData as never)
+
+                            if (result.success) {
+                              setAssignments(
+                                assignments.map((a) =>
+                                  a.id === selectedAssignment.id
+                                    ? { ...selectedAssignment }
+                                    : a
+                                )
+                              )
+                              showToast("Succès", t('toast.updateSuccess'), "success")
+                              setEditMode(false)
+                            } else {
+                              showToast("Erreur", result.error || t('toast.updateError'), "error")
+                            }
                           }}
                         >
-                          <Edit className="h-4 w-4 mr-2" />
-                          {t('edit.enable')}
+                          <Save className="h-4 w-4 mr-2" />
+                          {t('edit.save')}
                         </Button>
-                        <SheetClose asChild>
-                          <Button variant="outline" className="w-full sm:w-auto">
-                            <X className="h-4 w-4 mr-2" />
-                            {t('assignment.close')}
+                      ) : (
+                        <>
+                          <Button
+                            variant="outline"
+                            className="flex-1 sm:flex-none"
+                            onClick={() => {
+                              if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                                showToast(
+                                  "Erreur",
+                                  t('toast.cannotEdit'),
+                                  "error"
+                                );
+                                return;
+                              }
+                              setEditMode(true);
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            {t('edit.enable')}
                           </Button>
-                        </SheetClose>
-                      </>
-                    )}
-                  </SheetFooter>
-                </div>
-              </ScrollArea>
-            )}
+                          <Button
+                            variant="destructive"
+                            className="flex-1 sm:flex-none"
+                            onClick={async () => {
+                              if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                                showToast(
+                                  "Erreur",
+                                  t('toast.cannotEdit'),
+                                  "error"
+                                );
+                                return;
+                              }
+
+                              const result = await deleteExam(selectedAssignment.id)
+                              if (result.success) {
+                                setAssignments(assignments.filter(a => a.id !== selectedAssignment.id))
+                                showToast("Succès", t('toast.deleteSuccess'), "success")
+                                setIsSheetOpen(false)
+                              } else {
+                                showToast("Erreur", result.error || t('toast.deleteError'), "error")
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            {t('assignment.delete')}
+                          </Button>
+                        </>
+                      )}
+                      <SheetClose asChild>
+                        <Button variant="outline" className="flex-1 sm:flex-none">
+                          <X className="h-4 w-4 mr-2" />
+                          {t('assignment.close')}
+                        </Button>
+                      </SheetClose>
+                    </div>
+                  </div>
+                </ScrollArea>
+              )}
+            </>
           </SheetContent>
         </Sheet>
       </CardContent>
