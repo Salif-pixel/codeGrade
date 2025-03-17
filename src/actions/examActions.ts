@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import {ExamType, ParticipantStatus, SubmissionStatus} from '@prisma/client'
 import {prisma} from '@/lib/prisma'
+import { log } from 'console'
 
 interface QuestionData {
   id?: string
@@ -333,7 +334,7 @@ async function generateFakeAnswer(question: QuestionData, model: string) {
     
     if (question.programmingLanguage) {
       prompt = `Fournis une explication détaillée et des tests précis avec le résultat attendu pour la question suivante: ${question.text}. Retourne ta réponse sous ce format JSON spécifique:
-{
+      (ne pas inclure les parenthèses les  backticks \`\`\`json et les commentaires)
   "type": "code",
   "tests": [
     {
@@ -393,29 +394,43 @@ Important:
       body: JSON.stringify({
         model: "deepseek/deepseek-chat:free",
         messages: [{ role: 'user', content: prompt }],
-        response_format: question.choices?.length ? { type: "json_object" } : undefined
+        response_format: { type: "json_object" }
       })
     });
-    console.log(response)
-    if (!response.ok) {
-      throw new Error('Failed to generate answer');
+
+    const result = await response.json();
+    console.log('OpenRouter response:', result);
+
+    let evaluation;
+    try {
+      // Le contenu peut déjà être un objet JSON
+      evaluation = typeof result.choices[0].message.content === 'string'
+        ? JSON.parse(result.choices[0].message.content)
+        : result.choices[0].message.content;
+    } catch (error) {
+      console.error('Failed to parse evaluation:', error);
+      evaluation = {
+        score: 0,
+        explanation: "Erreur lors de l'évaluation",
+        feedback: "Une erreur est survenue",
+        codeQuality: "Non évalué"
+      };
     }
 
-    const data = await response.json();
-    console.log('Generated answer:', data.choices[0].message.content)
+    console.log('Parsed evaluation:', evaluation);
     
     // Pour les QCM, formater la réponse
     if (question.choices?.length) {
       try {
-        const parsedAnswer = JSON.parse(data.choices[0].message.content);
+        const parsedAnswer = JSON.parse(result.choices[0].message.content);
         return JSON.stringify(parsedAnswer, null, 2); // Retourner le JSON formaté
       } catch (e) {
         console.error('Error parsing JSON answer:', e);
-        return data.choices[0].message.content;
+        return result.choices[0].message.content;
       }
     }
 
-    return data.choices[0].message.content;
+    return result.choices[0].message.content;
   } catch (error) {
     console.error('Error generating answer:', error);
     return `Une erreur est survenue lors de la génération de la réponse pour: "${question.text}"`;
@@ -481,129 +496,170 @@ export async function submitExamAnswers(
     const maxPossibleScore = exam.questions.reduce((sum, q) => sum + q.maxPoints, 0);
     const formattedAnswers = [];
 
-    // Fonction utilitaire pour normaliser les chaînes
     const normalizeString = (str: string) => {
       if (typeof str !== 'string') return '';
       return str
         .toLowerCase()
-        .normalize('NFD')                    // Décomposer les caractères accentués
-        .replace(/[\u0300-\u036f]/g, '')    // Supprimer les diacritiques
-        .replace(/[^a-z0-9\s]/g, '')        // Garder uniquement lettres, chiffres et espaces
-        .trim()                             // Supprimer les espaces début/fin
-        .replace(/\s+/g, ' ');              // Normaliser les espaces multiples
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .trim()
+        .replace(/\s+/g, ' ');
     };
 
     for (const answer of answers) {
+      console.log("logggggggggg",answer);
       const question = exam.questions.find(q => q.id === answer.questionId);
       if (!question || !question.answer) continue;
-      
+
       try {
-        console.log('Question:', question.answer);
-        console.log('Answer:', answer.content);
+        // Vérifier si content est déjà un objet et le parser de manière sécurisée
+        let studentAnswer;
+        console.log("answersssss",answer.content);
         
-        const correctAnswerData = JSON.parse(question.answer);
+        try {
+          studentAnswer = typeof answer.content === 'string'
+            ? JSON.parse(answer.content)
+            : answer.content;
+        } catch (parseError) {
+          console.error('Error parsing student answer:', parseError);
+          studentAnswer = answer.content; // Utiliser la réponse brute si le parsing échoue
+        }
         
-        // Nettoyer la chaîne JSON avant de la parser
-        const cleanContent = answer.content.replace(/\\r\\n/g, '\n').replace(/\\/g, '');
-        const studentAnswer = JSON.parse(cleanContent);
+        console.log("studentAnswer parsed:", studentAnswer);
         
-        let isCorrect = false;
+        let correctAnswerData;
+        try {
+          correctAnswerData = JSON.parse(question.answer);
+        } catch (parseError) {
+          console.error('Error parsing correct answer:', parseError);
+          continue;
+        }
         
-        if (correctAnswerData.type === "code") {
-          // Pour les questions de code
-          console.log('Evaluating code answer:', studentAnswer);
-          
-          // Vérifier si tous les tests ont passé
-          const allTestsPassed = studentAnswer.testResults.every((result: any) => result.passed);
-          
-          isCorrect = allTestsPassed;
-          
-          // Attribution des points
-          if (isCorrect) {
-            totalScore += question.maxPoints;
+        if (question.programmingLanguage) {
+          // Vérifier que nous avons bien le code et les résultats des tests
+          if (!studentAnswer.code || !studentAnswer.testResults) {
+            console.error('Missing code or test results in student answer');
+            continue;
           }
 
-          // Simplifier la réponse formatée pour les résultats
+          // Évaluation du code avec OpenRouter
+          const prompt = `En tant qu'évaluateur de code, analyse ce code ${question.programmingLanguage} qui répond à la question: "${question.text}".
+
+Code soumis:
+${studentAnswer.code}
+
+Résultats des tests:
+${JSON.stringify(studentAnswer.testResults, null, 2)}
+
+Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`, sans commentaires, dans ce format exact:
+{
+  "score": (nombre entre 0 et ${question.maxPoints}),
+  "explanation": "Explication détaillée de l'évaluation",
+  "feedback": "Suggestions d'amélioration",
+  "codeQuality": "Analyse de la qualité du code"
+}`;
+
+          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: "deepseek/deepseek-chat:free",
+              messages: [{ role: 'user', content: prompt }],
+              response_format: { type: "json_object" }
+            })
+          });
+
+          const result = await response.json();
+          console.log('OpenRouter response:', result);
+
+          let evaluation;
+          try {
+            // Le contenu peut déjà être un objet JSON
+            evaluation = typeof result.choices[0].message.content === 'string'
+              ? JSON.parse(result.choices[0].message.content)
+              : result.choices[0].message.content;
+          } catch (error) {
+            console.error('Failed to parse evaluation:', error);
+            evaluation = {
+              score: 0,
+              explanation: "Erreur lors de l'évaluation",
+              feedback: "Une erreur est survenue",
+              codeQuality: "Non évalué"
+            };
+          }
+
+          console.log('Parsed evaluation:', evaluation);
+          
           formattedAnswers.push({
             questionId: answer.questionId,
             content: JSON.stringify({
               type: "code",
-              testResults: studentAnswer.testResults.map((result: any) => ({
-                name: result.testId,
-                passed: result.passed,
-                input: result.input,
-                expected: result.expected,
-                output: result.output
-              })),
-              explanation: correctAnswerData.explanation,
-              isCorrect,
+              code: studentAnswer.code,
+              testResults: studentAnswer.testResults,
+              evaluation: evaluation,
+              maxPoints: question.maxPoints
+            })
+          });
+          console.log('Code evaluation:', evaluation)
+
+          totalScore += evaluation.score;
+        } else {
+          // Logique existante pour QCM
+          let isCorrect = false;
+          
+          if (correctAnswerData.type === "single") {
+            const studentAnswerText = typeof studentAnswer.correctAnswers === 'string' 
+              ? studentAnswer.correctAnswers 
+              : studentAnswer.correctAnswers[0];
+            
+            const correctAnswerText = Array.isArray(correctAnswerData.correctAnswers)
+              ? correctAnswerData.correctAnswers[0]
+              : correctAnswerData.correctAnswers;
+
+            const normalizedStudentAnswer = normalizeString(studentAnswerText);
+            const normalizedCorrectAnswer = normalizeString(correctAnswerText);
+            
+            isCorrect = normalizedStudentAnswer === normalizedCorrectAnswer;
+          } else {
+            const normalizedStudentAnswers = new Set(
+              studentAnswer.correctAnswers.map(normalizeString)
+            );
+            const normalizedCorrectAnswers = new Set(
+              correctAnswerData.correctAnswers.map(normalizeString)
+            );
+            
+            isCorrect = normalizedStudentAnswers.size === normalizedCorrectAnswers.size &&
+                       [...normalizedStudentAnswers].every(answer => 
+                         normalizedCorrectAnswers.has(answer)
+                       );
+          }
+
+          if (isCorrect) {
+            totalScore += question.maxPoints;
+          }
+
+          formattedAnswers.push({
+            questionId: answer.questionId,
+            content: JSON.stringify({
+              type: correctAnswerData.type,
+              correctAnswers: studentAnswer.correctAnswers,
+              isCorrect: isCorrect,
               score: isCorrect ? question.maxPoints : 0,
               maxPoints: question.maxPoints
             })
           });
-        } else if (correctAnswerData.type === "single") {
-          // Normaliser et comparer la réponse unique
-          const studentAnswerText = typeof studentAnswer.correctAnswers === 'string' 
-            ? studentAnswer.correctAnswers 
-            : studentAnswer.correctAnswers[0];
-          
-          const correctAnswerText = Array.isArray(correctAnswerData.correctAnswers)
-            ? correctAnswerData.correctAnswers[0]
-            : correctAnswerData.correctAnswers;
-
-          const normalizedStudentAnswer = normalizeString(studentAnswerText);
-          const normalizedCorrectAnswer = normalizeString(correctAnswerText);
-          
-          console.log('Normalized student answer:', normalizedStudentAnswer);
-          console.log('Normalized correct answer:', normalizedCorrectAnswer);
-          
-          isCorrect = normalizedStudentAnswer === normalizedCorrectAnswer;
-        } else {
-          // Pour les réponses multiples, normaliser toutes les réponses
-          const normalizedStudentAnswers = new Set(
-            studentAnswer.correctAnswers.map(normalizeString)
-          );
-          const normalizedCorrectAnswers = new Set(
-            correctAnswerData.correctAnswers.map(normalizeString)
-          );
-          
-          console.log('Normalized student answers:', [...normalizedStudentAnswers]);
-          console.log('Normalized correct answers:', [...normalizedCorrectAnswers]);
-          
-          // Vérifier que les ensembles sont identiques
-          isCorrect = normalizedStudentAnswers.size === normalizedCorrectAnswers.size &&
-                     [...normalizedStudentAnswers].every(answer => 
-                       normalizedCorrectAnswers.has(answer)
-                     );
         }
-
-        // Attribution des points de la question si la réponse est correcte
-        if (isCorrect) {
-          console.log('Correct answer!')
-          totalScore += question.maxPoints;
-        }
-
-        formattedAnswers.push({
-          questionId: answer.questionId,
-          content: JSON.stringify({
-            type: correctAnswerData.type,
-            correctAnswers: studentAnswer.correctAnswers,
-            isCorrect: isCorrect,
-            score: isCorrect ? question.maxPoints : 0,
-            maxPoints: question.maxPoints
-          })
-        });
       } catch (error) {
-        console.error('Error parsing answer:', error);
-        console.error('Raw content:', answer.content);
-        continue; // Passer à la réponse suivante en cas d'erreur
+        console.error('Error processing answer:', error);
+        continue;
       }
     }
 
-    console.log('Total score:', totalScore);
-    console.log('Max possible score:', maxPossibleScore);
-
-    // Créer une nouvelle réponse avec les réponses aux questions
+    // Créer la réponse
     const examAnswer = await prisma.answer.create({
       data: {
         filePath: "exam_submission",
@@ -619,10 +675,8 @@ export async function submitExamAnswers(
         }
       }
     });
- console.log(formattedAnswers ,totalScore)
 
     if (isSubmission) {
-      // Mettre à jour le statut du participant
       await prisma.examParticipant.update({
         where: {
           examId_userId: {
@@ -635,20 +689,18 @@ export async function submitExamAnswers(
         }
       });
 
-      // Créer une correction automatique
       const correction = await prisma.correction.create({
         data: {
-          aiFeedback: "Correction automatique du QCM",
+          aiFeedback: exam.type === "CODE" ? "Évaluation IA du code" : "Correction automatique du QCM",
           autoScore: totalScore,
           answer: { connect: { id: examAnswer.id } }
         }
       });
 
-      // Créer la note finale
       await prisma.grade.create({
         data: {
           finalScore: totalScore,
-          comments: "Notation automatique basée sur les réponses au QCM",
+          comments: exam.type === "CODE" ? "Notation basée sur l'évaluation IA" : "Notation automatique basée sur les réponses au QCM",
           student: { connect: { id: studentId } },
           exam: { connect: { id: examId } },
           correction: { connect: { id: correction.id } },

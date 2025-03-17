@@ -3,20 +3,20 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { ExamType, ParticipantStatus } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
-export default async function ExamResultsPage({ params }: { params: { id: string } }) {
+export default async function ExamResultsPage({ params }: { params: { id: Promise<string> } }) {
   const header = await headers()
   const session = await auth.api.getSession({
     headers: header,
   })
-
+  
   if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=/available-exams/${params.id}/results`)
+    redirect(`/auth/login?callbackUrl=/available-exams/${await params.id}/results`)
   }
-
-  // Récupérer l'examen avec les questions, réponses et notes
+  
   const exam = await prisma.exam.findUnique({
-    where: { id: params.id },
+    where: { id: await params.id },
     include: {
       questions: true,
       grades:true,
@@ -43,7 +43,7 @@ export default async function ExamResultsPage({ params }: { params: { id: string
 
   // Vérifier si l'utilisateur a bien complété cet examen
   if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.COMPLETED) {
-    redirect(`/available-exams/${params.id}`)
+    redirect(`/available-exams/${await params.id}`)
   }
 
   return (
@@ -124,7 +124,57 @@ export default async function ExamResultsPage({ params }: { params: { id: string
                 </div>
               )}
 
-              {exam.type !== ExamType.CODE && (
+              {exam.type === ExamType.CODE ? (
+                <div>
+                  {/* Affichage du code soumis */}
+                  
+
+                  {/* Résultats des tests */}
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground mb-1">Résultats des tests :</p>
+                    <div className="space-y-2">
+                      {parsedStudentAnswer?.testResults?.map((test: any, index: number) => (
+                        <div key={index} className={cn(
+                          "p-3 rounded border",
+                          test.passed 
+                            ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" 
+                            : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
+                        )}>
+                          <p className="text-sm font-medium">Test {index + 1}</p>
+                          <p className="text-sm mt-1">Attendu : {test.expected}</p>
+                          <p className="text-sm">Obtenu : {test.output || "Pas de sortie"}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Évaluation IA */}
+                  <div className="space-y-4">
+                    {/* Score */}
+                    <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
+                      <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Score : {parsedStudentAnswer?.evaluation?.score}/{question.maxPoints}</p>
+                    </div>
+
+                    {/* Explication */}
+                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
+                      <p className="text-sm font-medium mb-2">Explication détaillée :</p>
+                      <p className="text-sm text-muted-foreground">{parsedStudentAnswer?.evaluation?.explanation}</p>
+                    </div>
+
+                    {/* Feedback */}
+                    <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
+                      <p className="text-sm font-medium mb-2">Suggestions d'amélioration :</p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">{parsedStudentAnswer?.evaluation?.feedback}</p>
+                    </div>
+
+                    {/* Qualité du code */}
+                    <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
+                      <p className="text-sm font-medium mb-2">Analyse de la qualité du code :</p>
+                      <p className="text-sm text-purple-700 dark:text-purple-300">{parsedStudentAnswer?.evaluation?.codeQuality}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
                 <div className="mb-4">
                   <p className="text-sm text-muted-foreground mb-1">Votre réponse:</p>
                   <div className="bg-muted p-4 rounded border">

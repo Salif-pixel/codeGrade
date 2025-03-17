@@ -4,71 +4,36 @@ export async function POST(request: Request) {
   try {
     const { code, language } = await request.json();
 
-    const apiKey = process.env.JUDGE0_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "API key missing" }, { status: 500 });
-    }
+    // Encoder le code en base64
+    const encodedCode = Buffer.from(code).toString('base64');
 
-    // 📌 Mapping des langages vers leurs IDs Judge0
-    const languageMapping: Record<string, number> = {
-      javascript: 63,
-      python: 71,
-      cpp: 54,
-      java: 62,
-      csharp: 51
-    };
-
-    const languageId = languageMapping[language];
-    if (!languageId) {
-      return NextResponse.json({ error: "Unsupported language" }, { status: 400 });
-    }
-
-    // 📌 1. Envoyer le code à Judge0
-    const submitResponse = await fetch("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true", {
+    const response = await fetch("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-rapidapi-key": apiKey,
+        "x-rapidapi-key": process.env.JUDGE0_API_KEY || '',
         "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
       },
       body: JSON.stringify({
-        source_code: code,
-        language_id: languageId,
+        source_code: encodedCode,
+        language_id: language === 'python' ? 71 : 63, // 71 pour Python, 63 pour JavaScript
         stdin: "",
       }),
     });
 
-    if (!submitResponse.ok) {
-      console.error("Submit response error:", await submitResponse.text());
-      return NextResponse.json({ error: "Submission failed" }, { status: submitResponse.status });
+    if (!response.ok) {
+      throw new Error(`Judge0 API error: ${response.status}`);
     }
 
-    const submitResult = await submitResponse.json();
-    if (!submitResult.token) {
-      return NextResponse.json({ error: "No token received" }, { status: 500 });
-    }
-
-    // 📌 2. Récupérer le résultat d'exécution
-    const outputResponse = await fetch(`https://judge0-ce.p.rapidapi.com/submissions/${submitResult.token}?base64_encoded=false`, {
-      method: "GET",
-      headers: {
-        "x-rapidapi-key": apiKey,
-        "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-      },
-    });
-
-    if (!outputResponse.ok) {
-      console.error("Output response error:", await outputResponse.text());
-      return NextResponse.json({ error: "Failed to get results" }, { status: outputResponse.status });
-    }
-
-    const outputResult = await outputResponse.json();
+    const result = await response.json();
+    const output = Buffer.from(result.stdout || '', 'base64').toString();
+    const error = result.stderr ? Buffer.from(result.stderr, 'base64').toString() : null;
 
     return NextResponse.json({
-      output: outputResult.stdout || outputResult.stderr || "No output",
-      error: outputResult.stderr,
-      status: outputResult.status?.description
+      output: output || error || "No output",
+      error: error
     });
+
   } catch (error) {
     console.error("Error executing code:", error);
     return NextResponse.json({ error: "Execution failed" }, { status: 500 });

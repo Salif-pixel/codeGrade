@@ -61,10 +61,17 @@ export default function CodeEditor({ initialCode, language, tests, onSubmit, isS
     const [activeTab, setActiveTab] = useState("editor")
     const [testResults, setTestResults] = useState<TestResult[]>([])
     const [allTestsPassed, setAllTestsPassed] = useState(false)
-    const [showTestInputs, setShowTestInputs] = useState(true);
+    const [showTestInputs, setShowTestInputs] = useState(true)
+
+    // Ajouter un useEffect pour mettre à jour le code quand initialCode change
+    useEffect(() => {
+        setCode(initialCode)
+    }, [initialCode])
 
     const handleEditorChange = (value: string | undefined) => {
-        setCode(value || "")
+        if (value !== undefined) {
+            setCode(value)
+        }
     }
 
     const runCode = async () => {
@@ -82,74 +89,61 @@ export default function CodeEditor({ initialCode, language, tests, onSubmit, isS
     }
 
     const runTests = async () => {
-        setIsRunning(true);
-        const results: TestResult[] = [];
+        setIsRunning(true)
+        const results: TestResult[] = []
 
         try {
-            if (!tests || tests.length === 0) {
-                console.log("Aucun test disponible");
-                return;
+            if (!code || code.trim() === '') {
+                throw new Error("Le code ne peut pas être vide")
             }
 
-            // Exécuter le code avec les prints pour chaque test
+            if (!tests || tests.length === 0) {
+                console.log("Aucun test disponible")
+                return
+            }
+
+            // Exécuter le code avec les tests
             const testCode = `
 ${code}
 
 # Exécuter et afficher le résultat pour chaque test
 ${tests.map(test => `print(${test.input})`).join('\n')}
-`;
+`
+            const result = await executeCode(testCode, language)
+            const outputs = result.output.split('\n').filter(line => line.trim() !== '')
 
-            console.log("Code exécuté:", testCode);
-
-            const result = await executeCode(testCode, language);
-            
-            // Séparer les lignes de sortie
-            const outputs = result.output.split('\n').filter(line => line.trim() !== '');
-            
-            // Comparer chaque ligne avec la valeur attendue
             tests.forEach((test, index) => {
-                const outputStr = String(outputs[index] || '').trim();
-                const expectedStr = String(test.expectedOutput).trim();
-                const passed = outputStr === expectedStr;
-
-                console.log("Test:", {
-                    input: test.input,
-                    expected: expectedStr,
-                    got: outputStr,
-                    passed
-                });
+                const outputStr = String(outputs[index] || '').trim()
+                const expectedStr = String(test.expectedOutput).trim()
+                const passed = outputStr === expectedStr
 
                 results.push({
                     testId: test.id,
                     passed,
                     output: outputStr,
                     expected: expectedStr
-                });
-            });
+                })
+            })
 
-            setTestResults(results);
-            const allPassed = results.every(r => r.passed);
-            setAllTestsPassed(allPassed);
-            setActiveTab("tests");
+            setTestResults(results)
+            const allPassed = results.every(r => r.passed)
+            setAllTestsPassed(allPassed)
 
+            // Envoyer les résultats au parent avec le code actuel
             onSubmit({
-                code,
+                code: code,
                 testResults: results,
                 type: "code",
                 correctAnswers: code,
                 isCorrect: allPassed
-            });
-        } catch (error) {
-            console.error("Erreur lors de l'exécution des tests:", error);
-            setOutput(`Erreur: ${error}`);
-        } finally {
-            setIsRunning(false);
-        }
-    };
+            })
 
-    const handleSubmit = () => {
-        // Exécuter les tests avant de soumettre
-        runTests()
+        } catch (error) {
+            console.error("Erreur lors de l'exécution des tests:", error)
+            setOutput(`Erreur: ${error}`)
+        } finally {
+            setIsRunning(false)
+        }
     }
 
     return (
@@ -179,12 +173,8 @@ ${tests.map(test => `print(${test.input})`).join('\n')}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
                 <TabsList className="w-full">
-                    <TabsTrigger value="editor" className="flex-1">
-                        Éditeur
-                    </TabsTrigger>
-                    <TabsTrigger value="output" className="flex-1">
-                        Sortie
-                    </TabsTrigger>
+                    <TabsTrigger value="editor" className="flex-1">Éditeur</TabsTrigger>
+                    <TabsTrigger value="output" className="flex-1">Sortie</TabsTrigger>
                     <TabsTrigger value="tests" className="flex-1">
                         Tests
                         {testResults.length > 0 && (
@@ -195,47 +185,22 @@ ${tests.map(test => `print(${test.input})`).join('\n')}
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="editor" className="mt-4">
-                    <Card className="border-2 shadow-md">
-                        <CardHeader className="bg-gray-50 dark:bg-zinc-800 pb-3">
-                            <CardTitle className="text-lg font-medium">Éditeur de code</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <Editor
-                                height="400px"
-                                defaultLanguage={language}
-                                defaultValue={initialCode}
-                                onChange={handleEditorChange}
-                                theme="vs-dark"
-                                options={{
-                                    minimap: { enabled: false },
-                                    fontSize: 14,
-                                    lineNumbers: "on",
-                                    automaticLayout: true,
-                                    scrollBeyondLastLine: false,
-                                }}
-                            />
-                        </CardContent>
-                        <CardFooter className="flex justify-between border-t bg-gray-50 dark:bg-zinc-800 p-4">
-                            <Button variant="outline" onClick={runCode} disabled={isRunning}>
-                                {isRunning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-                                Exécuter
-                            </Button>
-
-                            <Button 
-                                onClick={handleSubmit} 
-                                disabled={isSubmitting || !code.trim()} // Désactiver seulement si pas de code
-                                className="bg-blue-600 hover:bg-blue-700"
-                            >
-                                {isSubmitting ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <CheckCircle className="mr-2 h-4 w-4" />
-                                )}
-                                Soumettre
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                <TabsContent value="editor">
+                    <Editor
+                        height="400px"
+                        defaultLanguage={language}
+                        value={code}
+                        onChange={handleEditorChange}
+                        theme="vs-dark"
+                    />
+                    <div className="mt-4 flex justify-end gap-2">
+                        <Button onClick={runCode} disabled={isRunning}>
+                            Exécuter
+                        </Button>
+                        <Button onClick={runTests} disabled={isRunning}>
+                            Tester
+                        </Button>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="output" className="mt-4">

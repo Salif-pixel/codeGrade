@@ -35,6 +35,7 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   console.log(assignment.questions)
   const handleCodeSubmit = async (questionId: string, data: { code: string; testResults: any[]; isCorrect: boolean }) => {
+    console.log('Saving code answer:', data);
     setAnswers(prev => ({
       ...prev,
       [questionId]: {
@@ -58,20 +59,19 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
   }
 
   const handleFinalSubmit = async () => {
-    // Vérifier tous les tests une dernière fois
-    const formattedAnswers = await Promise.all(
-      Object.entries(answers).map(async ([questionId, answer]) => ({
-        questionId,
-        content: JSON.stringify({
-          code: answer.code,
-          testResults: answer.testResults,
-          type: "code",
-          correctAnswers: answer.code,
-          isCorrect: answer.isCorrect
-        })
-      }))
-    );
+    // Envoyer toutes les réponses d'un coup lors de la soumission finale
+    const formattedAnswers = Object.entries(answers).map(([questionId, answer]) => ({
+      questionId,
+      content: JSON.stringify({
+        type: "code",
+        code: answer.code,
+        testResults: answer.testResults,
+        correctAnswers: answer.code,
+        isCorrect: answer.isCorrect
+      })
+    }));
 
+    console.log('Submitting answers:', formattedAnswers);
     handleSubmit(formattedAnswers);
   }
 
@@ -143,7 +143,7 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
             disabled={isSubmitting || Object.keys(answers).length !== assignment.questions.length}
             className="bg-green-600 hover:bg-green-700"
           >
-            Terminer l'examen
+            Terminer l&apos;examen
           </Button>
         )}
       </div>

@@ -225,8 +225,37 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             feedback: { correct: "", incorrect: "" }
           })
         }));
+      } else if (exam.type === ExamType.CODE) {
+        // Parse le contenu si c'est une chaîne
+        let codeData;
+        if (Array.isArray(formData) && formData.length > 0) {
+          try {
+            codeData = JSON.parse(formData[0].content);
+          } catch (error) {
+            console.error("Error parsing code data:", error);
+            codeData = formData[0].content;
+          }
+        } else {
+          codeData = formData;
+        }
+        
+        console.log("Code data before formatting:", codeData);
+        
+        formattedAnswers = [{
+          questionId: exam.questions[0].id,
+          content: JSON.stringify({
+            type: "code",
+            code: codeData.code,
+            testResults: codeData.testResults,
+            isCorrect: codeData.isCorrect,
+            language: exam.questions[0].programmingLanguage,
+            questionText: exam.questions[0].text
+          })
+        }];
+        
+        console.log("Formatted answers:", formattedAnswers);
       } else {
-        // Pour PDF et CODE
+        // Pour PDF
         formattedAnswers = [{
           questionId: exam.questions[0].id,
           content: formData
