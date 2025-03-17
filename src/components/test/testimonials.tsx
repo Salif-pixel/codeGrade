@@ -14,7 +14,7 @@ const testimonials = [
   },
   {
     id: 2,
-    quote: "As a high school CS teacher, codeGrade has been a game-changer. My students receive immediate feedback on their code, which has significantly improved their learning outcomes and engagement.",
+    quote: "As a high school CS teacher, codeGrade has been a game-changer. My students receive immediate feedback on their Code, which has significantly improved their learning outcomes and engagement.",
     author: "Michael Chen",
     role: "Computer Science Teacher",
     institution: "Lincoln High School"

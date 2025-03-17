@@ -15,7 +15,7 @@ export default async function TakeExamPage({ params }: { params: { id: string } 
     redirect(`/auth/login?callbackUrl=/available-exams/${params.id}`)
   }
   
-  // Récupérer l'examen avec ses questions
+  // Récupérer l'examen avec ses questionse
   const exam = await prisma.exam.findUnique({
     where: { id: params.id },
     include: {
@@ -59,14 +59,15 @@ export default async function TakeExamPage({ params }: { params: { id: string } 
       text: q.text,
       maxPoints: q.maxPoints,
       choices: q.choices as string[] || [],
-      programmingLanguage: q.programmingLanguage || undefined,
-      studentAnswer: ""  // Nous n'avons pas de contenu direct, juste des soumissions
+      programmingLanguage: q.programmingLanguage as "python" | "javascript" | "sql" || undefined,
+      answer: q.answer || "",
+      studentAnswer: ""
     })),
     timeRemaining: exam.endDate ? Math.max(0, new Date(exam.endDate).getTime() - now.getTime()) : null,
     maxAttempts: exam.maxAttempts || 1,
     currentAttempt: 1,
   }
   
-  return <TakeExamComponent exam={examData} userId={session.user.id} />
+  return <TakeExamComponent exam={examData}  userId={session.user.id} /> 
 }
 

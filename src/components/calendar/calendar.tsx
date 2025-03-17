@@ -679,6 +679,7 @@ export default function CalendarView({
           }
           setIsSheetOpen(open);
         }}>
+          <SheetTitle></SheetTitle>
           <SheetContent side={sheetSide} className="p-0 border-l border-primary/10 dark:bg-zinc-900">
             <>
               {selectedAssignment && (

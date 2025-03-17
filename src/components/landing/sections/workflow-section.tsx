@@ -128,7 +128,7 @@ export function WorkflowSection() {
                                 </div>
                             </div>
 
-                            {/* Éditeur de code */}
+                            {/* Éditeur de Code */}
                             <div className="bg-gray-50 dark:bg-zinc-900 p-4 rounded-lg mb-4">
                                 <div className="flex justify-between items-center text-sm mb-2">
                                     <div className="flex space-x-2">

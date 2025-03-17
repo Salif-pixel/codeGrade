@@ -3,24 +3,38 @@ import { NextResponse } from 'next/server';
 // Fonction helper pour générer une réponse factice selon le type de question
 function generateFakeAnswer(question: any) {
   if (question.programmingLanguage) {
-    // Pour les questions de code
-    return `\`\`\`${question.programmingLanguage}
-// Solution possible
-function solution() {
+    // Pour les questions de Code
+    return JSON.stringify({
+      type: "code",
+      correctAnswers: `function solution(arr) {
   // Implémentation de base
-  console.log("Voici une solution possible");
-  // Plus de détails à venir avec l'API réelle
-  return "Résultat";
-}
-\`\`\`
-
-Explication:
-1. Cette solution utilise une approche simple
-2. Elle peut être optimisée davantage
-3. Points importants à considérer:
-   - Complexité: O(n)
-   - Utilisation mémoire: O(1)
-   - Bonnes pratiques respectées`;
+  return arr.sort((a, b) => a - b);
+}`,
+      tests: [
+        {
+          id: "test1",
+          name: "Test basique",
+          description: "Vérifie le fonctionnement de base",
+          input: "[5, 3, 1, 4, 2]",
+          expectedOutput: "[1, 2, 3, 4, 5]"
+        },
+        {
+          id: "test2",
+          name: "Test avec doublons",
+          description: "Vérifie le comportement avec des valeurs dupliquées",
+          input: "[3, 1, 3, 2, 1]",
+          expectedOutput: "[1, 1, 2, 3, 3]"
+        }
+      ],
+      explanation: `Cette solution utilise l'algorithme de tri natif pour:
+1. Trier les éléments dans l'ordre croissant
+2. Gérer correctement les doublons
+3. Retourner un nouveau tableau trié`,
+      feedback: {
+        correct: "Excellent ! Votre implémentation passe tous les tests.",
+        incorrect: "Attention, vérifiez que votre fonction:\n- Trie correctement les éléments\n- Gère les doublons\n- Retourne un nouveau tableau"
+      }
+    }, null, 2);
   } else if (question.choices?.length) {
     // Pour les questions QCM
     return `La réponse correcte serait le choix ${Math.floor(Math.random() * question.choices.length) + 1}.

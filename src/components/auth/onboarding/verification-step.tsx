@@ -56,7 +56,7 @@ export default function VerificationStep({ isVerified, onVerify, error }: Verifi
   const verifyEmailCode = () => {
     setLoading(true)
 
-    // Simulate verifying code
+    // Simulate verifying Code
     setTimeout(() => {
       setLoading(false)
       if (emailCode === "123456") {

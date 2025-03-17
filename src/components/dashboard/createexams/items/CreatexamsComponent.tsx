@@ -49,7 +49,7 @@ interface Question {
   text: string
   maxPoints: number
   choices: string[] // Pour les QCM : tableau des choix possibles
-  programmingLanguage?: string // Pour les questions de code : langage à utiliser
+  programmingLanguage?: string // Pour les questions de Code : langage à utiliser
   answer?: string
   isEditingAnswer?: boolean
   examId?: string
@@ -141,6 +141,11 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   }
 
   const addQuestion = () => {
+    if (format === "CODE" && questions.length >= 1) {
+      showToast(t("error"), t("codeLimit"), "error")
+      return
+    }
+    
     setQuestions([
       ...questions,
       {
@@ -642,6 +647,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                   type="button"
                   variant="outline"
                   onClick={addQuestion}
+                  disabled={format === "CODE" && questions.length >= 1}
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />

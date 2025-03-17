@@ -274,7 +274,7 @@ export default function AssignmentDetailModal({
                   </RadioGroup>
                 </div>
 
-                {/* Section Configuration du code */}
+                {/* Section Configuration du Code */}
                 {submissionType === "code" && isEditMode && (
                     <div className="rounded-lg bg-gray-50 p-4">
                       <h3 className="mb-3 text-sm font-medium uppercase text-gray-500">Configuration de l&aposéditeur de code</h3>
@@ -415,7 +415,7 @@ export default function AssignmentDetailModal({
                     </div>
                 )}
 
-                {/* Section Vue code en lecture seule */}
+                {/* Section Vue Code en lecture seule */}
                 {submissionType === "code" && !isEditMode && (
                     <div className="rounded-lg bg-indigo-50 p-5 border border-indigo-100">
                       <div className="mb-4 flex items-center">

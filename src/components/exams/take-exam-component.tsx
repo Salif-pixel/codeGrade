@@ -12,8 +12,9 @@ import { ExamType } from "@prisma/client"
 import { Clock, Save, Send, AlertCircle, CheckCircle, XCircle } from "lucide-react"
 import { submitExamAnswers } from "@/actions/examActions"
 import { cn } from "@/lib/utils"
-import QuizForm from "../../../app/[locale]/(dashboard)/available-exams/[id]/test";
-import { log } from "console"
+import QuizForm from "../dashboard/test/Qcm/qcm";
+import PdfComponent from "../dashboard/test/Document/pdf-component"
+import CodeComponent from "../dashboard/test/Code/code-component"
 
 
 type Question = {
@@ -21,7 +22,7 @@ type Question = {
   text: string
   maxPoints: number
   choices?: string[]
-  programmingLanguage?: string
+  programmingLanguage: "javascript" | "python" | "java" | "cpp" | "csharp"
   studentAnswer: string
 }
 
@@ -55,6 +56,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
   }>({ show: false, title: "", description: "" })
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: string[] }>({});
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("instructions")
   
   // Initialiser les réponses à partir des réponses existantes
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       if (distance <= 0) {
         setTimeLeft("00:00:00")
         clearInterval(timer)
-        handleSubmit()
+        handleSubmit({})
         
         setAlert({
           show: true,
@@ -207,49 +209,43 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
     }
   }
   
-  const handleSubmit = async () => {
-    if (submitting) return;
-
-    // Formater les réponses dans le format JSON requis
-    const formattedAnswers = exam.questions.map(question => {
-      const selectedIndices = quizAnswers[question.id] || [];
-      
-      // Déterminer si c'est une question à choix unique ou multiple
-      const isMultiple = selectedIndices.length > 1;
-      
-      return {
-        questionId: question.id,
-        content: JSON.stringify({
-          type: isMultiple ? "multiple" : "single",
-          correctAnswers: selectedIndices.map(answer => 
-            question?.choices?.findIndex(choice => choice === answer)
-          ).filter(index => index !== -1), // Convertir les réponses en indices
-          explanation: "", // L'explication sera fournie par le correcteur
-          feedback: {
-            correct: "",
-            incorrect: ""
-          }
-        })
-      };
-    });
-
+  const handleSubmit = async (formData: any) => {
     setSubmitting(true);
     
-    submitExamAnswers(exam.id, userId, formattedAnswers, true)
-      .then(result => {
-        if (result.success) {
-          router.push(`/${local}/available-exams/${exam.id}/results`);
-        } else {
-          setError("Erreur lors de la soumission de l'examen");
-        }
-      })
-      .catch(error => {
-        console.error("Error submitting exam:", error);
+    try {
+      let formattedAnswers;
+      
+      if (exam.type === ExamType.QCM) {
+        formattedAnswers = Object.entries(formData).map(([questionId, answer]) => ({
+          questionId,
+          content: JSON.stringify({
+            type: Array.isArray(answer) ? "multiple" : "single",
+            correctAnswers: answer,
+            explanation: "",
+            feedback: { correct: "", incorrect: "" }
+          })
+        }));
+      } else {
+        // Pour PDF et CODE
+        formattedAnswers = [{
+          questionId: exam.questions[0].id,
+          content: formData
+        }];
+      }
+
+      const result = await submitExamAnswers(exam.id, userId, formattedAnswers, true);
+      
+      if (result.success) {
+        router.push(`/${local}/available-exams/${exam.id}/results`);
+      } else {
         setError("Erreur lors de la soumission de l'examen");
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+      }
+    } catch (error) {
+      console.error("Error submitting exam:", error);
+      setError("Erreur lors de la soumission de l'examen");
+    } finally {
+      setSubmitting(false);
+    }
   };
   
   const isFormComplete = () => {
@@ -342,6 +338,20 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           onSubmit={handleQuizSubmit} 
           isSubmitting={submitting} 
         />
+      ) : exam.type === ExamType.DOCUMENT ? (
+        <PdfComponent
+          assignment={exam}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          handleSubmit={handleSubmit}
+          isSubmitting={submitting}
+        />
+      ) : exam.type === ExamType.CODE ? (
+        <CodeComponent
+          assignment={exam}
+          handleSubmit={handleSubmit}
+          isSubmitting={submitting}
+        />
       ) : (
         <>
           <Card className="border-primary/20">
@@ -349,7 +359,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
               <CardTitle>{t("instructions.title")}</CardTitle>
               <CardDescription>
                 {exam.type === ExamType.CODE
-                  ? t("instructions.code")
+                  ? t("instructions.Code")
                   : t("instructions.document")}
               </CardDescription>
             </CardHeader>
@@ -451,6 +461,13 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             </div>
           </div>
         </>
+      )}
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
     </div>
   )

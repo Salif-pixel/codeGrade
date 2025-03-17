@@ -61,7 +61,7 @@ export async function createExam(data: ExamData, userId: string) {
       if (invalidQuestions) {
         return {
           success: false,
-          error: 'Les questions de code doivent spécifier un langage de programmation'
+          error: 'Les questions de Code doivent spécifier un langage de programmation'
         }
       }
     }
@@ -105,7 +105,7 @@ export async function createExam(data: ExamData, userId: string) {
 export async function updateExam(examId: string, data: ExamData) {
   try {
     // Vérifier si l'examen existe et n'a pas commencé
-    const existingExam = await prisma.exam.findUnique({
+    const existingExam = await prisma.exam.findFirst({
       where: { id: examId },
       include: { questions: true }
     })
@@ -332,7 +332,31 @@ async function generateFakeAnswer(question: QuestionData, model: string) {
     let prompt = '';
     
     if (question.programmingLanguage) {
-      prompt = `Génère une réponse détaillée avec exemple de code en ${question.programmingLanguage} pour la question suivante: ${question.text}`;
+      prompt = `Fournis une explication détaillée et des tests précis avec le résultat attendu pour la question suivante: ${question.text}. Retourne ta réponse sous ce format JSON spécifique:
+{
+  "type": "code",
+  "tests": [
+    {
+      "id": "test1",
+      "name": "Test basique",
+      "description": "Vérifie le fonctionnement de base",
+      "input": "Entrée du test",
+      "expectedOutput": "Sortie attendue"
+    },
+    {
+      "id": "test2",
+      "name": "Test avancé",
+      "description": "Vérifie le comportement avec des données complexes",
+      "input": "Entrée du test",
+      "expectedOutput": "Sortie attendue (résultat)"
+    }
+  ],
+  "explanation": "Explication détaillée de la solution"
+}
+Important:
+- Fournis des tests exhaustifs pour valider la solution
+- L'explication doit être claire et aider l'étudiant à comprendre la solution
+- Le format JSON doit être respecté strictement`;
     } else if (question.choices?.length) {
       prompt = `Tu es un expert en évaluation. Analyse cette question QCM et fournis la ou les bonnes réponses.
 
@@ -398,14 +422,32 @@ Important:
   }
 }
 
-export async function updateExamAnswers(examId: string, questions: QuestionData[]) {
+export async function updateExamAnswers(examId: string, questions: any[]) {
   try {
-    // Mettre à jour chaque question avec sa réponse
+    // Vérifier que l'examen existe
+    const exam = await prisma.exam.findFirst({
+      where: { id: examId },
+      include: { questions: true }
+    });
+
+    if (!exam) {
+      return { success: false, error: 'Exam not found' };
+    }
+
+    // Mettre à jour les réponses pour chaque question
     await Promise.all(
       questions.map(async (question) => {
+        // Vérifier que la question existe
+        const existingQuestion = exam.questions.find(q => q.id === question.id);
+        if (!existingQuestion) {
+          console.warn(`Question ${question.id} not found in exam ${examId}`);
+          return;
+        }
+
         await prisma.question.update({
           where: {
-            id: question.id
+            id: question.id,
+            examId: examId // Ajouter cette condition pour s'assurer que la question appartient à l'examen
           },
           data: {
             answer: question.answer
@@ -414,11 +456,10 @@ export async function updateExamAnswers(examId: string, questions: QuestionData[
       })
     );
 
-    revalidatePath('/[locale]/exams');
     return { success: true };
   } catch (error) {
     console.error('Error updating exam answers:', error);
-    return { success: false, error: 'Failed to update exam answers' };
+    return { success: false, error: 'Failed to update answers' };
   }
 }
 
@@ -455,69 +496,108 @@ export async function submitExamAnswers(
     for (const answer of answers) {
       const question = exam.questions.find(q => q.id === answer.questionId);
       if (!question || !question.answer) continue;
+      
+      try {
+        console.log('Question:', question.answer);
+        console.log('Answer:', answer.content);
+        
+        const correctAnswerData = JSON.parse(question.answer);
+        
+        // Nettoyer la chaîne JSON avant de la parser
+        const cleanContent = answer.content.replace(/\\r\\n/g, '\n').replace(/\\/g, '');
+        const studentAnswer = JSON.parse(cleanContent);
+        
+        let isCorrect = false;
+        
+        if (correctAnswerData.type === "code") {
+          // Pour les questions de code
+          console.log('Evaluating code answer:', studentAnswer);
+          
+          // Vérifier si tous les tests ont passé
+          const allTestsPassed = studentAnswer.testResults.every((result: any) => result.passed);
+          
+          isCorrect = allTestsPassed;
+          
+          // Attribution des points
+          if (isCorrect) {
+            totalScore += question.maxPoints;
+          }
 
-      const correctAnswerData = JSON.parse(question.answer);
-      const studentAnswer = JSON.parse(answer.content);
-      
-      console.log('Question:', question.text);
-      console.log('Max points:', question.maxPoints);
-      console.log('Student answer:', studentAnswer);
-      console.log('Correct answer:', correctAnswerData);
-      
-      let isCorrect = false;
-      
-      if (correctAnswerData.type === "single") {
-        // Normaliser et comparer la réponse unique
-        const studentAnswerText = typeof studentAnswer.correctAnswers === 'string' 
-          ? studentAnswer.correctAnswers 
-          : studentAnswer.correctAnswers[0];
-        
-        const correctAnswerText = Array.isArray(correctAnswerData.correctAnswers)
-          ? correctAnswerData.correctAnswers[0]
-          : correctAnswerData.correctAnswers;
+          // Simplifier la réponse formatée pour les résultats
+          formattedAnswers.push({
+            questionId: answer.questionId,
+            content: JSON.stringify({
+              type: "code",
+              testResults: studentAnswer.testResults.map((result: any) => ({
+                name: result.testId,
+                passed: result.passed,
+                input: result.input,
+                expected: result.expected,
+                output: result.output
+              })),
+              explanation: correctAnswerData.explanation,
+              isCorrect,
+              score: isCorrect ? question.maxPoints : 0,
+              maxPoints: question.maxPoints
+            })
+          });
+        } else if (correctAnswerData.type === "single") {
+          // Normaliser et comparer la réponse unique
+          const studentAnswerText = typeof studentAnswer.correctAnswers === 'string' 
+            ? studentAnswer.correctAnswers 
+            : studentAnswer.correctAnswers[0];
+          
+          const correctAnswerText = Array.isArray(correctAnswerData.correctAnswers)
+            ? correctAnswerData.correctAnswers[0]
+            : correctAnswerData.correctAnswers;
 
-        const normalizedStudentAnswer = normalizeString(studentAnswerText);
-        const normalizedCorrectAnswer = normalizeString(correctAnswerText);
-        
-        console.log('Normalized student answer:', normalizedStudentAnswer);
-        console.log('Normalized correct answer:', normalizedCorrectAnswer);
-        
-        isCorrect = normalizedStudentAnswer === normalizedCorrectAnswer;
-      } else {
-        // Pour les réponses multiples, normaliser toutes les réponses
-        const normalizedStudentAnswers = new Set(
-          studentAnswer.correctAnswers.map(normalizeString)
-        );
-        const normalizedCorrectAnswers = new Set(
-          correctAnswerData.correctAnswers.map(normalizeString)
-        );
-        
-        console.log('Normalized student answers:', [...normalizedStudentAnswers]);
-        console.log('Normalized correct answers:', [...normalizedCorrectAnswers]);
-        
-        // Vérifier que les ensembles sont identiques
-        isCorrect = normalizedStudentAnswers.size === normalizedCorrectAnswers.size &&
-                   [...normalizedStudentAnswers].every(answer => 
-                     normalizedCorrectAnswers.has(answer)
-                   );
+          const normalizedStudentAnswer = normalizeString(studentAnswerText);
+          const normalizedCorrectAnswer = normalizeString(correctAnswerText);
+          
+          console.log('Normalized student answer:', normalizedStudentAnswer);
+          console.log('Normalized correct answer:', normalizedCorrectAnswer);
+          
+          isCorrect = normalizedStudentAnswer === normalizedCorrectAnswer;
+        } else {
+          // Pour les réponses multiples, normaliser toutes les réponses
+          const normalizedStudentAnswers = new Set(
+            studentAnswer.correctAnswers.map(normalizeString)
+          );
+          const normalizedCorrectAnswers = new Set(
+            correctAnswerData.correctAnswers.map(normalizeString)
+          );
+          
+          console.log('Normalized student answers:', [...normalizedStudentAnswers]);
+          console.log('Normalized correct answers:', [...normalizedCorrectAnswers]);
+          
+          // Vérifier que les ensembles sont identiques
+          isCorrect = normalizedStudentAnswers.size === normalizedCorrectAnswers.size &&
+                     [...normalizedStudentAnswers].every(answer => 
+                       normalizedCorrectAnswers.has(answer)
+                     );
+        }
+
+        // Attribution des points de la question si la réponse est correcte
+        if (isCorrect) {
+          console.log('Correct answer!')
+          totalScore += question.maxPoints;
+        }
+
+        formattedAnswers.push({
+          questionId: answer.questionId,
+          content: JSON.stringify({
+            type: correctAnswerData.type,
+            correctAnswers: studentAnswer.correctAnswers,
+            isCorrect: isCorrect,
+            score: isCorrect ? question.maxPoints : 0,
+            maxPoints: question.maxPoints
+          })
+        });
+      } catch (error) {
+        console.error('Error parsing answer:', error);
+        console.error('Raw content:', answer.content);
+        continue; // Passer à la réponse suivante en cas d'erreur
       }
-
-      // Attribution des points de la question si la réponse est correcte
-      if (isCorrect) {
-        console.log('Correct answer!')
-        totalScore += question.maxPoints;
-      }
-
-      formattedAnswers.push({
-        questionId: answer.questionId,
-        content: JSON.stringify({
-          type: correctAnswerData.type,
-          correctAnswers: studentAnswer.correctAnswers,
-          isCorrect: isCorrect,
-          score: isCorrect ? question.maxPoints : 0,
-          maxPoints: question.maxPoints
-        })
-      });
     }
 
     console.log('Total score:', totalScore);

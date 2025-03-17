@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { ParticipantStatus } from "@prisma/client"
+import { ExamType, ParticipantStatus } from "@prisma/client"
 
 export default async function ExamResultsPage({ params }: { params: { id: string } }) {
   const header = await headers()
@@ -124,23 +124,25 @@ export default async function ExamResultsPage({ params }: { params: { id: string
                 </div>
               )}
 
-              <div className="mb-4">
-                <p className="text-sm text-muted-foreground mb-1">Votre réponse:</p>
-                <div className="bg-muted p-4 rounded border">
-                  {parsedStudentAnswer?.correctAnswers ? (
-                    Array.isArray(parsedStudentAnswer.correctAnswers) ? 
-                      parsedStudentAnswer.correctAnswers.map((answer: string, index: number) => (
-                        <span key={index}>
-                          {answer}
-                          {index < parsedStudentAnswer.correctAnswers.length - 1 ? ', ' : ''}
-                        </span>
-                      ))
-                    : parsedStudentAnswer.correctAnswers
-                  ) : "Aucune réponse fournie"}
+              {exam.type !== ExamType.CODE && (
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground mb-1">Votre réponse:</p>
+                  <div className="bg-muted p-4 rounded border">
+                    {parsedStudentAnswer?.correctAnswers ? (
+                      Array.isArray(parsedStudentAnswer.correctAnswers) ? 
+                        parsedStudentAnswer.correctAnswers.map((answer: string, index: number) => (
+                          <span key={index}>
+                            {answer}
+                            {index < parsedStudentAnswer.correctAnswers.length - 1 ? ', ' : ''}
+                          </span>
+                        ))
+                      : parsedStudentAnswer.correctAnswers
+                    ) : "Aucune réponse fournie"}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {parsedCorrectAnswer && (
+              {exam.type !== ExamType.CODE && parsedCorrectAnswer && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Réponse correcte:</p>
                   <div className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 p-4 rounded border border-emerald-200 dark:border-emerald-800">
@@ -157,11 +159,11 @@ export default async function ExamResultsPage({ params }: { params: { id: string
               )}
 
               {/* Feedback selon la réponse */}
-              {parsedStudentAnswer?.isCorrect ? (
+              {exam.type !== ExamType.CODE && parsedStudentAnswer?.isCorrect ? (
                 <div className="mt-4 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 p-4 rounded border border-green-200 dark:border-green-800">
                   <p>{parsedCorrectAnswer?.feedback?.correct}</p>
                 </div>
-              ) : (
+              ) : exam.type !== ExamType.CODE && (
                 <div className="mt-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 p-4 rounded border border-red-200 dark:border-red-800">
                   <p>{parsedCorrectAnswer?.feedback?.incorrect}</p>
                 </div>

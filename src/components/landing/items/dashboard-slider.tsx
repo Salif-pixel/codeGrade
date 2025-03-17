@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils"
 const dashboardImages = [
     {
         id: 1,
-        src: "/assets/code.png",
+        src: "/assets/Code.png",
         alt: "Vue des évaluations",
-        title: "Interface d'évaluations code",
-        description: "Gérez toutes vos évaluations de code en un seul endroit",
+        title: "Interface d'évaluations Code",
+        description: "Gérez toutes vos évaluations de Code en un seul endroit",
     },
     {
         id: 2,
