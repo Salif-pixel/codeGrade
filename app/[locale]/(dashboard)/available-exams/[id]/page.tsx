@@ -5,19 +5,19 @@ import { prisma } from "@/lib/prisma"
 import {  ParticipantStatus } from "@prisma/client"
 import TakeExamComponent from "@/components/exams/take-exam-component"
 
-export default async function TakeExamPage({ params }: { params: { id: string } }) {
+export default async function TakeExamPage({ params }: { params: { id: Promise<string> } }) {
   const header = await headers()
   const session = await auth.api.getSession({
     headers: header,
   })
   
   if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=/available-exams/${params.id}`)
+    redirect(`/auth/login?callbackUrl=/available-exams/${await params.id}`)
   }
   
-  // Récupérer l'examen avec ses questionse
+  // Récupérer l'examen avec ses questions
   const exam = await prisma.exam.findUnique({
-    where: { id: params.id },
+    where: { id: await params.id },
     include: {
       questions: true,
       participants: {
