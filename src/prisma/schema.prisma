@@ -121,6 +121,7 @@ model Exam {
   startDate   DateTime?
   endDate     DateTime?
   status      ExamStatus @default(PENDING)
+  fileCorrection String?
 
   questions    Question[]        @relation("ExamQuestions")
   createdBy    User              @relation("ExamsCreated", fields: [createdById], references: [id])

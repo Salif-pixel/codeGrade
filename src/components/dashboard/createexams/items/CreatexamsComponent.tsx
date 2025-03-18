@@ -1,55 +1,46 @@
 "use client"
 
-import React, { useState, type ChangeEvent, useTransition } from "react"
+import React, { useState, type ChangeEvent, useTransition, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import {
-  ArrowLeft,
-  ArrowRight,
-  Upload,
-  FileText,
-  Code,
-  CheckSquare,
-  Plus,
-  Trash,
-  CheckCircle2,
-  Calendar,
-  ClipboardList,
-  BookOpen,
-  HelpCircle,
-  AlertCircle,
-  Clock,
-  Repeat,
-  Notebook,
-  FileQuestion,
-  Info,
-  Loader2,
-  Bot,
+  ArrowLeft, ArrowRight, Upload, FileText, Code, CheckSquare, Plus, Trash,
+  CheckCircle2, Calendar, ClipboardList, BookOpen, HelpCircle, AlertCircle,
+  Clock, Repeat, Notebook, FileQuestion, Info, Loader2, Bot,
+  X
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter
+} from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { createExam, generateAnswers, updateExamAnswers } from "@/actions/examActions"
+import { createExam, extractContentFromDocument, generateAnswers, generateDocumentAnswer, updateDocumentExamAnswer, updateExamAnswers } from "@/actions/examActions"
 import { useCustomToast } from "@/components/alert/alert"
 import { ExamType } from "@prisma/client"
 import { SimpleHeaderTitle } from "@/components/dashboard/header/header-title"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-
 import { Skeleton } from "@/components/ui/skeleton"
+import { useEdgeStore } from "@/lib/edgestore"
 
+// Types & Interfaces
 type ExamFormat = "QCM" | "PDF" | "CODE"
 
 interface Question {
   id: string
   text: string
   maxPoints: number
-  choices: string[] // Pour les QCM : tableau des choix possibles
-  programmingLanguage?: string // Pour les questions de Code : langage à utiliser
+  choices: string[]
+  programmingLanguage?: string
   answer?: string
   isEditingAnswer?: boolean
   examId?: string
@@ -59,85 +50,135 @@ interface ExamCreatorProps {
   userId: string
 }
 
+// Main Component
 const ExamCreator = ({ userId }: ExamCreatorProps) => {
+  // Hooks
+  const { edgestore } = useEdgeStore();
   const t = useTranslations('exams')
   const router = useRouter()
   const { showToast } = useCustomToast()
   const local = useLocale()
   const [, startTransition] = useTransition()
 
-  // Step control
-  const [currentStep, setCurrentStep] = useState<number>(1)
+  // Step State
   const totalSteps = 4
+  const [currentStep, setCurrentStep] = useState<number>(1)
 
-  // Form state
+  // Form State
   const [title, setTitle] = useState<string>("")
   const [description, setDescription] = useState<string>("")
-  const [type, ] = useState<ExamType>(ExamType.QCM)
+  const [type] = useState<ExamType>(ExamType.QCM)
   const [format, setFormat] = useState<ExamFormat>("QCM")
-  const [filePath, setFilePath] = useState<string>("")
-  const [maxAttempts, ] = useState<number>(1)
+  const [maxAttempts] = useState<number>(1)
+
+  const handleFormatChange = (value: ExamFormat) => {
+    setFormat(value)
+    if(value != "PDF"){
+      setFile(undefined)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+  }
+
+  // Date State
   const [startDate, setStartDate] = useState<string>(
-    new Date().toISOString().slice(0, 16),
+    new Date().toISOString().slice(0, 16)
   )
   const [endDate, setEndDate] = useState<string>(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
   )
-  const [deadline, ] = useState<string>(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+  const [deadline] = useState<string>(
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
   )
-  const [, setFile] = useState<File | null>(null)
-  const [questions, setQuestions] = useState<Question[]>([{ 
-    id: "1", 
-    text: "", 
+
+  // Questions State
+  const [questions, setQuestions] = useState<Question[]>([{
+    id: "1",
+    text: "",
     maxPoints: 10,
-    choices: format === "QCM" ? [""] : [],
-    programmingLanguage: format === "CODE" ? "python" : undefined
+    choices: [""],
+    programmingLanguage: undefined,
+    answer: ""
   }])
+  const [extractedText, setExtractedText] = useState<string>("")
+
+  // UI State
   const [showAnswers, setShowAnswers] = useState(false)
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false)
-  const [selectedModel, ] = useState("deepseek-chat")
+  const [selectedModel] = useState("deepseek/deepseek-chat:free")
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [examCreated, setExamCreated] = useState(false)
   const [, setCreatedExamId] = useState<string | null>(null)
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0]
-      setFile(selectedFile)
-      setFilePath(selectedFile.name) // In production, you would upload and get a path
+  // File Handlers
+  const [file, setFile] = useState<File>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadResult, setUploadResult] = useState<string | null>(null);
+
+  async function uploadFile(file: File) {
+    if (!file) return null;
+
+    try {
+      setUploadState("uploading");
+      setUploadError(null);
+      setUploadProgress(0);
+
+      const res = await edgestore.publicFiles.upload({
+        file,
+        onProgressChange: (progress) => {
+          setUploadProgress(progress);
+        },
+      });
+
+      setUploadProgress(100);
+      setUploadState("success");
+      setUploadResult(res.url);
+      return res.url;
+
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
+      setUploadState("error");
+      setUploadError(error instanceof Error ? error.message : "Une erreur est survenue");
+      setUploadProgress(0);
+      setUploadResult(null);
+      return null;
     }
   }
 
-
+  // Question Handlers
   const handleChoiceChange = (questionId: string, choiceIndex: number, value: string) => {
     setQuestions(questions.map(q => {
       if (q.id === questionId && q.choices) {
-        const newChoices = [...q.choices];
-        newChoices[choiceIndex] = value;
-        return { ...q, choices: newChoices };
+        const newChoices = [...q.choices]
+        newChoices[choiceIndex] = value
+        return { ...q, choices: newChoices }
       }
-      return q;
-    }));
+      return q
+    }))
   }
 
   const addChoice = (questionId: string) => {
     setQuestions(questions.map(q => {
       if (q.id === questionId && q.choices) {
-        return { ...q, choices: [...q.choices, ""] };
+        return { ...q, choices: [...q.choices, ""] }
       }
-      return q;
-    }));
+      return q
+    }))
   }
 
   const removeChoice = (questionId: string, choiceIndex: number) => {
     setQuestions(questions.map(q => {
       if (q.id === questionId && q.choices && q.choices.length > 1) {
-        const newChoices = q.choices.filter((_, index) => index !== choiceIndex);
-        return { ...q, choices: newChoices };
+        const newChoices = q.choices.filter((_, index) => index !== choiceIndex)
+        return { ...q, choices: newChoices }
       }
-      return q;
-    }));
+      return q
+    }))
   }
 
   const addQuestion = () => {
@@ -145,7 +186,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
       showToast(t("error"), t("codeLimit"), "error")
       return
     }
-    
+
     setQuestions([
       ...questions,
       {
@@ -154,7 +195,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
         maxPoints: 10,
         choices: format === "QCM" ? [""] : [],
         programmingLanguage: format === "CODE" ? "python" : undefined
-      },
+      }
     ])
   }
 
@@ -168,16 +209,18 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
   const updateQuestion = (id: string, field: keyof Question, value: string | number) => {
     setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, [field]: field === "maxPoints" ? Number(value) : value } : q)),
+      questions.map((q) => (
+        q.id === id ? { ...q, [field]: field === "maxPoints" ? Number(value) : value } : q
+      ))
     )
   }
 
+  // Navigation Handlers
   const nextStep = () => {
     if (currentStep === 1 && !title) {
       showToast(t("error"), t("titleRequired"), "error")
       return
     }
-
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
     }
@@ -189,11 +232,11 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     }
   }
 
+  // Form Submission & Answer Generation
   const handleSubmit = async () => {
     setIsGeneratingAnswers(true)
     startTransition(async () => {
       try {
-        // Empêcher la création multiple
         if (examCreated) {
           showToast(t("error"), t("examAlreadyCreated"), "error")
           return
@@ -206,7 +249,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           return
         }
 
-        if (format === "PDF" && !filePath) {
+        if (format === "PDF" && !file) {
           showToast(t("error"), t("fileRequired"), "error")
           setCurrentStep(2)
           return
@@ -221,13 +264,21 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           }
         }
 
-        // Créer l'examen
+        let res : string | null = null;
+        if(format == "PDF"){
+          res = await uploadFile(file!)
+          if(res){
+            setUploadResult(res)
+          }
+        }
+
+        // Create exam data
         const examData = {
           title,
           description,
           type: format === "PDF" ? ExamType.DOCUMENT : format === "QCM" ? ExamType.QCM : ExamType.CODE,
           format,
-          filePath: format === "PDF" ? filePath : "",
+          filePath: format === "PDF" ? res ?? "sample.pdf" : "",
           maxAttempts: Number(maxAttempts),
           startDate: startDate ? new Date(startDate) : undefined,
           endDate: endDate ? new Date(endDate) : undefined,
@@ -241,22 +292,40 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
           setCreatedExamId(result.data.id)
           showToast(t("success"), t("examCreated"), "success")
 
-          // Générer les réponses
           if (format !== "PDF") {
             const answersResult = await generateAnswers(questions, selectedModel)
-            
+
             if (answersResult.success && answersResult.questions) {
+              setShowAnswers(true)
               const questionsWithAnswers = await Promise.all(
                 answersResult.questions.map(async (q, index) => ({
                   ...q,
-                  id: result.data!.questions[index].id ,
+                  id: result.data!.questions[index].id,
                   examId: result.data!.id,
                   answer: await q.answer,
                   isEditingAnswer: false
                 }))
               )
               setQuestions(questionsWithAnswers)
-              setShowAnswers(true)
+            }
+          }else{
+            const text = await extractContentFromDocument(file!, file!.name.split('.').pop()! as "pdf" | "md" | "latex" | "txt");
+            console.log(text);
+            setExtractedText(text);
+            const answersResult = await generateDocumentAnswer(text, selectedModel)
+            console.log(answersResult);
+            if(answersResult.success){
+              setShowAnswers(true);
+              setQuestions([{
+                id: "1",
+                text: t("documentAnswer"),
+                maxPoints: 20,
+                choices: [],
+                answer: answersResult.evaluation,
+                examId: result.data!.id
+              }]);
+            }else{
+              showToast(t("error"), t("aiGeneration.error"), "error")
             }
           }
         } else {
@@ -279,37 +348,56 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
 
   const handleRedirect = async () => {
     try {
-      // Mettre à jour les réponses avant la redirection
-      const result = await updateExamAnswers(questions[0].examId!, questions);
+      let result;
+      if (format === "PDF") {
+        console.log(questions);
+        result = await updateDocumentExamAnswer(questions[0].examId!, questions[0].answer!)
+      } else {
+        result = await updateExamAnswers(questions[0].examId!, questions)
+      }
 
       if (result.success) {
-        showToast(t("success"), t("answersUpdated"), "success");
-        router.push(`/${local}/exams`);
+        showToast(t("success"), t("answersUpdated"), "success")
+        router.push(`/${local}/exams`)
       } else {
-        showToast(t("error"), t("updateAnswersError"), "error");
+        showToast(t("error"), t("updateAnswersError"), "error")
       }
     } catch (error) {
-      console.error("Error updating answers:", error);
-      showToast(t("error"), t("unknownError"), "error");
+      console.error("Error updating answers:", error)
+      showToast(t("error"), t("unknownError"), "error")
     }
   }
 
   const handleGenerateAnswers = async (regenerate = false) => {
     const actionToExecute = regenerate ? setIsRegenerating : setIsGeneratingAnswers
     actionToExecute(true)
-    
+
     try {
-      const answersResult = await generateAnswers(questions, selectedModel)
-      
-      if (answersResult.success && answersResult.questions) {
-        setQuestions(answersResult.questions.map((q, index) => ({
-          ...q,
-          id: questions[index].id, // Use the original question's ID
-          isEditingAnswer: false
-        })))
-        setShowAnswers(true)
+      if (format === "PDF") {
+        const answersResult = await generateDocumentAnswer(extractedText, selectedModel)
+        
+        if (answersResult.success) {
+          setQuestions([{
+            ...questions[0],
+            answer: answersResult.evaluation,
+          }])
+          setShowAnswers(true)
+        } else {
+          showToast(t("error"), t("aiGeneration.error"), "error")
+        }
       } else {
-        showToast(t("error"), t("aiGeneration.error"), "error")
+        const answersResult = await generateAnswers(questions, selectedModel)
+
+        if (answersResult.success && answersResult.questions) {
+          setQuestions(answersResult.questions.map((q, index) => ({
+            ...q,
+            id: questions[index].id,
+            isEditingAnswer: false
+          })))
+          setShowAnswers(true)
+        } else {
+          showToast(t("error"), t("aiGeneration.error"), "error")
+        }
       }
     } catch (error) {
       console.error("Error generating answers:", error)
@@ -488,21 +576,67 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
             <Card className="dark:bg-zinc-900 border-primary/20">
               <CardContent className="pt-6">
                 {format === "PDF" ? (
-                  <div className="space-y-4">
-                    <Label className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-primary" />
-                      {t("uploadDocument")}
-                    </Label>
-                    <Input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleFileChange}
-                      className="dark:bg-zinc-800"
-                    />
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <Label className="flex items-center gap-2 text-lg font-medium">
+                        <FileText className="h-5 w-5 text-primary" />
+                        {t("uploadDocument")}
+                      </Label>
+                      {file && (
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-primary">
+                            {file.name.split('.').pop()?.toUpperCase()}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive/80"
+                            onClick={() => {
+                              setFile(undefined)
+                              if (fileInputRef.current) {
+                                fileInputRef.current.value = ""
+                              }
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="relative">
+                      <Input
+                        type="file"
+                        accept=".pdf,.md,.tex,.txt"
+                        ref={fileInputRef}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            setFile(file)
+                            // uploadFile(file)
+                          }
+                        }}
+                        className="dark:bg-zinc-800 cursor-pointer file:cursor-pointer file:border-0 file:bg-primary/10 file:text-primary file:font-medium hover:file:bg-primary/20 transition-colors"
+                      />
+                    </div>
+
+                    {file && (
+                      <div className="space-y-2 p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <FileText className="h-4 w-4" />
+                          <span className="font-medium">{file.name}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                          <span>{new Date(file.lastModified).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-32">
-                    <p className="text-muted-foreground">
+                  <div className="flex items-center justify-center h-32 rounded-lg bg-primary/5 border border-dashed border-primary/20">
+                    <p className="text-muted-foreground flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
                       {t("documentUploadNotAllowed")}
                     </p>
                   </div>
@@ -674,83 +808,107 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               <h2 className="text-xl font-semibold">{t("review")}</h2>
             </div>
 
-            <Card className="border-primary/20 shadow-md">
-              <CardHeader className="pb-2 border-b">
-                <CardTitle className="text-xl">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+            <Card className="border-primary/20 py-0 overflow-hidden">
+              <CardHeader className=" border-b py-4">
+                <div className="space-y-1.5">
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                    {title}
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    {description}
+                  </CardDescription>
+                </div>
               </CardHeader>
+
               <CardContent className="pt-6">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-primary" />
-                        {t("type")}
-                      </p>
-                      <p className="font-medium">{type}</p>
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 rounded-md bg-primary/10">
+                          <FileText className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold">{t("type")}</h3>
+                      </div>
+                      <p className="text-lg">{type}</p>
                     </div>
 
-                    <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Code className="h-4 w-4 text-primary" />
-                        {t("format")}
-                      </p>
-                      <p className="font-medium flex items-center gap-2">
-                        {format === "QCM" && <CheckSquare className="h-4 w-4 text-primary" />}
-                        {format === "PDF" && <FileText className="h-4 w-4 text-primary" />}
-                        {format === "CODE" && <Code className="h-4 w-4 text-primary" />}
+                    <div className="p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 rounded-md bg-primary/10">
+                          <Code className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold">{t("format")}</h3>
+                      </div>
+                      <p className="text-lg flex items-center gap-2">
+                        {format === "QCM" && <CheckSquare className="h-5 w-5 text-primary" />}
+                        {format === "PDF" && <FileText className="h-5 w-5 text-primary" />}
+                        {format === "CODE" && <Code className="h-5 w-5 text-primary" />}
                         {format}
                       </p>
                     </div>
 
-                    <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Repeat className="h-4 w-4 text-primary" />
-                        {t("maxAttempts")}
-                      </p>
-                      <p className="font-medium">{maxAttempts}</p>
+                    <div className="p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 rounded-md bg-primary/10">
+                          <Repeat className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold">{t("maxAttempts")}</h3>
+                      </div>
+                      <p className="text-lg">{maxAttempts}</p>
                     </div>
 
-                    <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        {t("deadline")}
-                      </p>
-                      <p className="font-medium">{new Date(deadline).toLocaleString()}</p>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Upload className="h-4 w-4 text-primary" />
-                      {t("attachedFile")}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1 p-2 bg-primary/5 rounded-md">
-                      <FileText className="h-4 w-4 text-primary" />
-                      <p className="font-medium">{filePath}</p>
+                    <div className="p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 rounded-md bg-primary/10">
+                          <Calendar className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold">{t("deadline")}</h3>
+                      </div>
+                      <p className="text-lg">{new Date(deadline).toLocaleString()}</p>
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <FileQuestion className="h-4 w-4 text-primary" />
-                      {t("questionCount")}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="font-medium">
-                        {questions.length}
-                      </Badge>
-                      <p>{t("questions").toLowerCase()}</p>
+                  {format === "PDF" && (
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-md bg-primary/10">
+                          <Upload className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold">{t("attachedFile")}</h3>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800 rounded-md shadow-sm">
+                        <FileText className="h-5 w-5 text-primary" />
+                        <p className="font-medium">{file?.name}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {format !== "PDF" && (
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-md bg-primary/10">
+                          <FileQuestion className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold">{t("questionCount")}</h3>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" className="px-4 py-1.5 text-lg font-semibold">
+                          {questions.length}
+                        </Badge>
+                        <p className="text-lg">{t("questions").toLowerCase()}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
-              <CardFooter className="bg-primary/5 border-t">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-primary mt-0.5" />
-                  <p className="text-sm">{t("finalConfirmation")}</p>
+
+              <CardFooter className="border-t p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <AlertCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <p className="text-sm leading-relaxed">{t("finalConfirmation")}</p>
                 </div>
               </CardFooter>
             </Card>
@@ -766,7 +924,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     <>
       <SimpleHeaderTitle
         title={'exams.createNew'}
-        Icon={<Notebook className="h-5 w-5"/>}
+        Icon={<Notebook className="h-5 w-5" />}
       />
       <div className="container py-10">
         <Card className="mb-8 shadow-md border-zinc-200 dark:border-primary/20">
@@ -775,9 +933,8 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               {[1, 2, 3, 4].map((step) => (
                 <React.Fragment key={step}>
                   <div
-                    className={`flex flex-col items-center ${
-                      currentStep >= step ? "text-primary" : "text-muted-foreground"
-                    }`}
+                    className={`flex flex-col items-center ${currentStep >= step ? "text-primary" : "text-muted-foreground"
+                      }`}
                     onClick={() => step < currentStep && setCurrentStep(step)}
                   >
                     <div
@@ -848,9 +1005,9 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               ) : (
                 <>
                   {!examCreated ? (
-                    <Button 
-                      type="button" 
-                      onClick={handleSubmit} 
+                    <Button
+                      type="button"
+                      onClick={handleSubmit}
                       disabled={isGeneratingAnswers}
                       className="bg-primary hover:bg-primary/90"
                     >
@@ -868,7 +1025,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                       )}
                     </Button>
                   ) : (
-                    <Button 
+                    <Button
                       onClick={() => handleGenerateAnswers(true)}
                       disabled={isRegenerating}
                       className="bg-primary hover:bg-primary/90"
@@ -921,23 +1078,41 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
                 <AnswerSkeleton />
               ) : (
                 <div className="space-y-6">
-                  {questions.map((question) => (
-                    <Card key={question.id} className="border-primary/20">
+                  {format === "PDF" ? (
+                    <Card className="border-primary/20">
                       <CardHeader>
-                        <CardTitle className="text-lg">{question.text}</CardTitle>
+                        <CardTitle className="text-lg">{t("documentAnswer")}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
                           <Textarea
-                            value={question.answer || ''}
-                            onChange={(e) => updateAnswer(question.id, e.target.value)}
+                            value={questions[0].answer || ''}
+                            onChange={(e) => updateAnswer(questions[0].id, e.target.value)}
                             placeholder={t("aiGeneration.answerPlaceholder")}
-                            className="min-h-[100px]"
+                            className="min-h-[300px]"
                           />
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                  ) : (
+                    questions.map((question) => (
+                      <Card key={question.id} className="border-primary/20">
+                        <CardHeader>
+                          <CardTitle className="text-lg">{question.text}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2">
+                            <Textarea
+                              value={question.answer || ''}
+                              onChange={(e) => updateAnswer(question.id, e.target.value)}
+                              placeholder={t("aiGeneration.answerPlaceholder")}
+                              className="min-h-[100px]"
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </div>
               )}
             </CardContent>
@@ -948,7 +1123,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
               >
                 {t('back')}
               </Button>
-              <Button 
+              <Button
                 onClick={handleRedirect}
                 className="bg-primary hover:bg-primary/90"
               >

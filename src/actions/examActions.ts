@@ -1,9 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import {ExamType, ParticipantStatus, SubmissionStatus} from '@prisma/client'
-import {prisma} from '@/lib/prisma'
-import { log } from 'console'
+import { ExamType, ParticipantStatus, SubmissionStatus } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
+import { marked } from 'marked';
+import extractText from 'react-pdftotext';
 
 interface QuestionData {
   id?: string
@@ -26,21 +27,48 @@ interface ExamData {
   questions?: QuestionData[]
 }
 
+export async function extractContentFromDocument(file: File, type: 'pdf' | 'md' | 'latex' | 'txt'): Promise<string> {
+  try {
+    switch (type) {
+      case 'pdf': {
+        const text = await extractText(file);
+        return text;
+      }
+
+      case 'md': {
+        const text = await file.text();
+        return marked.parse(text);
+      }
+
+      case 'latex':
+      case 'txt': {
+        return await file.text();
+      }
+
+      default:
+        throw new Error('Unsupported file type');
+    }
+  } catch (error) {
+    console.error('Error processing file:', error);
+    throw new Error(`Failed to extract content: ${(error as Error).message}`);
+  }
+}
+
 export async function createExam(data: ExamData, userId: string) {
   try {
     // Validation des données selon le type d'examen
     if (data.type === 'DOCUMENT') {
       if (!data.filePath || data.questions?.length) {
-        return { 
-          success: false, 
-          error: 'Un devoir de type DOCUMENT nécessite un fichier et ne doit pas avoir de questions' 
+        return {
+          success: false,
+          error: 'Un devoir de type DOCUMENT nécessite un fichier et ne doit pas avoir de questions'
         }
       }
     } else {
       if (data.filePath || !data.questions?.length) {
-        return { 
-          success: false, 
-          error: 'Les devoirs de type QCM ou CODE nécessitent des questions et ne doivent pas avoir de fichier' 
+        return {
+          success: false,
+          error: 'Les devoirs de type QCM ou CODE nécessitent des questions et ne doivent pas avoir de fichier'
         }
       }
     }
@@ -248,7 +276,7 @@ export async function getExams(userId: string) {
   }
 }
 
-export async function joinExam(examId: string,userId: string) {
+export async function joinExam(examId: string, userId: string) {
   try {
 
     // Vérifier si l'utilisateur n'est pas déjà participant
@@ -331,7 +359,7 @@ async function generateFakeAnswer(question: QuestionData, model: string) {
   console.log('Generating answer for:', question.text)
   try {
     let prompt = '';
-    
+
     if (question.programmingLanguage) {
       prompt = `Fournis une explication détaillée et des tests précis avec le résultat attendu pour la question suivante: ${question.text}. Retourne ta réponse sous ce format JSON spécifique:
       (ne pas inclure les parenthèses les  backticks \`\`\`json et les commentaires)
@@ -418,7 +446,7 @@ Important:
     }
 
     console.log('Parsed evaluation:', evaluation);
-    
+
     // Pour les QCM, formater la réponse
     if (question.choices?.length) {
       try {
@@ -508,15 +536,15 @@ export async function submitExamAnswers(
     };
 
     for (const answer of answers) {
-      console.log("logggggggggg",answer);
+      console.log("logggggggggg", answer);
       const question = exam.questions.find(q => q.id === answer.questionId);
       if (!question || !question.answer) continue;
 
       try {
         // Vérifier si content est déjà un objet et le parser de manière sécurisée
         let studentAnswer;
-        console.log("answersssss",answer.content);
-        
+        console.log("answersssss", answer.content);
+
         try {
           studentAnswer = typeof answer.content === 'string'
             ? JSON.parse(answer.content)
@@ -525,9 +553,9 @@ export async function submitExamAnswers(
           console.error('Error parsing student answer:', parseError);
           studentAnswer = answer.content; // Utiliser la réponse brute si le parsing échoue
         }
-        
+
         console.log("studentAnswer parsed:", studentAnswer);
-        
+
         let correctAnswerData;
         try {
           correctAnswerData = JSON.parse(question.answer);
@@ -535,7 +563,7 @@ export async function submitExamAnswers(
           console.error('Error parsing correct answer:', parseError);
           continue;
         }
-        
+
         if (question.programmingLanguage) {
           // Vérifier que nous avons bien le code et les résultats des tests
           if (!studentAnswer.code || !studentAnswer.testResults) {
@@ -593,7 +621,7 @@ Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`
           }
 
           console.log('Parsed evaluation:', evaluation);
-          
+
           formattedAnswers.push({
             questionId: answer.questionId,
             content: JSON.stringify({
@@ -610,19 +638,19 @@ Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`
         } else {
           // Logique existante pour QCM
           let isCorrect = false;
-          
+
           if (correctAnswerData.type === "single") {
-            const studentAnswerText = typeof studentAnswer.correctAnswers === 'string' 
-              ? studentAnswer.correctAnswers 
+            const studentAnswerText = typeof studentAnswer.correctAnswers === 'string'
+              ? studentAnswer.correctAnswers
               : studentAnswer.correctAnswers[0];
-            
+
             const correctAnswerText = Array.isArray(correctAnswerData.correctAnswers)
               ? correctAnswerData.correctAnswers[0]
               : correctAnswerData.correctAnswers;
 
             const normalizedStudentAnswer = normalizeString(studentAnswerText);
             const normalizedCorrectAnswer = normalizeString(correctAnswerText);
-            
+
             isCorrect = normalizedStudentAnswer === normalizedCorrectAnswer;
           } else {
             const normalizedStudentAnswers = new Set(
@@ -631,11 +659,11 @@ Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`
             const normalizedCorrectAnswers = new Set(
               correctAnswerData.correctAnswers.map(normalizeString)
             );
-            
+
             isCorrect = normalizedStudentAnswers.size === normalizedCorrectAnswers.size &&
-                       [...normalizedStudentAnswers].every(answer => 
-                         normalizedCorrectAnswers.has(answer)
-                       );
+              [...normalizedStudentAnswers].every(answer =>
+                normalizedCorrectAnswers.has(answer)
+              );
           }
 
           if (isCorrect) {
@@ -714,5 +742,76 @@ Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`
   } catch (error) {
     console.error('Error submitting exam answers:', error);
     return { success: false, error: 'Failed to submit answers' };
+  }
+}
+
+export async function generateDocumentAnswer(text: string, model: string = "mistralai/mistral-7b-instruct") {
+  try {
+    console.log('Generating document answer for text of length:', text.length);
+
+    const prompt = `En tant que correcteur, fournis une correction détaillée et complète de ce document.
+
+Document à corriger:
+${text}
+
+Fournis une correction détaillée qui explique les points clés, les concepts importants, et propose une solution complète.`;
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
+      })
+    });
+
+    const result = await response.json();
+    console.log('OpenRouter response received', result);
+
+    const evaluation = result.choices[0].message.content;
+
+    return { success: true, evaluation };
+  } catch (error) {
+    console.error('Error generating document answer:', error);
+    return {
+      success: false,
+      error: 'Échec de la génération de l\'évaluation du document'
+    };
+  }
+}
+
+export async function updateDocumentExamAnswer(examId: string, answer: string) {
+  try {
+    // Vérifier que l'examen existe et qu'il est de type DOCUMENT
+    const exam = await prisma.exam.findFirst({
+      where: {
+        id: examId,
+        type: 'DOCUMENT'
+      }
+    });
+
+    if (!exam) {
+      return { success: false, error: 'Examen non trouvé ou type invalide' };
+    }
+
+
+    // Mettre à jour la correction du document
+    await prisma.exam.update({
+      where: {
+        id: examId
+      },
+      data: {
+        fileCorrection: answer
+      }
+    });
+
+    revalidatePath('/[locale]/(dashboard)/exams');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating document exam answer:', error);
+    return { success: false, error: 'Échec de la mise à jour de la réponse' };
   }
 }
