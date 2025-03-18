@@ -68,6 +68,6 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
     currentAttempt: 1,
   }
   
-  return <TakeExamComponent exam={examData}  userId={session.user.id} /> 
+  return <TakeExamComponent exam={examData as never}  userId={session.user.id} />
 }
 

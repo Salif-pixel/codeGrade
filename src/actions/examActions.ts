@@ -5,6 +5,8 @@ import { ExamType, ParticipantStatus, SubmissionStatus } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { marked } from 'marked';
 import extractText from 'react-pdftotext';
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 interface QuestionData {
   id?: string
@@ -813,5 +815,42 @@ export async function updateDocumentExamAnswer(examId: string, answer: string) {
   } catch (error) {
     console.error('Error updating document exam answer:', error);
     return { success: false, error: 'Échec de la mise à jour de la réponse' };
+  }
+}
+
+export async function getExamsForUser() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
+    if (!session?.user) {
+      return { success: false, error: 'Utilisateur non authentifié' };
+    }
+
+    const userId = session.user.id;
+    
+    // Récupérer les examens créés par l'utilisateur (si professeur)
+    // et les examens auxquels l'utilisateur participe (si étudiant)
+    const exams = await prisma.exam.findMany({
+      where: {
+        OR: [
+          { createdById: userId },
+          { participants: { some: { userId } } }
+        ]
+      },
+      include: {
+        questions: true,
+        participants: {
+          where: { userId },
+          select: { status: true }
+        }
+      },
+      orderBy: { startDate: 'asc' }
+    });
+
+    return { success: true, data: exams };
+  } catch (error) {
+    console.error('Error fetching user exams:', error);
+    return { success: false, error: 'Failed to fetch exams' };
   }
 }

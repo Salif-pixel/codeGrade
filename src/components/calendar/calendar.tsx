@@ -3,10 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { format, addDays, startOfWeek, isSameDay, addWeeks, subWeeks } from "date-fns"
+import { format, addDays, startOfWeek, isSameDay, addWeeks, subWeeks, addMonths, subMonths } from "date-fns"
 import { fr, enUS } from "date-fns/locale"
 import {
-  Plus,
   Lock,
   Unlock,
   ChevronLeft,
@@ -18,7 +17,6 @@ import {
   Clock,
   FileText,
   AlertCircle,
-  BookOpen,
   CheckCircle,
   CalendarIcon,
   MoreHorizontal,
@@ -26,9 +24,10 @@ import {
   Edit,
   CalendarCheck,
   CalendarClock,
-  Repeat,
   Save,
   FileQuestion,
+  CalendarPlus2Icon as CalendarIcon2,
+  List,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -36,15 +35,7 @@ import { cn } from "@/lib/utils"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCustomToast } from "@/components/alert/alert"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-  SheetClose,
-} from "@/components/ui/sheet"
+import {Sheet, SheetContent, SheetClose, SheetTitle} from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { updateExam, deleteExam } from "@/actions/examActions"
@@ -55,10 +46,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations, useLocale } from "next-intl"
+import { motion, AnimatePresence } from "framer-motion"
 
-
-type CalendarView = "day" | "week" | "month"
+type CalendarView = "day" | "week" | "month" | "year"
 
 // Types alignés avec le schéma Prisma
 export type ExamType = "DOCUMENT" | "QCM" | "CODE"
@@ -98,10 +89,11 @@ interface Assignment {
 }
 
 export default function CalendarView({
-  initialExams,
-}: { user: User; initialExams: (Exam & { questions: Question[], answers: Answer[] })[] }) {
+                                       initialExams,
+                                     }: { user: User; initialExams: (Exam & { questions: Question[]; answers: Answer[] })[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [weekDays, setWeekDays] = useState<Date[]>([])
+  const [monthDays, setMonthDays] = useState<Date[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -126,7 +118,7 @@ export default function CalendarView({
   // Heures de la journée (de 7h à 18h)
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
-  const t = useTranslations('calendar')
+  const t = useTranslations("calendar")
   const locale = useLocale()
 
   // Effect to initialize assignments with provided exams
@@ -144,17 +136,12 @@ export default function CalendarView({
         startDate: exam.startDate,
         endDate: exam.endDate,
         submissionType: exam.format,
-        // tests:
-        //   exam.questions?.map((q) => ({
-        //     name: q.text,
-        //     description: "",
-        //   })) || [],
         status: exam.status,
         submissions: {
           total: exam.answers.length,
-          pending: exam.answers.filter(a => a.status === "PENDING").length,
-          corrected: exam.answers.filter(a => a.status === "CORRECTED").length,
-          revised: exam.answers.filter(a => a.status === "REVISED").length,
+          pending: exam.answers.filter((a) => a.status === "PENDING").length,
+          corrected: exam.answers.filter((a) => a.status === "CORRECTED").length,
+          revised: exam.answers.filter((a) => a.status === "REVISED").length,
         },
         questions: exam.questions,
       }))
@@ -178,7 +165,10 @@ export default function CalendarView({
         // Sur mobile, forcer la vue jour
         if (!isTablet) {
           setView("day")
-        } else if (savedView && (savedView === "day" || savedView === "week")) {
+        } else if (
+            savedView &&
+            (savedView === "day" || savedView === "week" || savedView === "month" || savedView === "year")
+        ) {
           // Utiliser la vue sauvegardée si elle existe et est valide
           setView(savedView)
         } else if (!isDesktop) {
@@ -212,6 +202,27 @@ export default function CalendarView({
     const startDay = startOfWeek(currentDate, { weekStartsOn: 1 }) // Commence le lundi
     const days = Array.from({ length: 7 }, (_, i) => addDays(startDay, i))
     setWeekDays(days)
+
+    // Générer les jours du mois pour la vue mois
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth()
+    const firstDayOfMonth = new Date(year, month, 1)
+    const lastDayOfMonth = new Date(year, month + 1, 0)
+    const daysInMonth = lastDayOfMonth.getDate()
+
+    const firstDayOfWeek = startOfWeek(firstDayOfMonth, { weekStartsOn: 1 }).getDate()
+    const firstDayOffset = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1
+
+    const totalDays = Math.ceil((daysInMonth + firstDayOffset) / 7) * 7
+
+    const monthDaysArray = []
+    for (let i = 0; i < totalDays; i++) {
+      const dayOffset = i - firstDayOffset
+      const day = new Date(year, month, dayOffset + 1)
+      monthDaysArray.push(day)
+    }
+
+    setMonthDays(monthDaysArray)
   }, [currentDate])
 
   // Effet pour le clignotement du cercle d'édition
@@ -247,6 +258,14 @@ export default function CalendarView({
     return assignments.filter((assignment) => {
       const assignDate = new Date(assignment.date)
       return isSameDay(assignDate, day) && assignDate.getHours() === hour
+    })
+  }
+
+  // Fonction pour obtenir les devoirs pour un jour spécifique (vue mois)
+  const getAssignmentsForDay = (day: Date) => {
+    return assignments.filter((assignment) => {
+      const assignDate = new Date(assignment.date)
+      return isSameDay(assignDate, day)
     })
   }
 
@@ -332,16 +351,24 @@ export default function CalendarView({
     return hour >= startHour && hour <= endHour
   }
 
-  // Fonction pour naviguer entre les jours
+  // Fonction pour naviguer entre les jours/semaines/mois
   const navigateDate = (direction: "prev" | "next") => {
     if (view === "day") {
       // Navigation par jour
       const newDate = new Date(currentDate)
       newDate.setDate(newDate.getDate() + (direction === "next" ? 1 : -1))
       setCurrentDate(newDate)
-    } else {
+    } else if (view === "week") {
       // Navigation par semaine
       setCurrentDate(direction === "next" ? addWeeks(currentDate, 1) : subWeeks(currentDate, 1))
+    } else if (view === "month") {
+      // Navigation par mois
+      setCurrentDate(direction === "next" ? addMonths(currentDate, 1) : subMonths(currentDate, 1))
+    } else {
+      // Navigation par année
+      const newDate = new Date(currentDate)
+      newDate.setFullYear(newDate.getFullYear() + (direction === "next" ? 1 : -1))
+      setCurrentDate(newDate)
     }
   }
 
@@ -349,8 +376,10 @@ export default function CalendarView({
   const getVisibleDays = () => {
     if (view === "day") {
       return [currentDate]
-    } else {
+    } else if (view === "week") {
       return weekDays
+    } else {
+      return monthDays
     }
   }
 
@@ -385,25 +414,25 @@ export default function CalendarView({
     switch (examType) {
       case "QCM":
         return (
-          <Badge className="bg-amber-500 hover:bg-amber-600 text-white">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            QCM
-          </Badge>
+            <Badge className="bg-amber-500 hover:bg-amber-600 text-white">
+              <CheckCircle className="h-3 w-3 mr-1" />
+              QCM
+            </Badge>
         )
       case "CODE":
         return (
-          <Badge className="bg-indigo-500 hover:bg-indigo-600 text-white">
-            <CodeIcon className="h-3 w-3 mr-1" />
-            Code
-          </Badge>
+            <Badge className="bg-indigo-500 hover:bg-indigo-600 text-white">
+              <CodeIcon className="h-3 w-3 mr-1" />
+              Code
+            </Badge>
         )
       case "DOCUMENT":
       default:
         return (
-          <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
-            <FileText className="h-3 w-3 mr-1" />
-            Document
-          </Badge>
+            <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
+              <FileText className="h-3 w-3 mr-1" />
+              Document
+            </Badge>
         )
     }
   }
@@ -421,668 +450,790 @@ export default function CalendarView({
     }
   }
 
+  // Fonction pour formater le titre de la vue
+  const getViewTitle = () => {
+    if (view === "day") {
+      return format(currentDate, t("dates.format.full"), { locale: locale === "fr" ? fr : enUS })
+    } else if (view === "week") {
+      const startOfWeekDate = weekDays[0] || currentDate
+      const endOfWeekDate = weekDays[6] || currentDate
+      const sameMonth = startOfWeekDate.getMonth() === endOfWeekDate.getMonth()
+
+      if (sameMonth) {
+        return `${format(startOfWeekDate, "d")} - ${format(endOfWeekDate, "d MMMM yyyy", { locale: locale === "fr" ? fr : enUS })}`
+      } else {
+        return `${format(startOfWeekDate, "d MMM")} - ${format(endOfWeekDate, "d MMM yyyy", { locale: locale === "fr" ? fr : enUS })}`
+      }
+    } else if (view === "month") {
+      return format(currentDate, "MMMM yyyy", { locale: locale === "fr" ? fr : enUS })
+    } else {
+      return format(currentDate, "yyyy")
+    }
+  }
+
+  // Générer les mois pour la vue année
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date(currentDate.getFullYear(), i, 1)
+    return {
+      date,
+      name: format(date, "MMMM", { locale: locale === "fr" ? fr : enUS }),
+    }
+  })
+
+  // Fonction pour aller à aujourd'hui
+  const goToToday = () => {
+    setCurrentDate(new Date())
+  }
 
   return (
-    <Card className="bg-background shadow-md border-primary/10">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CalendarCheck className="h-5 w-5 text-primary" />
-            <span>{t('title')}</span>
-          </div>
+      <Card className="bg-background shadow-md border-primary/10">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CalendarCheck className="h-5 w-5 text-primary" />
+              <span>{t("title")}</span>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="p-4">
+            {/* Header avec titre, navigation et contrôles */}
+            <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {/* Titre et navigation */}
+              <div className="flex items-center">
+                <div className="flex items-center space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 rounded-full"
+                            onClick={() => navigateDate("prev")}
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t("navigation.previous")}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="p-4">
-          {/* Header avec titre, navigation et contrôles */}
-          <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {/* Titre et navigation */}
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 rounded-full"
-                        onClick={() => navigateDate("prev")}
-                      >
-                        <ChevronLeft className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('navigation.previous')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 rounded-full"
+                            onClick={() => navigateDate("next")}
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t("navigation.next")}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 rounded-full"
-                        onClick={() => navigateDate("next")}
-                      >
-                        <ChevronRight className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('navigation.next')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 rounded-full"
-                        onClick={() => setCurrentDate(new Date())}
-                      >
-                        <CalendarClock className="h-5 w-5 text-primary" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('navigation.today')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="h-9 w-9 rounded-full" onClick={goToToday}>
+                          <CalendarClock className="h-5 w-5 text-primary" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t("navigation.today")}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <h2 className="ml-3 text-lg font-semibold sm:text-xl flex items-center">
+                  <CalendarIcon className="h-5 w-5 mr-2 text-primary hidden sm:inline-block" />
+                  {getViewTitle()}
+                </h2>
               </div>
-              <h2 className="ml-3 text-lg font-semibold sm:text-xl flex items-center">
-                <CalendarIcon className="h-5 w-5 mr-2 text-primary hidden sm:inline-block" />
-                {view === "day"
-                  ? format(currentDate, t('dates.format.full'), { locale: locale === 'fr' ? fr : enUS })
-                  : format(weekDays[0] || new Date(), t('dates.format.monthYear'), { locale: locale === 'fr' ? fr : enUS })}
-              </h2>
-            </div>
 
-            {/* Contrôles */}
-            <div className="flex items-center justify-start md:justify-end gap-2">
-              <Tabs value={view} onValueChange={(v) => handleViewChange(v as CalendarView)} className="mr-2">
-                <TabsList className="h-9 p-1 bg-muted/80">
-                  <TabsTrigger
-                    value="day"
-                    className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
-                  >
-                    <Calendar className="mr-1 h-4 w-4" />
-                    <span className="hidden sm:inline">{t('views.day')}</span>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="week"
-                    className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
-                    disabled={!isTablet} // Désactiver le bouton semaine sur mobile
-                  >
-                    <CalendarDays className="mr-1 h-4 w-4" />
-                    <span className="hidden sm:inline">{t('views.week')}</span>
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-
-              {editMode && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button size="sm" className="h-9 bg-primary hover:bg-primary/90">
-                        <Plus className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">{t('assignment.add')}</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('assignment.add')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-
-          {/* Calendrier */}
-          <div className="overflow-hidden rounded-lg border border-border shadow-sm bg-card" ref={calendarRef}>
-            {/* En-tête des jours */}
-            <div
-              className="grid border-b"
-              style={{
-                gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
-                width: "100%",
-              }}
-            >
-              <div className="border-r border-border p-2 text-center font-medium text-muted-foreground bg-muted/30 dark:bg-zinc-900"></div>
-              {visibleDays.map((day, index) => {
-                const dayNumber = format(day, "d")
-                const dayName = format(day, "EEE", { locale: locale === 'fr' ? fr : enUS })
-                const isToday = isSameDay(day, new Date())
-
-                return (
-                  <div
-                    key={index}
-                    className={cn(
-                      "border-r border-border p-2 text-center last:border-r-0",
-                      isToday ? "bg-primary/10" : "bg-muted/30 dark:bg-zinc-900",
-                    )}
-                  >
-                    <div className="font-medium text-foreground/80">{dayName}</div>
-                    <div
-                      className={cn(
-                        "mx-auto mt-1 flex h-8 w-8 items-center justify-center rounded-full",
-                        isToday && "bg-primary text-primary-foreground font-medium",
-                      )}
+              {/* Contrôles */}
+              <div className="flex items-center justify-start md:justify-end gap-2">
+                <Tabs value={view} onValueChange={(v) => handleViewChange(v as CalendarView)} className="mr-2">
+                  <TabsList className="h-9 p-1 bg-muted/80">
+                    <TabsTrigger
+                        value="day"
+                        className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
                     >
-                      {dayNumber}
-                    </div>
-                  </div>
-                )
-              })}
+                      <List className="mr-1 h-4 w-4" />
+                      <span className="hidden sm:inline">{t("views.day")}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="week"
+                        className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
+                        disabled={!isTablet} // Désactiver le bouton semaine sur mobile
+                    >
+                      <Calendar className="mr-1 h-4 w-4" />
+                      <span className="hidden sm:inline">{t("views.week")}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="month"
+                        className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
+                        disabled={!isTablet} // Désactiver le bouton mois sur mobile
+                    >
+                      <CalendarDays className="mr-1 h-4 w-4" />
+                      <span className="hidden sm:inline">{t("views.month")}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="year"
+                        className="flex h-7 items-center px-3 data-[state=active]:bg-background data-[state=active]:text-primary"
+                        disabled={!isTablet} // Désactiver le bouton année sur mobile
+                    >
+                      <CalendarIcon2 className="mr-1 h-4 w-4" />
+                      <span className="hidden sm:inline">{t("views.year")}</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
             </div>
 
-            {/* Grille des heures */}
-            <div className="relative overflow-x-auto">
-              {hours.map((hour) => (
-                <div
-                  key={hour}
-                  className="grid border-b border-border last:border-b-0"
-                  style={{
-                    gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
-                    width: "100%",
-                  }}
-                >
-                  <div className="border-r border-border p-2 text-right text-sm text-muted-foreground min-w-[60px] bg-muted/20 dark:bg-zinc-900 flex items-center justify-end">
-                    <div className="flex items-center">
-                      <Clock className="h-3 w-3 mr-1 opacity-70" />
-                      {hour}:00
-                    </div>
-                  </div>
-                  {visibleDays.map((day, dayIndex) => {
-                    const isCurrentHour = new Date().getHours() === hour && isSameDay(day, new Date())
-
-                    return (
+            {/* Calendrier */}
+            <div className="overflow-hidden rounded-lg border border-border shadow-sm bg-card" ref={calendarRef}>
+              <AnimatePresence mode="wait">
+                {/* Vue jour et semaine */}
+                {(view === "day" || view === "week") && (
+                    <motion.div
+                        key={`${view}-view`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                      {/* En-tête des jours */}
                       <div
-                        key={`${hour}-${dayIndex}`}
-                        className={cn(
-                          "relative h-[100px] border-r border-border last:border-r-0",
-                          isInSelection(dayIndex, hour) && "bg-primary/10",
-                          isCurrentHour && "bg-primary/5",
-                        )}
-                        onMouseDown={(e) => handleMouseDown(dayIndex, hour, e)}
+                          className="grid border-b"
+                          style={{
+                            gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
+                            width: "100%",
+                          }}
                       >
-                        {isCurrentHour && (
-                          <div className="absolute left-0 right-0 border-t-2 border-primary z-10 top-0"></div>
-                        )}
-                        {getAssignmentsForHourAndDay(hour, day).map((assignment, idx) => (
-                          <div
-                            key={idx}
-                            className={cn(
-                              "assignment-item absolute left-0 right-0 z-10 m-1 overflow-hidden rounded-md p-2 text-sm cursor-pointer",
-                              getExamTypeColor(assignment.type as ExamType),
-                            )}
-                            style={{
-                              height: getAssignmentHeight(assignment.duration),
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              openAssignmentDetails(assignment)
-                            }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="font-medium flex items-center">
-                                {getExamTypeIcon(assignment.type as ExamType)}
-                                <span className="ml-1">
-                                  {typeof assignment.date === "string"
-                                    ? format(new Date(assignment.date), "HH:mm")
-                                    : format(assignment.date, "HH:mm")}
-                                </span>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 rounded-full opacity-70 hover:opacity-100"
-                                  >
-                                    <MoreHorizontal className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => openAssignmentDetails(assignment)}>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    {t('assignment.details')}
-                                  </DropdownMenuItem>
-                                  {editMode && (
-                                    <DropdownMenuItem className="text-destructive">
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      {t('assignment.delete')}
-                                    </DropdownMenuItem>
+                        <div className="border-r border-border p-2 text-center font-medium text-muted-foreground bg-muted/30 dark:bg-zinc-900"></div>
+                        {visibleDays.map((day, index) => {
+                          const dayNumber = format(day, "d")
+                          const dayName = format(day, "EEE", { locale: locale === "fr" ? fr : enUS })
+                          const isToday = isSameDay(day, new Date())
+
+                          return (
+                              <div
+                                  key={index}
+                                  className={cn(
+                                      "border-r border-border p-2 text-center last:border-r-0",
+                                      isToday ? "bg-primary/10" : "bg-muted/30 dark:bg-zinc-900",
                                   )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                            <div className="font-bold mt-1 line-clamp-1">{assignment.title}</div>
-                            <div className="text-xs line-clamp-1 opacity-80">{assignment.description}</div>
-                            {assignment.submissionType === "code" && (
-                              <div className="mt-1 flex items-center text-xs font-medium">
-                                <CodeIcon className="mr-1 h-3 w-3" />
-                                {assignment.language?.toUpperCase()}
+                              >
+                                <div className="font-medium text-foreground/80">{dayName}</div>
+                                <div
+                                    className={cn(
+                                        "mx-auto mt-1 flex h-8 w-8 items-center justify-center rounded-full",
+                                        isToday && "bg-primary text-primary-foreground font-medium",
+                                    )}
+                                >
+                                  {dayNumber}
+                                </div>
                               </div>
-                            )}
-                          </div>
+                          )
+                        })}
+                      </div>
+
+                      {/* Grille des heures */}
+                      <div className="relative overflow-x-auto">
+                        {hours.map((hour) => (
+                            <div
+                                key={hour}
+                                className="grid border-b border-border last:border-b-0"
+                                style={{
+                                  gridTemplateColumns: `60px repeat(${visibleDays.length}, 1fr)`,
+                                  width: "100%",
+                                }}
+                            >
+                              <div className="border-r border-border p-2 text-right text-sm text-muted-foreground min-w-[60px] bg-muted/20 dark:bg-zinc-900 flex items-center justify-end">
+                                <div className="flex items-center">
+                                  <Clock className="h-3 w-3 mr-1 opacity-70" />
+                                  {hour}:00
+                                </div>
+                              </div>
+                              {visibleDays.map((day, dayIndex) => {
+                                const isCurrentHour = new Date().getHours() === hour && isSameDay(day, new Date())
+                                const assignmentsForCell = getAssignmentsForHourAndDay(hour, day)
+
+                                return (
+                                    <div
+                                        key={`${hour}-${dayIndex}`}
+                                        className={cn(
+                                            "relative h-[100px] border-r border-border last:border-r-0",
+                                            isInSelection(dayIndex, hour) && "bg-primary/10",
+                                            isCurrentHour && "bg-primary/5",
+                                        )}
+                                        onMouseDown={(e) => handleMouseDown(dayIndex, hour, e)}
+                                    >
+                                      {isCurrentHour && (
+                                          <div className="absolute left-0 right-0 border-t-2 border-primary z-10 top-0"></div>
+                                      )}
+                                      {assignmentsForCell.map((assignment, index) => (
+                                          <div
+                                              key={assignment.id}
+                                              className={cn(
+                                                  "absolute top-2 left-2 right-2 rounded-md p-2 text-sm text-foreground cursor-pointer assignment-item",
+                                                  getExamTypeColor(assignment.type as ExamType),
+                                              )}
+                                              style={{ height: getAssignmentHeight(assignment.duration) }}
+                                          >
+                                            <div className="flex items-center justify-between">
+                                              <div className="font-medium flex items-center">
+                                                {getExamTypeIcon(assignment.type as ExamType)}
+                                                <span className="ml-1">
+                                        {typeof assignment.date === "string"
+                                            ? format(new Date(assignment.date), "HH:mm")
+                                            : format(assignment.date, "HH:mm")}
+                                      </span>
+                                              </div>
+                                              <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                  <Button
+                                                      variant="ghost"
+                                                      size="icon"
+                                                      className="h-6 w-6 rounded-full opacity-70 hover:opacity-100"
+                                                  >
+                                                    <MoreHorizontal className="h-3 w-3" />
+                                                  </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                  <DropdownMenuItem onClick={() => openAssignmentDetails(assignment)}>
+                                                    <Edit className="h-4 w-4 mr-2" />
+                                                    {t("assignment.details")}
+                                                  </DropdownMenuItem>
+                                                  {editMode && (
+                                                      <DropdownMenuItem className="text-destructive">
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        {t("assignment.delete")}
+                                                      </DropdownMenuItem>
+                                                  )}
+                                                </DropdownMenuContent>
+                                              </DropdownMenu>
+                                            </div>
+                                            <div className="font-bold mt-1 line-clamp-1">{assignment.title}</div>
+                                            <div className="text-xs line-clamp-1 opacity-80">{assignment.description}</div>
+                                            {assignment.submissionType === "code" && (
+                                                <div className="mt-1 flex items-center text-xs font-medium">
+                                                  <CodeIcon className="mr-1 h-3 w-3" />
+                                                  {assignment.language?.toUpperCase()}
+                                                </div>
+                                            )}
+                                          </div>
+                                      ))}
+                                    </div>
+                                )
+                              })}
+                            </div>
                         ))}
                       </div>
-                    )
-                  })}
-                </div>
-              ))}
+                    </motion.div>
+                )}
+
+                {/* Vue mois */}
+                {view === "month" && (
+                    <motion.div
+                        key="month-view"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                      {/* En-tête des jours de la semaine */}
+                      <div className="grid grid-cols-7 border-b border-border">
+                        {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, i) => (
+                            <div
+                                key={i}
+                                className="p-2 text-center font-medium text-muted-foreground bg-muted/30 dark:bg-zinc-900"
+                            >
+                              {day}
+                            </div>
+                        ))}
+                      </div>
+
+                      {/* Grille des jours du mois */}
+                      <div className="grid grid-cols-7">
+                        {monthDays.map((day, index) => {
+                          const isCurrentMonth = day.getMonth() === currentDate.getMonth()
+                          const isToday = isSameDay(day, new Date())
+                          const dayAssignments = getAssignmentsForDay(day)
+
+                          return (
+                              <div
+                                  key={index}
+                                  className={cn(
+                                      "min-h-[100px] border border-border p-1 relative",
+                                      !isCurrentMonth && "bg-muted/10 opacity-50",
+                                      isToday && "bg-primary/5",
+                                  )}
+                                  onClick={() => {
+                                    setCurrentDate(day)
+                                    setView("day")
+                                  }}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div
+                                      className={cn(
+                                          "h-6 w-6 flex items-center justify-center text-sm",
+                                          isToday && "bg-primary text-primary-foreground rounded-full",
+                                      )}
+                                  >
+                                    {format(day, "d")}
+                                  </div>
+                                </div>
+
+                                <div className="mt-1 space-y-1 max-h-[80px] overflow-hidden">
+                                  {dayAssignments.slice(0, 3).map((assignment, idx) => (
+                                      <div
+                                          key={idx}
+                                          className={cn(
+                                              "text-xs p-1 rounded truncate cursor-pointer",
+                                              getExamTypeColor(assignment.type as ExamType),
+                                          )}
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            openAssignmentDetails(assignment)
+                                          }}
+                                      >
+                                        {typeof assignment.date === "string"
+                                            ? format(new Date(assignment.date), "HH:mm")
+                                            : format(assignment.date, "HH:mm")}{" "}
+                                        - {assignment.title}
+                                      </div>
+                                  ))}
+
+                                  {dayAssignments.length > 3 && (
+                                      <div className="text-xs text-center text-muted-foreground">
+                                        +{dayAssignments.length - 3} autres
+                                      </div>
+                                  )}
+                                </div>
+                              </div>
+                          )
+                        })}
+                      </div>
+                    </motion.div>
+                )}
+
+                {/* Vue année */}
+                {view === "year" && (
+                    <motion.div
+                        key="year-view"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="p-4"
+                    >
+                      <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                        {months.map((month) => {
+                          const isCurrentMonth =
+                              month.date.getMonth() === new Date().getMonth() &&
+                              month.date.getFullYear() === new Date().getFullYear()
+
+                          // Calculer le nombre d'assignements pour ce mois
+                          const monthAssignments = assignments.filter((assignment) => {
+                            const assignDate = new Date(assignment.date)
+                            return (
+                                assignDate.getMonth() === month.date.getMonth() &&
+                                assignDate.getFullYear() === month.date.getFullYear()
+                            )
+                          })
+
+                          return (
+                              <motion.div
+                                  key={month.name}
+                                  whileHover={{ scale: 1.03 }}
+                                  className={cn(
+                                      "border border-border rounded-md p-3 cursor-pointer",
+                                      isCurrentMonth && "bg-primary/5 border-primary/20",
+                                  )}
+                                  onClick={() => {
+                                    setCurrentDate(month.date)
+                                    setView("month")
+                                  }}
+                              >
+                                <h3 className="text-center font-medium mb-2">{month.name}</h3>
+
+                                <div className="grid grid-cols-7 gap-1 text-center text-xs">
+                                  {["L", "M", "M", "J", "V", "S", "D"].map((d, i) => (
+                                      <div key={i} className="text-muted-foreground">
+                                        {d}
+                                      </div>
+                                  ))}
+
+                                  {/* Mini calendrier pour chaque mois */}
+                                  {Array.from({ length: 35 }).map((_, i) => {
+                                    const firstDayOfMonth = new Date(month.date.getFullYear(), month.date.getMonth(), 1)
+                                    const firstDayOffset = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1
+                                    const dayNum = i - firstDayOffset + 1
+                                    const isValidDay =
+                                        dayNum > 0 &&
+                                        dayNum <= new Date(month.date.getFullYear(), month.date.getMonth() + 1, 0).getDate()
+
+                                    return (
+                                        <div
+                                            key={i}
+                                            className={cn(
+                                                "aspect-square flex items-center justify-center text-[10px]",
+                                                isValidDay ? "text-foreground" : "invisible",
+                                                isValidDay &&
+                                                isCurrentMonth &&
+                                                dayNum === new Date().getDate() &&
+                                                "bg-primary text-primary-foreground rounded-full",
+                                            )}
+                                        >
+                                          {isValidDay ? dayNum : ""}
+                                        </div>
+                                    )
+                                  })}
+                                </div>
+
+                                {monthAssignments.length > 0 && (
+                                    <div className="mt-2 text-xs text-center">
+                                      <Badge variant="outline" className="bg-primary/10">
+                                        {monthAssignments.length} assignement{monthAssignments.length > 1 ? "s" : ""}
+                                      </Badge>
+                                    </div>
+                                )}
+                              </motion.div>
+                          )
+                        })}
+                      </div>
+                    </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-        </div>
 
-        {/* Sheet pour afficher les détails d'un devoir */}
-        <Sheet open={isSheetOpen} onOpenChange={(open) => {
-          if (!open) {
-            setEditMode(false);
-          }
-          setIsSheetOpen(open);
-        }}>
-          <SheetTitle></SheetTitle>
-          <SheetContent side={sheetSide} className="p-0 border-l border-primary/10 dark:bg-zinc-900">
-            <>
-              {selectedAssignment && (
-                <ScrollArea className="h-full">
-                  <div className={cn("p-6 space-y-6", editMode ? "min-h-[calc(100vh-85px)]" : "min-h-[calc(100vh-129px)]")}>
-                    {/* En-tête */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-4 flex-1">
-                          {editMode ? (
-                            <Input
-                              type="text"
-                              value={selectedAssignment.title}
-                              onChange={(e) =>
-                                setSelectedAssignment({
-                                  ...selectedAssignment,
-                                  title: e.target.value,
-                                })
-                              }
-                              className="text-xl font-semibold border-none bg-muted/30 focus-visible:ring-1"
-                            />
-                          ) : (
-                            <h2 className="text-xl font-semibold flex mb-4 items-center gap-2">
-                              {getExamTypeIcon(selectedAssignment.type as ExamType)}
-                              {selectedAssignment.title}
-                            </h2>
-                          )}
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            {getExamTypeBadge(selectedAssignment.type as ExamType)}
-                            <Badge variant="outline" className="font-normal">
-                              {selectedAssignment.maxAttempts} tentative{selectedAssignment.maxAttempts > 1 ? 's' : ''}
-                            </Badge>
+          {/* Sheet pour afficher les détails d'un devoir */}
+          <Sheet
+              open={isSheetOpen}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setEditMode(false)
+                }
+                setIsSheetOpen(open)
+              }}
+          >
+            <SheetTitle>
+
+            </SheetTitle>
+            <SheetContent side={sheetSide} className="p-0 border-l border-primary/10 dark:bg-zinc-900">
+              <>
+                {selectedAssignment && (
+                    <ScrollArea className="h-full">
+                      <div
+                          className={cn("p-6 space-y-6", editMode ? "min-h-[calc(100vh-85px)]" : "min-h-[calc(100vh-129px)]")}
+                      >
+                        {/* En-tête */}
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-4 flex-1">
+                              {editMode ? (
+                                  <Input
+                                      type="text"
+                                      value={selectedAssignment.title}
+                                      onChange={(e) =>
+                                          setSelectedAssignment({
+                                            ...selectedAssignment,
+                                            title: e.target.value,
+                                          })
+                                      }
+                                      className="text-xl font-semibold border-none bg-muted/30 focus-visible:ring-1"
+                                  />
+                              ) : (
+                                  <h2 className="text-xl font-semibold flex mb-4 items-center gap-2">
+                                    {getExamTypeIcon(selectedAssignment.type as ExamType)}
+                                    {selectedAssignment.title}
+                                  </h2>
+                              )}
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                {getExamTypeBadge(selectedAssignment.type as ExamType)}
+                                <Badge variant="outline" className="font-normal">
+                                  {selectedAssignment.maxAttempts} tentative{selectedAssignment.maxAttempts > 1 ? "s" : ""}
+                                </Badge>
+                              </div>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                                    showToast("Erreur", t("toast.cannotEdit"), "error")
+                                    return
+                                  }
+                                  setEditMode(!editMode)
+                                }}
+                                className={cn("rounded-full h-8 w-8", editMode && "text-primary")}
+                            >
+                              {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                            </Button>
+                          </div>
+
+                          {/* Dates */}
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium flex items-center gap-2">
+                                <CalendarClock className="h-4 w-4 text-primary" />
+                                {t("sheet.startDate")}
+                              </label>
+                              {editMode ? (
+                                  <Input
+                                      type="datetime-local"
+                                      value={
+                                        typeof selectedAssignment.startDate === "string"
+                                            ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
+                                            : selectedAssignment.startDate?.toISOString().slice(0, 16)
+                                      }
+                                      onChange={(e) =>
+                                          setSelectedAssignment({
+                                            ...selectedAssignment,
+                                            startDate: new Date(e.target.value),
+                                          })
+                                      }
+                                      className="text-sm"
+                                  />
+                              ) : (
+                                  <p className="text-sm bg-muted/30 p-2 rounded">
+                                    {typeof selectedAssignment.startDate === "string"
+                                        ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", {
+                                          locale: locale === "fr" ? fr : enUS,
+                                        })
+                                        : format(selectedAssignment.startDate ?? new Date(), "dd MMMM yyyy à HH:mm", {
+                                          locale: locale === "fr" ? fr : enUS,
+                                        })}
+                                  </p>
+                              )}
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium flex items-center gap-2 text-destructive">
+                                <AlertCircle className="h-4 w-4" />
+                                {t("sheet.deadline")}
+                              </label>
+                              {editMode ? (
+                                  <Input
+                                      type="datetime-local"
+                                      value={
+                                        selectedAssignment.endDate
+                                            ? typeof selectedAssignment.endDate === "string"
+                                                ? new Date(selectedAssignment.endDate).toISOString().slice(0, 16)
+                                                : selectedAssignment.endDate.toISOString().slice(0, 16)
+                                            : ""
+                                      }
+                                      onChange={(e) =>
+                                          setSelectedAssignment({
+                                            ...selectedAssignment,
+                                            endDate: e.target.value ? new Date(e.target.value) : undefined,
+                                          })
+                                      }
+                                      className="text-sm"
+                                  />
+                              ) : (
+                                  <p className="text-sm bg-muted/30 p-2 rounded">
+                                    {selectedAssignment.endDate
+                                        ? typeof selectedAssignment.endDate === "string"
+                                            ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", {
+                                              locale: locale === "fr" ? fr : enUS,
+                                            })
+                                            : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", {
+                                              locale: locale === "fr" ? fr : enUS,
+                                            })
+                                        : "Aucune date limite"}
+                                  </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-primary" />
+                              Description
+                            </label>
+                            {editMode ? (
+                                <Textarea
+                                    value={selectedAssignment.description}
+                                    onChange={(e) =>
+                                        setSelectedAssignment({
+                                          ...selectedAssignment,
+                                          description: e.target.value,
+                                        })
+                                    }
+                                    className="min-h-[100px] text-sm resize-none"
+                                    placeholder="Description de l'évaluation"
+                                />
+                            ) : (
+                                <div className="text-sm bg-muted/30 p-3 rounded-md min-h-[100px]">
+                                  {selectedAssignment.description || "Aucune description"}
+                                </div>
+                            )}
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
-                              showToast(
-                                "Erreur",
-                                t('toast.cannotEdit'),
-                                "error"
-                              );
-                              return;
-                            }
-                            setEditMode(!editMode);
-                          }}
-                          className={cn("rounded-full h-8 w-8", editMode && "text-primary")}
-                        >
-                          {editMode ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
-                        </Button>
-                      </div>
 
-                      {/* Dates */}
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium flex items-center gap-2">
-                            <CalendarClock className="h-4 w-4 text-primary" />
-                            {t('sheet.startDate')}
-                          </label>
-                          {editMode ? (
-                            <Input
-                              type="datetime-local"
-                              value={
-                                typeof selectedAssignment.startDate === "string"
-                                  ? new Date(selectedAssignment.startDate).toISOString().slice(0, 16)
-                                  : selectedAssignment.startDate?.toISOString().slice(0, 16)
-                              }
-                              onChange={(e) =>
-                                setSelectedAssignment({
-                                  ...selectedAssignment,
-                                  startDate: new Date(e.target.value),
-                                })
-                              }
-                              className="text-sm"
-                            />
-                          ) : (
-                            <p className="text-sm bg-muted/30 p-2 rounded">
-                              {typeof selectedAssignment.startDate === "string"
-                                ? format(new Date(selectedAssignment.startDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
-                                : format(selectedAssignment.startDate ?? new Date(), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })}
-                            </p>
-                          )}
-                        </div>
+                        <Separator />
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium flex items-center gap-2 text-destructive">
-                            <AlertCircle className="h-4 w-4" />
-                            {t('sheet.deadline')}
-                          </label>
-                          {editMode ? (
-                            <Input
-                              type="datetime-local"
-                              value={
-                                selectedAssignment.endDate
-                                  ? typeof selectedAssignment.endDate === "string"
-                                    ? new Date(selectedAssignment.endDate).toISOString().slice(0, 16)
-                                    : selectedAssignment.endDate.toISOString().slice(0, 16)
-                                  : ""
-                              }
-                              onChange={(e) =>
-                                setSelectedAssignment({
-                                  ...selectedAssignment,
-                                  endDate: e.target.value ? new Date(e.target.value) : undefined,
-                                })
-                              }
-                              className="text-sm"
-                            />
-                          ) : (
-                            <p className="text-sm bg-muted/30 p-2 rounded">
-                              {selectedAssignment.endDate
-                                ? typeof selectedAssignment.endDate === "string"
-                                  ? format(new Date(selectedAssignment.endDate), "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
-                                  : format(selectedAssignment.endDate, "dd MMMM yyyy à HH:mm", { locale: locale === 'fr' ? fr : enUS })
-                                : "Aucune date limite"}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Description */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-primary" />
-                          Description
-                        </label>
-                        {editMode ? (
-                          <Textarea
-                            value={selectedAssignment.description}
-                            onChange={(e) =>
-                              setSelectedAssignment({
-                                ...selectedAssignment,
-                                description: e.target.value,
-                              })
-                            }
-                            className="min-h-[100px] text-sm resize-none"
-                            placeholder="Description de l'évaluation"
-                          />
-                        ) : (
-                          <div className="text-sm bg-muted/30 p-3 rounded-md min-h-[100px]">
-                            {selectedAssignment.description || "Aucune description"}
-                          </div>
+                        {/* Questions */}
+                        {selectedAssignment.questions && selectedAssignment.questions.length > 0 && (
+                            <div className="space-y-4">
+                              <h3 className="text-sm font-medium flex items-center gap-2">
+                                <FileQuestion className="h-4 w-4 text-primary" />
+                                Questions ({selectedAssignment.questions.length})
+                              </h3>
+                              <div className="space-y-3">
+                                {selectedAssignment.questions.map((question, index) => (
+                                    <Card key={index} className="border-border">
+                                      <CardContent className="p-4 space-y-3">
+                                        <div className="flex items-start justify-between gap-4">
+                                          <p className="text-sm flex-1">{question.text}</p>
+                                          <Badge variant="outline" className="shrink-0">
+                                            {question.maxPoints} pt{question.maxPoints > 1 ? "s" : ""}
+                                          </Badge>
+                                        </div>
+                                        {question.choices && (
+                                            <div className="space-y-2">
+                                              {question.choices.map((choice, choiceIndex) => (
+                                                  <div
+                                                      key={choiceIndex}
+                                                      className="text-sm text-muted-foreground bg-muted/30 p-2 rounded"
+                                                  >
+                                                    {choice}
+                                                  </div>
+                                              ))}
+                                            </div>
+                                        )}
+                                        {question.programmingLanguage && (
+                                            <Badge variant="secondary" className="text-xs">
+                                              <CodeIcon className="h-3 w-3 mr-1" />
+                                              {question.programmingLanguage}
+                                            </Badge>
+                                        )}
+                                      </CardContent>
+                                    </Card>
+                                ))}
+                              </div>
+                            </div>
                         )}
                       </div>
-                    </div>
 
-                    <Separator />
+                      {/* Footer */}
+                      <div className="sticky bottom-0 p-6 bg-background border-t">
+                        <div className="flex flex-wrap gap-2">
+                          {editMode ? (
+                              <Button
+                                  className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+                                  onClick={async () => {
+                                    if (!selectedAssignment) return
 
-                    {/* Questions */}
-                    {selectedAssignment.questions && selectedAssignment.questions.length > 0 && (
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium flex items-center gap-2">
-                          <FileQuestion className="h-4 w-4 text-primary" />
-                          Questions ({selectedAssignment.questions.length})
-                        </h3>
-                        <div className="space-y-3">
-                          {selectedAssignment.questions.map((question, index) => (
-                            <Card key={index} className="border-border">
-                              <CardContent className="p-4 space-y-3">
-                                <div className="flex items-start justify-between gap-4">
-                                  <p className="text-sm flex-1">{question.text}</p>
-                                  <Badge variant="outline" className="shrink-0">
-                                    {question.maxPoints} pt{question.maxPoints > 1 ? 's' : ''}
-                                  </Badge>
-                                </div>
-                                {question.choices && (
-                                  <div className="space-y-2">
-                                    {question.choices.map((choice, choiceIndex) => (
-                                      <div
-                                        key={choiceIndex}
-                                        className="text-sm text-muted-foreground bg-muted/30 p-2 rounded"
-                                      >
-                                        {choice}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                                {question.programmingLanguage && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    <CodeIcon className="h-3 w-3 mr-1" />
-                                    {question.programmingLanguage}
-                                  </Badge>
-                                )}
-                              </CardContent>
-                            </Card>
-                          ))}
+                                    if (selectedAssignment.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
+                                      showToast("Erreur", t("toast.cannotEdit"), "error")
+                                      return
+                                    }
+
+                                    const examData = {
+                                      title: selectedAssignment.title,
+                                      description: selectedAssignment.description,
+                                      type: selectedAssignment.type as ExamType,
+                                      format: selectedAssignment.format,
+                                      maxAttempts: selectedAssignment.maxAttempts,
+                                      startDate: selectedAssignment.startDate,
+                                      endDate: selectedAssignment.endDate,
+                                      questions: selectedAssignment.questions
+                                          ? selectedAssignment.questions.map((q) => ({
+                                            id: q.id,
+                                            text: q.text,
+                                            maxPoints: Number(q.maxPoints),
+                                            choices: q.choices || [],
+                                            programmingLanguage: q.programmingLanguage,
+                                            examId: q.examId,
+                                          }))
+                                          : undefined,
+                                    }
+
+                                    const result = await updateExam(selectedAssignment.id, examData as never)
+
+                                    if (result.success) {
+                                      setAssignments(
+                                          assignments.map((a) =>
+                                              a.id === selectedAssignment.id ? { ...selectedAssignment } : a,
+                                          ),
+                                      )
+                                      showToast("Succès", t("toast.updateSuccess"), "success")
+                                      setEditMode(false)
+                                    } else {
+                                      showToast("Erreur", result.error || t("toast.updateError"), "error")
+                                    }
+                                  }}
+                              >
+                                <Save className="h-4 w-4 mr-2" />
+                                {t("edit.save")}
+                              </Button>
+                          ) : (
+                              <>
+                                <Button
+                                    variant="outline"
+                                    className="flex-1 sm:flex-none"
+                                    onClick={() => {
+                                      if (
+                                          selectedAssignment?.startDate &&
+                                          new Date(selectedAssignment.startDate) <= new Date()
+                                      ) {
+                                        showToast("Erreur", t("toast.cannotEdit"), "error")
+                                        return
+                                      }
+                                      setEditMode(true)
+                                    }}
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  {t("edit.enable")}
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    className="flex-1 sm:flex-none"
+                                    onClick={async () => {
+                                      if (
+                                          selectedAssignment?.startDate &&
+                                          new Date(selectedAssignment.startDate) <= new Date()
+                                      ) {
+                                        showToast("Erreur", t("toast.cannotEdit"), "error")
+                                        return
+                                      }
+
+                                      const result = await deleteExam(selectedAssignment.id)
+                                      if (result.success) {
+                                        setAssignments(assignments.filter((a) => a.id !== selectedAssignment.id))
+                                        showToast("Succès", t("toast.deleteSuccess"), "success")
+                                        setIsSheetOpen(false)
+                                      } else {
+                                        showToast("Erreur", result.error || t("toast.deleteError"), "error")
+                                      }
+                                    }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  {t("assignment.delete")}
+                                </Button>
+                              </>
+                          )}
+                          <SheetClose asChild>
+                            <Button variant="outline" className="flex-1 sm:flex-none">
+                              <X className="h-4 w-4 mr-2" />
+                              {t("assignment.close")}
+                            </Button>
+                          </SheetClose>
                         </div>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="sticky bottom-0 p-6 bg-background border-t">
-                    <div className="flex flex-wrap gap-2">
-                      {editMode ? (
-                        <Button
-                          className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
-                          onClick={async () => {
-                            if (!selectedAssignment) return;
-
-                            if (selectedAssignment.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
-                              showToast(
-                                "Erreur",
-                                t('toast.cannotEdit'),
-                                "error"
-                              );
-                              return;
-                            }
-
-                            const examData = {
-                              title: selectedAssignment.title,
-                              description: selectedAssignment.description,
-                              type: selectedAssignment.type as ExamType,
-                              format: selectedAssignment.format,
-                              maxAttempts: selectedAssignment.maxAttempts,
-                              startDate: selectedAssignment.startDate,
-                              endDate: selectedAssignment.endDate,
-                              questions: selectedAssignment.questions ? selectedAssignment.questions.map((q) => ({
-                                id: q.id,
-                                text: q.text,
-                                maxPoints: Number(q.maxPoints),
-                                choices: q.choices || [],
-                                programmingLanguage: q.programmingLanguage,
-                                examId: q.examId
-                              })) : undefined
-                            }
-
-                            const result = await updateExam(selectedAssignment.id, examData as never)
-
-                            if (result.success) {
-                              setAssignments(
-                                assignments.map((a) =>
-                                  a.id === selectedAssignment.id
-                                    ? { ...selectedAssignment }
-                                    : a
-                                )
-                              )
-                              showToast("Succès", t('toast.updateSuccess'), "success")
-                              setEditMode(false)
-                            } else {
-                              showToast("Erreur", result.error || t('toast.updateError'), "error")
-                            }
-                          }}
-                        >
-                          <Save className="h-4 w-4 mr-2" />
-                          {t('edit.save')}
-                        </Button>
-                      ) : (
-                        <>
-                          <Button
-                            variant="outline"
-                            className="flex-1 sm:flex-none"
-                            onClick={() => {
-                              if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
-                                showToast(
-                                  "Erreur",
-                                  t('toast.cannotEdit'),
-                                  "error"
-                                );
-                                return;
-                              }
-                              setEditMode(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            {t('edit.enable')}
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            className="flex-1 sm:flex-none"
-                            onClick={async () => {
-                              if (selectedAssignment?.startDate && new Date(selectedAssignment.startDate) <= new Date()) {
-                                showToast(
-                                  "Erreur",
-                                  t('toast.cannotEdit'),
-                                  "error"
-                                );
-                                return;
-                              }
-
-                              const result = await deleteExam(selectedAssignment.id)
-                              if (result.success) {
-                                setAssignments(assignments.filter(a => a.id !== selectedAssignment.id))
-                                showToast("Succès", t('toast.deleteSuccess'), "success")
-                                setIsSheetOpen(false)
-                              } else {
-                                showToast("Erreur", result.error || t('toast.deleteError'), "error")
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            {t('assignment.delete')}
-                          </Button>
-                        </>
-                      )}
-                      <SheetClose asChild>
-                        <Button variant="outline" className="flex-1 sm:flex-none">
-                          <X className="h-4 w-4 mr-2" />
-                          {t('assignment.close')}
-                        </Button>
-                      </SheetClose>
-                    </div>
-                  </div>
-                </ScrollArea>
-              )}
-            </>
-          </SheetContent>
-        </Sheet>
-      </CardContent>
-    </Card>
+                    </ScrollArea>
+                )}
+              </>
+            </SheetContent>
+          </Sheet>
+        </CardContent>
+      </Card>
   )
 }
-//
-// function ExamSheet({ exam, user, onClose }: { exam: Assignment; user: User; onClose: () => void }) {
-//   const canStartExam = user.role === "STUDENT" && exam.status === "ACTIVE"
-//   const getStatusMessage = (status: ExamStatus) => {
-//     switch (status) {
-//       case "PENDING":
-//         return "L'examen n'a pas encore commencé"
-//       case "ACTIVE":
-//         return "L'examen est en cours"
-//       case "COMPLETED":
-//         return "L'examen est terminé"
-//     }
-//   }
-//
-//   const router = useRouter()
-//
-//   return (
-//     <SheetContent>
-//       <SheetHeader>
-//         <SheetTitle>{exam.title}</SheetTitle>
-//         <SheetDescription>{exam.description}</SheetDescription>
-//       </SheetHeader>
-//
-//       <div className="py-4">
-//         <div className="space-y-4">
-//           {/* Informations de l'examen */}
-//           <div>
-//             <h3 className="font-medium mb-2">Détails</h3>
-//             <div className="space-y-2">
-//               <div className="flex justify-between">
-//                 <span>Type:</span>
-//                 <span>{exam.type}</span>
-//               </div>
-//               <div className="flex justify-between">
-//                 <span>Date de début:</span>
-//                 <span>{exam.startDate ? new Date(exam.startDate).toLocaleDateString() : "Non définie"}</span>
-//               </div>
-//               <div className="flex justify-between">
-//                 <span>Date de fin:</span>
-//                 <span>{exam.endDate ? new Date(exam.endDate).toLocaleDateString() : "Non définie"}</span>
-//               </div>
-//               <div className="flex justify-between">
-//                 <span>Statut:</span>
-//                 <span>{getStatusMessage(exam.status)}</span>
-//               </div>
-//             </div>
-//           </div>
-//
-//           {/* Actions spécifiques au rôle */}
-//           {user.role === "STUDENT" ? (
-//             <div className="space-y-2">
-//               {canStartExam ? (
-//                 <Button
-//                   className="w-full"
-//                   onClick={() => router.push(`/exams/${exam.id}/take`)}
-//                 >
-//                   Commencer l&apos;examen
-//                 </Button>
-//               ) : (
-//                 <Button disabled className="w-full">
-//                   {exam.status === "PENDING" ? "Pas encore disponible" : "Examen terminé"}
-//                 </Button>
-//               )}
-//             </div>
-//           ) : (
-//             <div className="space-y-2">
-//               <Button
-//                 className="w-full"
-//                 onClick={() => router.push(`/exams/${exam.id}/results`)}
-//               >
-//                 Voir les résultats
-//               </Button>
-//               <Button
-//                 variant="outline"
-//                 className="w-full"
-//                 onClick={() => router.push(`/exams/${exam.id}/edit`)}
-//               >
-//                 Modifier l&apos;examen
-//               </Button>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//
-//       <SheetFooter>
-//         <SheetClose asChild>
-//           <Button variant="outline">Fermer</Button>
-//         </SheetClose>
-//       </SheetFooter>
-//     </SheetContent>
-//   )
-// }
-//
+

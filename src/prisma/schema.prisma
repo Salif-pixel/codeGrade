@@ -52,6 +52,10 @@ model User {
   role               Role              @default(STUDENT)
   createdAt          DateTime
   updatedAt          DateTime
+  website            String?
+  preferredLanguage  String?
+  technologies       String[]
+  passions           String[]
   sessions           Session[]
   accounts           Account[]
   exams              Exam[]            @relation("ExamsCreated")

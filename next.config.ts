@@ -6,10 +6,19 @@ const nextConfig: NextConfig = {
         viewTransition: true,
         nodeMiddleware: true,
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "**",
+            },
+            {
+                protocol: "http",
+                hostname: "**",
+            },
+        ],
+    },
 };
 
-const withNextIntl = createNextIntlPlugin(
-    './src/i18n/request.ts'
-);
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 export default withNextIntl(nextConfig);
-

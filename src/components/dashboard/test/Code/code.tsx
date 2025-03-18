@@ -1,32 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Play, CheckCircle, XCircle, CodeIcon } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Textarea } from "@/components/ui/textarea"
+import { Loader2 } from "lucide-react"
 import Editor from "@monaco-editor/react"
-import { cn } from "@/lib/utils"
-
-// Importons notre module de simulation d'exécution de code
-import { executeCode as executeCodeMock } from "./code-mock"
-
-interface CodeTest {
-    id: string
-    name: string
-    description: string
-    testCode?: string
-    expectedOutput: string
-    input: string
-}
 
 interface CodeEditorProps {
     initialCode: string
-    language: "javascript" | "python" | "sql"
-    tests: CodeTest[]
-    onSubmit: (data: { code: string; testResults: TestResult[]; type: string; correctAnswers: string; isCorrect: boolean }) => void
+    language: string
+    tests: any[]
+    onSubmit: (code: string, testResults: any[]) => void
     isSubmitting: boolean
 }
 
@@ -37,36 +23,12 @@ interface TestResult {
     expected: string
 }
 
-async function executeCode(code: string, language: string, input?: string) {
-    try {
-        // On exécute simplement le code tel quel
-        const response = await fetch('/api/execute-code', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, language })
-        });
-        
-        const result = await response.json();
-        return { output: result.output || result.error };
-    } catch (error) {
-        console.error('Error executing code:', error);
-        return { error: typeof error === 'string' ? error : 'Failed to execute code' };
-    }
-}
-
 export default function CodeEditor({ initialCode, language, tests, onSubmit, isSubmitting }: CodeEditorProps) {
-    const [code, setCode] = useState(initialCode)
+    const [code, setCode] = useState(initialCode || "")
     const [output, setOutput] = useState("")
     const [isRunning, setIsRunning] = useState(false)
-    const [activeTab, setActiveTab] = useState("editor")
     const [testResults, setTestResults] = useState<TestResult[]>([])
     const [allTestsPassed, setAllTestsPassed] = useState(false)
-    const [showTestInputs, setShowTestInputs] = useState(true)
-
-    // Ajouter un useEffect pour mettre à jour le code quand initialCode change
-    useEffect(() => {
-        setCode(initialCode)
-    }, [initialCode])
 
     const handleEditorChange = (value: string | undefined) => {
         if (value !== undefined) {
@@ -74,13 +36,12 @@ export default function CodeEditor({ initialCode, language, tests, onSubmit, isS
         }
     }
 
-    const runCode = async () => {
+    const handleRunCode = async () => {
         setIsRunning(true)
         setOutput("")
-        
         try {
             const result = await executeCode(code, language)
-            setOutput(result.output || result.error)
+            setOutput(result.output || result.error || "")
         } catch (error) {
             setOutput(`Error: ${error}`)
         } finally {
@@ -88,211 +49,88 @@ export default function CodeEditor({ initialCode, language, tests, onSubmit, isS
         }
     }
 
-    const runTests = async () => {
-        setIsRunning(true)
-        const results: TestResult[] = []
+    const handleSubmit = () => {
+        // Soumettre le code sans exécuter les tests
+        onSubmit({
+            code: code,
+            testResults: [],
+            type: "code",
+            correctAnswers: code,
+        })
+    }
 
+    async function executeCode(code: string, language: string) {
         try {
-            if (!code || code.trim() === '') {
-                throw new Error("Le code ne peut pas être vide")
-            }
-
-            if (!tests || tests.length === 0) {
-                console.log("Aucun test disponible")
-                return
-            }
-
-            // Exécuter le code avec les tests
-            const testCode = `
-${code}
-
-# Exécuter et afficher le résultat pour chaque test
-${tests.map(test => `print(${test.input})`).join('\n')}
-`
-            const result = await executeCode(testCode, language)
-            const outputs = result.output.split('\n').filter(line => line.trim() !== '')
-
-            tests.forEach((test, index) => {
-                const outputStr = String(outputs[index] || '').trim()
-                const expectedStr = String(test.expectedOutput).trim()
-                const passed = outputStr === expectedStr
-
-                results.push({
-                    testId: test.id,
-                    passed,
-                    output: outputStr,
-                    expected: expectedStr
-                })
-            })
-
-            setTestResults(results)
-            const allPassed = results.every(r => r.passed)
-            setAllTestsPassed(allPassed)
-
-            // Envoyer les résultats au parent avec le code actuel
-            onSubmit({
-                code: code,
-                testResults: results,
-                type: "code",
-                correctAnswers: code,
-                isCorrect: allPassed
-            })
-
+            const response = await fetch('/api/execute-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language })
+            });
+            
+            const result = await response.json();
+            return { output: result.output || result.error };
         } catch (error) {
-            console.error("Erreur lors de l'exécution des tests:", error)
-            setOutput(`Erreur: ${error}`)
-        } finally {
-            setIsRunning(false)
+            console.error('Error executing code:', error);
+            return { error: typeof error === 'string' ? error : 'Failed to execute code' };
         }
     }
 
     return (
-        <div className="mx-auto max-w-4xl">
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-100">
-                        <CodeIcon className="mr-1 h-3 w-3" />
-                        {language.toUpperCase()}
-                    </Badge>
-                    <span className="text-sm text-gray-500">
-            {tests.length} test{tests.length !== 1 ? "s" : ""}
-          </span>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-4">
+                <Card>
+                    <CardContent className="p-0">
+                        <Editor
+                            height="400px"
+                            language={language}
+                            value={code}
+                            onChange={handleEditorChange}
+                            theme="vs-dark"
+                            options={{
+                                minimap: { enabled: false },
+                                fontSize: 14,
+                                lineNumbers: "on",
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true,
+                            }}
+                        />
+                    </CardContent>
+                </Card>
 
-                <Select value={language} disabled>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Langage" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="javascript">JavaScript</SelectItem>
-                        <SelectItem value="python">Python</SelectItem>
-                        <SelectItem value="sql">SQL</SelectItem>
-                    </SelectContent>
-                </Select>
+                <div className="flex space-x-2">
+                    <Button onClick={handleRunCode} disabled={isRunning}>
+                        {isRunning ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Exécution...
+                            </>
+                        ) : (
+                            "Exécuter"
+                        )}
+                    </Button>
+                    <Button onClick={handleSubmit} disabled={isSubmitting}>
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Soumission...
+                            </>
+                        ) : (
+                            "Soumettre"
+                        )}
+                    </Button>
+                </div>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                <TabsList className="w-full">
-                    <TabsTrigger value="editor" className="flex-1">Éditeur</TabsTrigger>
-                    <TabsTrigger value="output" className="flex-1">Sortie</TabsTrigger>
-                    <TabsTrigger value="tests" className="flex-1">
-                        Tests
-                        {testResults.length > 0 && (
-                            <Badge className={`ml-2 ${allTestsPassed ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                {testResults.filter((r) => r.passed).length}/{testResults.length}
-                            </Badge>
-                        )}
-                    </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="editor">
-                    <Editor
-                        height="400px"
-                        defaultLanguage={language}
-                        value={code}
-                        onChange={handleEditorChange}
-                        theme="vs-dark"
-                    />
-                    <div className="mt-4 flex justify-end gap-2">
-                        <Button onClick={runCode} disabled={isRunning}>
-                            Exécuter
-                        </Button>
-                        <Button onClick={runTests} disabled={isRunning}>
-                            Tester
-                        </Button>
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="output" className="mt-4">
-                    <Card className="border-2 shadow-md">
-                        <CardHeader className="bg-gray-50 dark:bg-zinc-800 pb-3">
-                            <CardTitle className="text-lg font-medium">Sortie du programme</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-              <pre className="min-h-[400px] w-full bg-zinc-900 p-4 font-mono text-sm text-white">
-                {output || "Exécutez votre code pour voir la sortie ici"}
-              </pre>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="tests" className="mt-4">
-                    <Card className="border-2 shadow-md">
-                        <CardHeader className="bg-gray-50 dark:bg-zinc-800 pb-3">
-                            <CardTitle className="text-lg font-medium">Résultats des tests</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4">
-                            {testResults.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
-                                    <CodeIcon className="mb-2 h-12 w-12" />
-                                    <p>Testez votre fonction avec les inputs fournis ci-dessus</p>
-                                    <p className="text-sm mt-2">Assurez-vous que votre fonction retourne les résultats attendus</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {tests.map((test, index) => {
-                                        const result = testResults.find((r) => r.testId === test.id)
-
-                                        return (
-                                            <div
-                                                key={test.id}
-                                                className={cn(
-                                                    "p-4 rounded-lg",
-                                                    result?.passed ? "bg-green-50 dark:bg-green-900/20" : "bg-red-50 dark:bg-red-900/20"
-                                                )}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    {result?.passed ? (
-                                                        <CheckCircle className="h-5 w-5 text-green-500" />
-                                                    ) : (
-                                                        <XCircle className="h-5 w-5 text-red-500" />
-                                                    )}
-                                                    <h3 className="font-medium">{test.name}</h3>
-                                                </div>
-                                                <p className="mt-1 text-sm text-muted-foreground">{test.description}</p>
-                                                <div className="mt-2 space-y-2">
-                                                    <div>
-                                                        <span className="text-sm font-medium">Entrée:</span>
-                                                        <pre className="mt-1 rounded bg-zinc-100 p-2 text-sm dark:bg-zinc-800">
-                                                            {test.input}
-                                                        </pre>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-sm font-medium">Sortie attendue:</span>
-                                                        <pre className="mt-1 rounded bg-zinc-100 p-2 text-sm dark:bg-zinc-800">
-                                                            {test.expectedOutput}
-                                                        </pre>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-sm font-medium">Votre sortie:</span>
-                                                        <pre className="mt-1 rounded bg-zinc-100 p-2 text-sm dark:bg-zinc-800">
-                                                            {result?.output || "Pas de sortie"}
-                                                        </pre>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
-
-            {/* Afficher les inputs des tests */}
-            <div className="mb-4 p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                <h3 className="text-sm font-medium mb-2">Inputs des tests :</h3>
-                <div className="space-y-2">
-                    {tests.map((test, index) => (
-                        <div key={test.id} className="flex items-center gap-2">
-                            <span className="text-sm font-mono">Test {index + 1}:</span>
-                            <code className="px-2 py-1 bg-gray-100 dark:bg-zinc-700 rounded">
-                                {test.input}
-                            </code>
-                        </div>
-                    ))}
-                </div>
+            <div className="space-y-4">
+                <Card>
+                    <CardContent className="p-0">
+                        <Textarea
+                            value={output}
+                            readOnly
+                            className="h-[400px] font-mono bg-black text-green-400 p-4"
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )

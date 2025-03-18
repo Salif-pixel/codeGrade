@@ -15,6 +15,7 @@ export const get_users = async ()=>{
     const users = await prisma.user.findMany({
         include: {
             accounts: true,
+
         }
     });
     return users;
