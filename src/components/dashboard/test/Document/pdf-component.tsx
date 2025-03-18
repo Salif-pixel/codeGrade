@@ -1,10 +1,18 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Card} from "@/components/ui/card";
 import {Clock, FileText} from "lucide-react";
-import PdfViewer from "@/components/dashboard/test/Document/pdf-viewer";
 import PdfUpload from "@/components/dashboard/test/Document/pdf-upload";
+import FileRenderer from "@/components/file-renderer";
 
-export default function PdfComponent({assignment, activeTab, setActiveTab, handleSubmit, isSubmitting}: {assignment: any, activeTab: string, setActiveTab: any, handleSubmit: any, isSubmitting: any}) {
+export default function PdfComponent({assignment, activeTab, setActiveTab, handleSubmit, isSubmitting, submittedFile}: {
+    assignment: any, 
+    activeTab: string, 
+    setActiveTab: any, 
+    handleSubmit: any, 
+    isSubmitting: any,
+    submittedFile?: { url: string, type: string }
+}) {
+    console.log(assignment)
     return (
         <div className="grid gap-6 lg:grid-cols-2">
             <div>
@@ -34,12 +42,15 @@ export default function PdfComponent({assignment, activeTab, setActiveTab, handl
                         </Card>
                     </TabsContent>
                     <TabsContent value="document" className="mt-4">
-                        <div className="rounded border">
-                            {assignment.pdfUrl ? (
-                                <PdfViewer pdfUrl={assignment.pdfUrl} height="600px"/>
+                        <div className="rounded border p-4">
+                            {assignment.filePath ? (
+                                <div>
+                                    <h3 className="mb-2 text-lg font-semibold">Votre document soumis</h3>
+                                    <FileRenderer fileurl={assignment.filePath} type={assignment.format as 'pdf' | 'md' | 'latex' | 'txt'} />
+                                </div>
                             ) : (
                                 <div className="flex h-[600px] items-center justify-center bg-gray-100">
-                                    <p>Aucun document fourni par le professeur</p>
+                                    <p>Aucun document soumis</p>
                                 </div>
                             )}
                         </div>
@@ -51,9 +62,9 @@ export default function PdfComponent({assignment, activeTab, setActiveTab, handl
 
             <div className="hidden lg:block">
                 <h2 className="mb-4 text-lg font-semibold">Document du professeur</h2>
-                <div className="rounded border">
-                    {assignment.pdfUrl ? (
-                        <PdfViewer pdfUrl={assignment.pdfUrl} height="800px"/>
+                <div className="rounded border p-4">
+                    {assignment.filePath ? (
+                        <FileRenderer fileurl={assignment.filePath} type={assignment.format as 'pdf' | 'md' | 'latex' | 'txt'} />
                     ) : (
                         <div className="flex h-[800px] items-center justify-center bg-gray-100">
                             <p>Aucun document fourni par le professeur</p>

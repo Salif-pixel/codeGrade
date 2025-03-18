@@ -1,6 +1,7 @@
 // components/FileRenderer.tsx
 import { useState, useEffect } from 'react';
 import { extractContentFromDocument } from '@/actions/examActions';
+
 interface FileRendererProps {
   fileurl: string;
   type: 'pdf' | 'md' | 'latex' | 'txt';
@@ -8,27 +9,35 @@ interface FileRendererProps {
 
 export default function FileRenderer({ fileurl, type }: FileRendererProps) {
   const [content, setContent] = useState<string>('');
-  const file = new File([fileurl], fileurl, { type: type });
 
   useEffect(() => {
     async function loadContent() {
       try {
+        // Fetch the file from the provided URL
+        const response = await fetch(fileurl);
+        if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);
+
+        // Convert response to a Blob and create a File object
+        const blob = await response.blob();
+        const file = new File([blob], 'file', { type: blob.type });
+
+        // Extract content
         const extracted = await extractContentFromDocument(file, type);
         setContent(extracted);
       } catch (error) {
         console.error('Erreur lors de l’extraction du contenu : ', error);
+        setContent('Erreur lors du chargement du fichier.');
       }
     }
+
     loadContent();
-  }, [file, type]);
+  }, [fileurl, type]);
 
   return (
     <div>
       {type === 'md' ? (
-        // Pour le markdown, on affiche le HTML converti en utilisant dangerouslySetInnerHTML
-        <div dangerouslySetInnerHTML={{ __html: content }} />
+        <div dangerouslySetInnerHTML={{ __html: content }} className='p-4 break-all text-wrap' />
       ) : (
-        // Pour les autres types, on affiche le contenu dans une balise pre pour conserver le formatage
         <pre>{content}</pre>
       )}
     </div>

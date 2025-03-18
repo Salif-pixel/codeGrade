@@ -50,10 +50,11 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
   // Préparer les données pour le composant
   const examData = {
     id: exam.id,
+    filePath: exam.filePath,
     title: exam.title,
     description: exam.description || "",
     type: exam.type,
-    format: exam.format || "",
+    format: exam.filePath?.split(".").pop() || "",
     questions: exam.questions.map(q => ({
       id: q.id,
       text: q.text,
