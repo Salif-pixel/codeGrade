@@ -46,6 +46,8 @@ export default async function ExamResultsPage({ params }: { params: { id: Promis
     redirect(`/available-exams/${await params.id}`)
   }
 
+  console.log(exam.grades)
+
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-6">Résultats de l&apos;examen</h1>
@@ -68,7 +70,7 @@ export default async function ExamResultsPage({ params }: { params: { id: Promis
             <p className="text-sm text-muted-foreground">Note</p>
             <p className="font-medium">
               {exam.grades.length > 0
-                ? `${exam.grades[0].finalScore}/${exam.questions.reduce((sum, q) => sum + q.maxPoints, 0)}`
+                ? `${exam.grades.find((grade) => grade.studentId === session.user.id)?.finalScore}/${exam.questions.reduce((sum, q) => sum + q.maxPoints, 0)}`
                 : "En attente de notation"}
             </p>
           </div>
