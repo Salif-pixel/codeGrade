@@ -9,6 +9,7 @@ import { Locale } from "@/i18n/routing";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
 import TopLoader from "@/components/top-loader";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -51,8 +52,10 @@ export default async function LocaleLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        {children}
-                        <Toaster />
+                        <EdgeStoreProvider>
+                            {children}
+                            <Toaster />
+                        </EdgeStoreProvider>
                     </ThemeProvider>
                 </NextIntlClientProvider>
             </body>
