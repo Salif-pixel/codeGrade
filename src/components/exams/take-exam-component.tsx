@@ -369,7 +369,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         />
       ) : exam.type === ExamType.DOCUMENT ? (
         <PdfComponent
-          assignment={exam}
+          assignment={exam as any}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           handleSubmit={handleSubmit}
@@ -377,7 +377,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         />
       ) : exam.type === ExamType.CODE ? (
         <CodeComponent
-          assignment={exam}
+          assignment={exam as any}
           handleSubmit={handleSubmit}
           isSubmitting={submitting}
         />

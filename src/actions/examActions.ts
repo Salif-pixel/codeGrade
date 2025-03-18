@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache'
 import {ExamType, ParticipantStatus, SubmissionStatus} from '@prisma/client'
 import {prisma} from '@/lib/prisma'
 import { log } from 'console'
-
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 interface QuestionData {
   id?: string
   text: string
@@ -714,5 +715,42 @@ Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`
   } catch (error) {
     console.error('Error submitting exam answers:', error);
     return { success: false, error: 'Failed to submit answers' };
+  }
+}
+
+export async function getExamsForUser() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
+    if (!session?.user) {
+      return { success: false, error: 'Utilisateur non authentifié' };
+    }
+
+    const userId = session.user.id;
+    
+    // Récupérer les examens créés par l'utilisateur (si professeur)
+    // et les examens auxquels l'utilisateur participe (si étudiant)
+    const exams = await prisma.exam.findMany({
+      where: {
+        OR: [
+          { createdById: userId },
+          { participants: { some: { userId } } }
+        ]
+      },
+      include: {
+        questions: true,
+        participants: {
+          where: { userId },
+          select: { status: true }
+        }
+      },
+      orderBy: { startDate: 'asc' }
+    });
+
+    return { success: true, data: exams };
+  } catch (error) {
+    console.error('Error fetching user exams:', error);
+    return { success: false, error: 'Failed to fetch exams' };
   }
 }

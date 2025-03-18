@@ -32,6 +32,7 @@ export const navigationConfig = () => {
       roles: [Role.TEACHER, Role.STUDENT, Role.SUPERADMIN],
       // badge: 3,
     },
+
     // Pages pour les professeurs
     {
       id: "create-exam",
@@ -64,6 +65,13 @@ export const navigationConfig = () => {
       roles: [Role.STUDENT, Role.SUPERADMIN],
     },
     {
+      id: "profile",
+      title: t("profile"),
+      href: "/profile",
+      icon: <User className="w-5 h-5" />,
+      roles: [Role.TEACHER, Role.STUDENT, Role.SUPERADMIN],
+    },
+    {
       id: "settings",
       title: t("settings"),
       href: "/settings",
@@ -91,6 +99,13 @@ export const navigationConfigForMiddleware = () => {
       title: "Settings",
       href: "/settings",
       icon: <Settings2 className="w-5 h-5" />,
+      roles: [Role.TEACHER, Role.STUDENT, Role.SUPERADMIN],
+    },
+    {
+      id: "profile",
+      title: "Profile",
+      href: "/profile",
+      icon: <User className="w-5 h-5" />,
       roles: [Role.TEACHER, Role.STUDENT, Role.SUPERADMIN],
     },
 

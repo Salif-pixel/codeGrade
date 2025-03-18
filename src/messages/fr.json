@@ -13,6 +13,7 @@
     "create_exam": "Créer une évaluation",
     "my_exams": "Mes évaluations",
     "stats": "Tableau de bord",
+    "profile": "Profil",
     "available_exams": "Évaluations actives",
     "results": "Rapport de performance"
   },
@@ -390,7 +391,23 @@
     "finish": "Terminer",
     "required": "Requis",
     "needHelp": "Besoin d'aide ?",
-    "contactSupport": "Contactez notre support"
+    "contactSupport": "Contactez notre support",
+    "search": {
+      "title": "Recherche",
+      "placeholder": "Rechercher...",
+      "noResults": "Aucun résultat trouvé.",
+      "navigation": "Navigation",
+      "results": "Résultats",
+      "searching": "Recherche en cours..."
+    },
+    "navigation": {
+      "available-exams": "Examens disponibles",
+      "my-exams": "Mes examens",
+      "results": "Résultats",
+      "dashboard": "Tableau de bord",
+      "settings": "Paramètres",
+      "profile": "Profil"
+    }
   },
   "steps": {
     "welcome": "Bienvenue",
@@ -701,6 +718,10 @@
         "dark": "Sombre",
         "system": "Système"
       },
+      "profile": {
+        "title": "Profil",
+        "description": "Personnalisez votre profil"
+      },
       "colorTheme": {
         "title": "Thème de couleur",
         "jade": "Jade",
@@ -740,7 +761,10 @@
     },
     "views": {
       "day": "Jour",
-      "week": "Semaine"
+      "week": "Semaine",
+      "month": "Mois",
+      "agenda": "Agenda",
+      "year": "Année"
     },
     "assignment": {
       "add": "Ajouter une évaluation",
@@ -1026,4 +1050,5 @@
     },
     "confirmSubmitIncomplete": "Certaines questions n'ont pas été répondues. Voulez-vous quand même soumettre l'examen ?"
   }
+  
 }

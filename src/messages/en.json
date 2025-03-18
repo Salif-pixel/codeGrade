@@ -11,6 +11,7 @@
     "exit": "Back",
     "settings": "Preferences",
     "create_exam": "Design Assessment",
+    "profile": "Profile",
     "my_exams": "My Assessments",
     "stats": "Dashboard",
     "available_exams": "Active Assessments",
@@ -390,7 +391,25 @@
     "finish": "Finish",
     "required": "Required",
     "needHelp": "Need help?",
-    "contactSupport": "Contact our support"
+    "contactSupport": "Contact our support",
+    "common": {
+      "search": {
+        "title": "Search",
+        "placeholder": "Search...",
+        "noResults": "No results found.",
+        "navigation": "Navigation",
+        "results": "Results",
+        "searching": "Searching..."
+      },
+      "navigation": {
+        "available-exams": "Available Exams",
+        "my-exams": "My Exams",
+        "results": "Results",
+        "dashboard": "Dashboard",
+        "settings": "Settings",
+        "profile": "Profile"
+      }
+    }
   },
   "steps": {
     "welcome": "Welcome",
@@ -700,6 +719,10 @@
         "dark": "Dark",
         "system": "System"
       },
+      "profile": {
+        "title": "Profile",
+        "description": "Update your personal information"
+      },
       "colorTheme": {
         "title": "Color Theme",
         "jade": "Jade",
@@ -739,7 +762,10 @@
     },
     "views": {
       "day": "Day",
-      "week": "Week"
+      "week": "Week",
+        "month": "Month",
+        "agenda": "Agenda",
+      "year": "Year"
     },
     "assignment": {
       "add": "Add Assessment",
