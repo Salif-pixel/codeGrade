@@ -172,7 +172,7 @@ export default function AvailableExamsComponent({ exams }: AvailableExamsCompone
                       <CheckCircle className="h-5 w-5" />
                       {exam.grade && (
                         <span className="font-medium">
-                          {exam.grade.finalScore}/{exam.maxGrade}
+                          {exam.grade.finalScore}/{exam.maxGrade != 0 ? exam.maxGrade : 20}
                         </span>
                       )}
                     </div>
@@ -221,7 +221,7 @@ export default function AvailableExamsComponent({ exams }: AvailableExamsCompone
                   {exam.status === ParticipantStatus.COMPLETED && exam.grade && (
                     <Badge className="ml-auto rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-100">
                       <Trophy className="mr-1 h-3 w-3" />
-                      {t("assignment.grade")}: {exam.grade.finalScore}/{exam.maxGrade}
+                      {t("assignment.grade")}: {exam.grade.finalScore}/{exam.maxGrade != 0 ? exam.maxGrade : 20}
                     </Badge>
                   )}
 

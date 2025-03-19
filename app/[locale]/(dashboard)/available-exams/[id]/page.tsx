@@ -69,6 +69,7 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
     timeRemaining: exam.endDate ? Math.max(0, new Date(exam.endDate).getTime() - now.getTime()) : null,
     maxAttempts: exam.maxAttempts || 1,
     currentAttempt: 1,
+    fileCorrection: exam.fileCorrection || "",
   }
   
   return <TakeExamComponent exam={examData as never}  userId={session.user.id} />

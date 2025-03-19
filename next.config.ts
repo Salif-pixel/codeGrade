@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
                 canvas: './empty-module.ts',
             },
         },
+        serverActions: {
+            bodySizeLimit: '20mb',
+        },
     },
     images: {
         remotePatterns: [

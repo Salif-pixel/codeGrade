@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { ExamType } from "@prisma/client"
 import { Clock, Save, Send, AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { submitExamAnswers } from "@/actions/examActions"
+import { evaluatePdfSubmission, extractContentFromDocument, submitExamAnswers } from "@/actions/examActions"
 import { cn } from "@/lib/utils"
 import QuizForm from "../dashboard/test/Qcm/qcm";
 import PdfComponent from "../dashboard/test/Document/pdf-component"
@@ -36,6 +36,8 @@ type ExamData = {
   timeRemaining: number | null
   maxAttempts: number
   currentAttempt: number
+  fileCorrection: string
+  filePath: string
 }
 
 export default function TakeExamComponent({ exam, userId }: { exam: ExamData; userId: string }) {
@@ -210,12 +212,13 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
   }
   
   const handleSubmit = async (formData: any) => {
+
     setSubmitting(true);
     
     try {
-      let formattedAnswers;
+      let formattedAnswers : any;
       
-      if (exam.type === ExamType.QCM) {
+      if (exam.type == ExamType.QCM) {
         formattedAnswers = Object.entries(formData).map(([questionId, answer]) => ({
           questionId,
           content: JSON.stringify({
@@ -225,7 +228,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             feedback: { correct: "", incorrect: "" }
           })
         }));
-      } else if (exam.type === ExamType.CODE) {
+      } else if (exam.type == ExamType.CODE) {
         let codeData;
         if (Array.isArray(formData) && formData.length > 0) {
           try {
@@ -249,21 +252,38 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             questionText: exam.questions[0].text
           })
         }];
-      } else if (exam.type === ExamType.DOCUMENT) {
+      } else{
         // Pour les examens de type DOCUMENT
-        formattedAnswers = [{
-          questionId: exam.questions[0].id,
-          content: formData // Le contenu extrait du PDF
-        }];
-
-        window.alert(formattedAnswers)
+        const response = await fetch(exam.filePath, {
+          cache: 'no-store'
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch file');
+        }
+        const blob = await response.blob();
+        const file = new File([blob], "exam.pdf", { type: "application/pdf" });
+        
+        const examText = await extractContentFromDocument(file, "pdf")
+        // console.log(exam)
+        formattedAnswers = {
+          correction: exam.fileCorrection,
+          studentAnswer: formData,
+          examText: examText
+        };
       }
 
-      if (!formattedAnswers || formattedAnswers.length === 0) {
+      console.log("reponse \n------------------------\n", formattedAnswers)
+
+      if (!formattedAnswers) {
         throw new Error("Aucune réponse à soumettre");
       }
 
-      const result = await submitExamAnswers(exam.id, userId, formattedAnswers, true);
+      let result;
+      if (exam.type == ExamType.DOCUMENT) {
+        result = await evaluatePdfSubmission(exam.id, userId, formattedAnswers, true);
+      } else {
+        result = await submitExamAnswers(exam.id, userId, formattedAnswers, false);
+      }
       
       if (result.success) {
         setAlert({
@@ -276,9 +296,8 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         // Rediriger vers la page des résultats après un court délai
         setTimeout(() => {
           router.push(`/${local}/available-exams/${exam.id}/results`);
-        }, 2000);
+        }, 500);
       } else {
-        setError(result.error || "Erreur lors de la soumission de l'examen");
         setAlert({
           show: true,
           title: t("submitError.title"),
@@ -287,8 +306,6 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         });
       }
     } catch (error) {
-      console.error("Error submitting exam:", error);
-      setError("Erreur lors de la soumission de l'examen");
       setAlert({
         show: true,
         title: t("submitError.title"),

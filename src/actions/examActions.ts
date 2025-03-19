@@ -57,7 +57,7 @@ export async function extractContentFromDocument(file: File, type: "pdf" | "md" 
       default:
         throw new Error(`Unsupported file type: ${type}`)
     }
-  } catch (error : any) {
+  } catch (error: any) {
     console.error("Error extracting content:", error)
     throw new Error(`Failed to extract content from ${type} file: ${error.message}`)
   }
@@ -545,7 +545,6 @@ export async function submitExamAnswers(
     };
 
     for (const answer of answers) {
-      console.log("logggggggggg", answer);
       const question = exam.questions.find(q => q.id === answer.questionId);
       if (!question || !question.answer) continue;
 
@@ -835,7 +834,7 @@ export async function getExamsForUser() {
     }
 
     const userId = session.user.id;
-    
+
     // Récupérer les examens créés par l'utilisateur (si professeur)
     // et les examens auxquels l'utilisateur participe (si étudiant)
     const exams = await prisma.exam.findMany({
@@ -865,7 +864,11 @@ export async function getExamsForUser() {
 export async function evaluatePdfSubmission(
   examId: string,
   studentId: string,
-  submittedPdfContent: string,
+  submissionData: {
+    correction: string,
+    studentAnswer: string,
+    examText: string
+  },
   isSubmission: boolean
 ) {
   try {
@@ -877,34 +880,25 @@ export async function evaluatePdfSubmission(
         filePath: true,
         fileCorrection: true,
         questions: true
-      }
+      },
     });
+
 
     if (!exam) {
       throw new Error("Examen non trouvé");
     }
 
-    if (!exam.filePath) {
-      throw new Error("Chemin du fichier non trouvé");
-    }
-
-    // Extraire le contenu du PDF du devoir
-    const examPdfContent = await extractContentFromDocument(
-      new File([await fetch(exam.filePath).then(r => r.blob())], "exam.pdf", { type: "application/pdf" }),
-      "pdf"
-    );
-
     // Préparer le prompt pour l'IA
     const prompt = `En tant que correcteur, évalue cette copie d'examen.
 
 Sujet du devoir:
-${examPdfContent}
+${submissionData.examText}
 
 Corrigé type:
-${exam.fileCorrection}
+${submissionData.correction}
 
 Copie de l'étudiant:
-${submittedPdfContent}
+${submissionData.studentAnswer}
 
 Fournis une évaluation détaillée au format JSON suivant (sans backticks, sans commentaires):
 {
@@ -932,7 +926,10 @@ Fournis une évaluation détaillée au format JSON suivant (sans backticks, sans
     const result = await response.json();
     const evaluation = JSON.parse(result.choices[0].message.content);
 
-    // Créer la réponse dans la base de données
+    // TODO refactor here cause it's not working
+    // const examResponse = await prisma.exam.update({
+
+    // });
     const examAnswer = await prisma.answer.create({
       data: {
         filePath: "pdf_submission",
@@ -940,16 +937,11 @@ Fournis une évaluation détaillée au format JSON suivant (sans backticks, sans
         status: isSubmission ? SubmissionStatus.REVISED : SubmissionStatus.PENDING,
         student: { connect: { id: studentId } },
         exam: { connect: { id: examId } },
-        questionAnswers: {
-          create: [{
-            question: { connect: { id: exam.questions[0].id } },
-            content: JSON.stringify({
-              type: "pdf",
-              submittedContent: submittedPdfContent,
-              evaluation: evaluation
-            })
-          }]
-        }
+        content: JSON.stringify({
+          type: "pdf",
+          submittedContent: submissionData.studentAnswer,
+          evaluation: evaluation
+        })
       }
     });
 
