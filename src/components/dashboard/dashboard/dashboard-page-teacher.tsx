@@ -8,6 +8,9 @@ import { format } from "date-fns"
 import { ExamStatus } from "@prisma/client"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
+import { useEdgeStore } from "@/lib/edgestore"
+import { useState } from "react"
+import { toast } from "sonner"
 
 interface TeacherDashboardData {
     metrics: {
@@ -127,10 +130,10 @@ export default function DashboardPageTeacher({ data }: DashboardPageTeacherProps
                                         <TableCell>
                                             <span
                                                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${exam.status === 'COMPLETED'
-                                                        ? "bg-green-100 text-green-800"
-                                                        : exam.status === 'ACTIVE'
-                                                            ? "bg-blue-100 text-blue-800"
-                                                            : "bg-yellow-100 text-yellow-800"
+                                                    ? "bg-green-100 text-green-800"
+                                                    : exam.status === 'ACTIVE'
+                                                        ? "bg-blue-100 text-blue-800"
+                                                        : "bg-yellow-100 text-yellow-800"
                                                     }`}
                                             >
                                                 {getStatusText(exam.status)}

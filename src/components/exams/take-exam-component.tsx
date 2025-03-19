@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { ExamType } from "@prisma/client"
 import { Clock, Save, Send, AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { submitExamAnswers } from "@/actions/examActions"
+import { evaluatePdfSubmission, extractContentFromDocument, submitExamAnswers } from "@/actions/examActions"
 import { cn } from "@/lib/utils"
 import QuizForm from "../dashboard/test/Qcm/qcm";
 import PdfComponent from "../dashboard/test/Document/pdf-component"
@@ -36,6 +36,8 @@ type ExamData = {
   timeRemaining: number | null
   maxAttempts: number
   currentAttempt: number
+  fileCorrection: string
+  filePath: string
 }
 
 export default function TakeExamComponent({ exam, userId }: { exam: ExamData; userId: string }) {
@@ -210,12 +212,13 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
   }
   
   const handleSubmit = async (formData: any) => {
+
     setSubmitting(true);
     
     try {
-      let formattedAnswers;
+      let formattedAnswers : any;
       
-      if (exam.type === ExamType.QCM) {
+      if (exam.type == ExamType.QCM) {
         formattedAnswers = Object.entries(formData).map(([questionId, answer]) => ({
           questionId,
           content: JSON.stringify({
@@ -225,8 +228,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             feedback: { correct: "", incorrect: "" }
           })
         }));
-      } else if (exam.type === ExamType.CODE) {
-        // Parse le contenu si c'est une chaîne
+      } else if (exam.type == ExamType.CODE) {
         let codeData;
         if (Array.isArray(formData) && formData.length > 0) {
           try {
@@ -239,8 +241,6 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           codeData = formData;
         }
         
-        console.log("Code data before formatting:", codeData);
-        
         formattedAnswers = [{
           questionId: exam.questions[0].id,
           content: JSON.stringify({
@@ -252,26 +252,66 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             questionText: exam.questions[0].text
           })
         }];
+      } else{
+        // Pour les examens de type DOCUMENT
+        const response = await fetch(exam.filePath, {
+          cache: 'no-store'
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch file');
+        }
+        const blob = await response.blob();
+        const file = new File([blob], "exam.pdf", { type: "application/pdf" });
         
-        console.log("Formatted answers:", formattedAnswers);
-      } else {
-        // Pour PDF
-        formattedAnswers = [{
-          questionId: exam.questions[0].id,
-          content: formData
-        }];
+        const examText = await extractContentFromDocument(file, "pdf")
+        // console.log(exam)
+        formattedAnswers = {
+          correction: exam.fileCorrection,
+          studentAnswer: formData,
+          examText: examText
+        };
       }
 
-      const result = await submitExamAnswers(exam.id, userId, formattedAnswers, true);
+      console.log("reponse \n------------------------\n", formattedAnswers)
+
+      if (!formattedAnswers) {
+        throw new Error("Aucune réponse à soumettre");
+      }
+
+      let result;
+      if (exam.type == ExamType.DOCUMENT) {
+        result = await evaluatePdfSubmission(exam.id, userId, formattedAnswers, true);
+      } else {
+        result = await submitExamAnswers(exam.id, userId, formattedAnswers, false);
+      }
       
       if (result.success) {
-        router.push(`/${local}/available-exams/${exam.id}/results`);
+        setAlert({
+          show: true,
+          title: t("submitSuccess.title"),
+          description: t("submitSuccess.description"),
+          variant: "default"
+        });
+        
+        // Rediriger vers la page des résultats après un court délai
+        setTimeout(() => {
+          router.push(`/${local}/available-exams/${exam.id}/results`);
+        }, 500);
       } else {
-        setError("Erreur lors de la soumission de l'examen");
+        setAlert({
+          show: true,
+          title: t("submitError.title"),
+          description: t("submitError.description"),
+          variant: "destructive"
+        });
       }
     } catch (error) {
-      console.error("Error submitting exam:", error);
-      setError("Erreur lors de la soumission de l'examen");
+      setAlert({
+        show: true,
+        title: t("submitError.title"),
+        description: t("submitError.description"),
+        variant: "destructive"
+      });
     } finally {
       setSubmitting(false);
     }
@@ -289,12 +329,12 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
     return exam.questions.map(q => ({
       id: q.id,
       text: q.text,
-      options: (q.choices || []).map((choice, ) => ({
+      options: (q.choices || []).map((choice) => ({
         id: choice,
         text: choice
       }))
-    }))
-  }
+    }));
+  };
 
   const handleQuizSubmit = (quizAnswers: Record<string, string | string[]>) => {
     const formattedAnswers = Object.entries(quizAnswers).map(([questionId, answer]) => ({
@@ -310,24 +350,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       })
     }));
 
-    setSubmitting(true);
-    console.log(formattedAnswers)
-    // Envoyer directement le tableau formattedAnswers
-    submitExamAnswers(exam.id, userId, formattedAnswers, true)
-      .then(result => {
-        if (result.success) {
-          router.push(`/${local}/available-exams/${exam.id}/results`);
-        } else {
-          setError("Erreur lors de la soumission de l'examen");
-        }
-      })
-      .catch(error => {
-        console.error("Error submitting exam:", error);
-        setError("Erreur lors de la soumission de l'examen");
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+    handleSubmit(formattedAnswers);
   };
   
   return (

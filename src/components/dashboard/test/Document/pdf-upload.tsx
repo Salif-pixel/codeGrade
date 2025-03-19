@@ -85,7 +85,7 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
 
                             {!file ? (
                                 <div
-                                    className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 hover:bg-gray-50"
+                                    className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-zinc-500 p-6 hover:bg-zinc-200 dark:hover:bg-zinc-950 "
                                     onClick={() => fileInputRef.current?.click()}
                                 >
                                     <Upload className="mb-2 h-8 w-8 text-gray-400" />
@@ -109,7 +109,7 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
 
                                     {preview && (
                                         <div className="mt-4 rounded border">
-                                            <iframe src={preview} className="h-[200px] w-full rounded" title="Prévisualisation du PDF" />
+                                            <iframe src={preview} className="h-auto w-full aspect-[1/1.4142] rounded" title="Prévisualisation du PDF" />
                                         </div>
                                     )}
                                 </div>

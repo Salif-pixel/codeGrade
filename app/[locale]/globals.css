@@ -253,9 +253,161 @@
   }
 }
 
+@theme {
+  /* Base typography scale */
+  --font-heading: system-ui, sans-serif;
+  --font-body: system-ui, sans-serif;
+
+  /* Custom colors for markdown content */
+  --color-prose-body: oklch(0.32 0 0);
+  --color-prose-headings: oklch(0.2 0 0);
+  --color-prose-links: oklch(0.55 0.2 250);
+  --color-prose-code-bg: oklch(0.95 0 0);
+
+  /* Dark mode colors */
+  --color-prose-body-dark: oklch(0.9 0 0);
+  --color-prose-headings-dark: oklch(0.98 0 0);
+  --color-prose-links-dark: oklch(0.75 0.15 250);
+  --color-prose-code-bg-dark: oklch(0.2 0 0);
+}
+
+/* Custom prose styles using the new v4 approach */
 @layer components {
+
   .container {
     @apply mx-auto px-8;
     max-width: 1400px;
+  }
+  
+  .prose {
+    color: var(--color-prose-body);
+    max-width: 65ch;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    color: var(--color-prose-headings);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+  }
+
+  .prose h1 {
+    font-size: 2.25rem;
+    margin-top: 0;
+  }
+
+  .prose h2 {
+    font-size: 1.875rem;
+  }
+
+  .prose h3 {
+    font-size: 1.5rem;
+  }
+
+  .prose p {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+
+  .prose a {
+    color: var(--color-prose-links);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklch, var(--color-prose-links) 30%, transparent);
+  }
+
+  .prose a:hover {
+    text-decoration-color: var(--color-prose-links);
+  }
+
+  .prose ul,
+  .prose ol {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    padding-left: 1.625em;
+  }
+
+  .prose ul {
+    list-style-type: disc;
+  }
+
+  .prose ol {
+    list-style-type: decimal;
+  }
+
+  .prose li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .prose blockquote {
+    font-style: italic;
+    border-left-width: 4px;
+    border-left-color: color-mix(in oklch, var(--color-prose-body) 30%, transparent);
+    padding-left: 1em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+  }
+
+  .prose code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.875em;
+    background-color: var(--color-prose-code-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25em;
+  }
+
+  .prose pre {
+    background-color: var(--color-prose-code-bg);
+    border-radius: 0.375em;
+    overflow-x: auto;
+    padding: 1em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+  }
+
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.875em;
+    color: inherit;
+  }
+
+  /* Dark mode styles */
+  .dark .prose {
+    color: var(--color-prose-body-dark);
+  }
+
+  .dark .prose h1,
+  .dark .prose h2,
+  .dark .prose h3,
+  .dark .prose h4,
+  .dark .prose h5,
+  .dark .prose h6 {
+    color: var(--color-prose-headings-dark);
+  }
+
+  .dark .prose a {
+    color: var(--color-prose-links-dark);
+  }
+
+  .dark .prose blockquote {
+    border-left-color: color-mix(in oklch, var(--color-prose-body-dark) 30%, transparent);
+  }
+
+  .dark .prose code {
+    background-color: var(--color-prose-code-bg-dark);
+  }
+
+  .dark .prose pre {
+    background-color: var(--color-prose-code-bg-dark);
   }
 }

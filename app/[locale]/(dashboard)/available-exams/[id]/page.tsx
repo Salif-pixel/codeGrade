@@ -10,14 +10,16 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
   const session = await auth.api.getSession({
     headers: header,
   })
+
+  const parameters = await params
   
   if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=/available-exams/${await params.id}`)
+    redirect(`/auth/login?callbackUrl=/available-exams/${await parameters.id}`)
   }
   
   // Récupérer l'examen avec ses questions
   const exam = await prisma.exam.findUnique({
-    where: { id: await params.id },
+    where: { id: await parameters.id },
     include: {
       questions: true,
       participants: {
@@ -50,10 +52,11 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
   // Préparer les données pour le composant
   const examData = {
     id: exam.id,
+    filePath: exam.filePath,
     title: exam.title,
     description: exam.description || "",
     type: exam.type,
-    format: exam.format || "",
+    format: exam.filePath?.split(".").pop() || "",
     questions: exam.questions.map(q => ({
       id: q.id,
       text: q.text,
@@ -66,6 +69,7 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
     timeRemaining: exam.endDate ? Math.max(0, new Date(exam.endDate).getTime() - now.getTime()) : null,
     maxAttempts: exam.maxAttempts || 1,
     currentAttempt: 1,
+    fileCorrection: exam.fileCorrection || "",
   }
   
   return <TakeExamComponent exam={examData as never}  userId={session.user.id} />

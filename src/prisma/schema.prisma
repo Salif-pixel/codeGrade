@@ -113,18 +113,19 @@ model Verification {
 }
 
 model Exam {
-  id          String     @id @default(uuid())
-  title       String
-  description String?
-  filePath    String?
-  format      String?
-  type        ExamType
-  maxAttempts Int        @default(1)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  startDate   DateTime?
-  endDate     DateTime?
-  status      ExamStatus @default(PENDING)
+  id             String     @id @default(uuid())
+  title          String
+  description    String?
+  filePath       String?
+  format         String?
+  type           ExamType
+  maxAttempts    Int        @default(1)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  startDate      DateTime?
+  endDate        DateTime?
+  status         ExamStatus @default(PENDING)
+  fileCorrection String?
 
   questions    Question[]        @relation("ExamQuestions")
   createdBy    User              @relation("ExamsCreated", fields: [createdById], references: [id])
@@ -154,6 +155,7 @@ model Answer {
   attemptNumber Int              @default(1)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
+  content       String?          @db.VarChar(5000)
   status        SubmissionStatus @default(PENDING)
 
   // Relations existantes
