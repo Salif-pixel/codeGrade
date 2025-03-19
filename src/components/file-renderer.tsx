@@ -1,15 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Document, Page, pdfjs } from "react-pdf"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-
-// Initialize PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 
 interface FileRendererProps {
   file: File
@@ -17,45 +11,26 @@ interface FileRendererProps {
 }
 
 export default function FileRenderer({ file, content }: FileRendererProps) {
-  const [numPages, setNumPages] = useState<number | null>(null)
-  const [pageNumber, setPageNumber] = useState<number>(1)
   const [renderedLatex, setRenderedLatex] = useState<string>("")
   const [activeTab, setActiveTab] = useState<string>("preview")
+  const [pdfUrl, setPdfUrl] = useState<string>("")
 
   const fileType = getFileType(file)
 
+  // Gestion de l'URL blob pour le PDF
   useEffect(() => {
-    if (fileType === "latex" && typeof content === "string") {
-      // For LaTeX files, we'll render them using KaTeX
-      import("katex").then((katex) => {
-        try {
-          // Basic LaTeX rendering
-          const html = content
-            .split("\n")
-            .map((line) => {
-              if (line.includes("$$")) {
-                try {
-                  const mathContent = line.split("$$")[1]
-                  return katex.renderToString(mathContent, { displayMode: true })
-                } catch (e) {
-                  return line
-                }
-              }
-              return line
-            })
-            .join("<br />")
+    if (fileType === "pdf") {
+      const url = content instanceof ArrayBuffer 
+        ? URL.createObjectURL(new Blob([content], { type: 'application/pdf' }))
+        : URL.createObjectURL(file)
+      setPdfUrl(url)
 
-          setRenderedLatex(html)
-        } catch (e) {
-          setRenderedLatex("Failed to render LaTeX content")
-        }
-      })
+      // Nettoyage de l'URL lors du démontage
+      return () => {
+        URL.revokeObjectURL(url)
+      }
     }
-  }, [content, fileType])
-
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
-    setNumPages(numPages)
-  }
+  }, [content, file, fileType])
 
   function getFileType(file: File): "markdown" | "text" | "pdf" | "latex" | "unknown" {
     const extension = file.name.split(".").pop()?.toLowerCase()
@@ -74,54 +49,16 @@ export default function FileRenderer({ file, content }: FileRendererProps) {
   }
 
   if (fileType === "unknown") {
-    return <div className="text-center py-10">Unsupported file type</div>
+    return <div className="text-center py-10">Type de fichier non supporté</div>
   }
 
   if (fileType === "pdf") {
     return (
-      <div className="flex flex-col items-center">
-        <Document
-          file={content}
-          onLoadSuccess={onDocumentLoadSuccess}
-          className="max-w-full"
-          error={<div className="text-center py-10">Failed to load PDF. Please check if the file is valid.</div>}
-          loading={<div className="text-center py-10">Loading PDF...</div>}
-        >
-          <Page
-            pageNumber={pageNumber}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-            className="max-w-full"
-            scale={1}
-          />
-        </Document>
-
-        {numPages && (
-          <div className="flex items-center gap-4 mt-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
-              disabled={pageNumber <= 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            <span className="text-sm">
-              Page {pageNumber} of {numPages}
-            </span>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setPageNumber((prev) => Math.min(prev + 1, numPages || 1))}
-              disabled={pageNumber >= (numPages || 1)}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </div>
+      <iframe
+        src={pdfUrl}
+        className="w-full aspect-[1/1.4142] h-auto rounded-lg border border-gray-200" 
+        title="PDF Viewer"
+      />
     )
   }
 
@@ -129,20 +66,19 @@ export default function FileRenderer({ file, content }: FileRendererProps) {
     return (
       <Tabs defaultValue="preview" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="mb-4">
-          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="preview">Aperçu</TabsTrigger>
           <TabsTrigger value="source">Source</TabsTrigger>
         </TabsList>
 
         <TabsContent value="preview" className="min-h-[300px]">
-          {/* Use the prose class we defined in globals.css */}
-          <article className="prose">
+          <article className="prose dark:prose-invert max-w-none">
             {typeof content === "string" && <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>}
           </article>
         </TabsContent>
 
         <TabsContent value="source">
           <pre className="p-4 bg-muted rounded-md overflow-auto max-h-[500px]">
-            <code>{typeof content === "string" ? content : "Cannot display content"}</code>
+            <code>{typeof content === "string" ? content : "Impossible d'afficher le contenu"}</code>
           </pre>
         </TabsContent>
       </Tabs>
@@ -153,28 +89,27 @@ export default function FileRenderer({ file, content }: FileRendererProps) {
     return (
       <Tabs defaultValue="preview" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="mb-4">
-          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="preview">Aperçu</TabsTrigger>
           <TabsTrigger value="source">Source</TabsTrigger>
         </TabsList>
 
         <TabsContent value="preview" className="min-h-[300px]">
-          <div className="prose" dangerouslySetInnerHTML={{ __html: renderedLatex }} />
+          <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: renderedLatex }} />
         </TabsContent>
 
         <TabsContent value="source">
           <pre className="p-4 bg-muted rounded-md overflow-auto max-h-[500px]">
-            <code>{typeof content === "string" ? content : "Cannot display content"}</code>
+            <code>{typeof content === "string" ? content : "Impossible d'afficher le contenu"}</code>
           </pre>
         </TabsContent>
       </Tabs>
     )
   }
 
-  // Text files
+  // Fichiers texte
   return (
     <pre className="p-4 bg-muted rounded-md overflow-auto max-h-[500px] whitespace-pre-wrap">
-      {typeof content === "string" ? content : "Cannot display content"}
+      {typeof content === "string" ? content : "Impossible d'afficher le contenu"}
     </pre>
   )
 }
-

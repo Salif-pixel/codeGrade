@@ -10,14 +10,16 @@ export default async function TakeExamPage({ params }: { params: { id: Promise<s
   const session = await auth.api.getSession({
     headers: header,
   })
+
+  const parameters = await params
   
   if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=/available-exams/${await params.id}`)
+    redirect(`/auth/login?callbackUrl=/available-exams/${await parameters.id}`)
   }
   
   // Récupérer l'examen avec ses questions
   const exam = await prisma.exam.findUnique({
-    where: { id: await params.id },
+    where: { id: await parameters.id },
     include: {
       questions: true,
       participants: {

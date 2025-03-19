@@ -3,10 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { ExamType, ParticipantStatus, SubmissionStatus } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
-import { marked } from 'marked';
-import extractText from 'react-pdftotext';
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 
 interface QuestionData {
   id?: string
@@ -29,30 +28,38 @@ interface ExamData {
   questions?: QuestionData[]
 }
 
-export async function extractContentFromDocument(file: File, type: 'pdf' | 'md' | 'latex' | 'txt'): Promise<string> {
+async function fileToBuffer(file: File): Promise<Buffer> {
+  const arrayBuffer = await file.arrayBuffer()
+  return Buffer.from(arrayBuffer)
+}
+
+export async function extractContentFromDocument(file: File, type: "pdf" | "md" | "latex" | "txt"): Promise<string> {
   try {
+    const buffer = await fileToBuffer(file)
+
     switch (type) {
-      case 'pdf': {
-        const text = await extractText(file);
-        return text;
+      case "pdf": {
+        // Create a blob from the buffer
+        const blob = new Blob([buffer])
+        // Use PDFLoader to extract text from PDF
+        const loader = new PDFLoader(blob)
+        const docs = await loader.load()
+        return docs.map((doc: any) => doc.pageContent).join("\n")
       }
 
-      case 'md': {
-        const text = await file.text();
-        return marked.parse(text);
-      }
-
-      case 'latex':
-      case 'txt': {
-        return await file.text();
+      case "md":
+      case "latex":
+      case "txt": {
+        // For text-based formats, we can just return the text content
+        return buffer.toString("utf-8")
       }
 
       default:
-        throw new Error('Unsupported file type');
+        throw new Error(`Unsupported file type: ${type}`)
     }
-  } catch (error) {
-    console.error('Error processing file:', error);
-    throw new Error(`Failed to extract content: ${(error as Error).message}`);
+  } catch (error : any) {
+    console.error("Error extracting content:", error)
+    throw new Error(`Failed to extract content from ${type} file: ${error.message}`)
   }
 }
 
@@ -852,5 +859,145 @@ export async function getExamsForUser() {
   } catch (error) {
     console.error('Error fetching user exams:', error);
     return { success: false, error: 'Failed to fetch exams' };
+  }
+}
+
+export async function evaluatePdfSubmission(
+  examId: string,
+  studentId: string,
+  submittedPdfContent: string,
+  isSubmission: boolean
+) {
+  try {
+    // Récupérer l'examen avec le contenu du PDF original et le corrigé
+    const exam = await prisma.exam.findUnique({
+      where: { id: examId },
+      select: {
+        id: true,
+        filePath: true,
+        fileCorrection: true,
+        questions: true
+      }
+    });
+
+    if (!exam) {
+      throw new Error("Examen non trouvé");
+    }
+
+    if (!exam.filePath) {
+      throw new Error("Chemin du fichier non trouvé");
+    }
+
+    // Extraire le contenu du PDF du devoir
+    const examPdfContent = await extractContentFromDocument(
+      new File([await fetch(exam.filePath).then(r => r.blob())], "exam.pdf", { type: "application/pdf" }),
+      "pdf"
+    );
+
+    // Préparer le prompt pour l'IA
+    const prompt = `En tant que correcteur, évalue cette copie d'examen.
+
+Sujet du devoir:
+${examPdfContent}
+
+Corrigé type:
+${exam.fileCorrection}
+
+Copie de l'étudiant:
+${submittedPdfContent}
+
+Fournis une évaluation détaillée au format JSON suivant (sans backticks, sans commentaires):
+{
+  "score": (note sur 20),
+  "feedback": "Commentaires détaillés sur la copie",
+  "pointsForts": ["Liste des points forts"],
+  "pointsFaibles": ["Liste des points à améliorer"],
+  "justificationNote": "Explication détaillée de la note attribuée"
+}`;
+
+    // Obtenir l'évaluation de l'IA
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "deepseek/deepseek-chat:free",
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: "json_object" }
+      })
+    });
+
+    const result = await response.json();
+    const evaluation = JSON.parse(result.choices[0].message.content);
+
+    // Créer la réponse dans la base de données
+    const examAnswer = await prisma.answer.create({
+      data: {
+        filePath: "pdf_submission",
+        attemptNumber: 1,
+        status: isSubmission ? SubmissionStatus.REVISED : SubmissionStatus.PENDING,
+        student: { connect: { id: studentId } },
+        exam: { connect: { id: examId } },
+        questionAnswers: {
+          create: [{
+            question: { connect: { id: exam.questions[0].id } },
+            content: JSON.stringify({
+              type: "pdf",
+              submittedContent: submittedPdfContent,
+              evaluation: evaluation
+            })
+          }]
+        }
+      }
+    });
+
+    if (isSubmission) {
+      // Mettre à jour le statut du participant
+      await prisma.examParticipant.update({
+        where: {
+          examId_userId: {
+            examId,
+            userId: studentId
+          }
+        },
+        data: {
+          status: ParticipantStatus.COMPLETED
+        }
+      });
+
+      // Créer la correction
+      const correction = await prisma.correction.create({
+        data: {
+          aiFeedback: evaluation.feedback,
+          autoScore: evaluation.score,
+          answer: { connect: { id: examAnswer.id } }
+        }
+      });
+
+      // Créer la note finale
+      await prisma.grade.create({
+        data: {
+          finalScore: evaluation.score,
+          comments: JSON.stringify({
+            feedback: evaluation.feedback,
+            pointsForts: evaluation.pointsForts,
+            pointsFaibles: evaluation.pointsFaibles,
+            justificationNote: evaluation.justificationNote
+          }),
+          student: { connect: { id: studentId } },
+          exam: { connect: { id: examId } },
+          correction: { connect: { id: correction.id } },
+          answer: { connect: { id: examAnswer.id } }
+        }
+      });
+    }
+
+    revalidatePath(`/available-exams/${examId}`);
+    return { success: true, evaluation };
+  } catch (error) {
+    console.error('Error evaluating PDF submission:', error);
+    return { success: false, error: 'Échec de l\'évaluation du PDF' };
   }
 }

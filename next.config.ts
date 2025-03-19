@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
     experimental: {
         viewTransition: true,
         nodeMiddleware: true,
+        turbo: {
+            resolveAlias: {
+                canvas: './empty-module.ts',
+            },
+        },
     },
     images: {
         remotePatterns: [

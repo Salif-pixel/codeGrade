@@ -226,7 +226,6 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           })
         }));
       } else if (exam.type === ExamType.CODE) {
-        // Parse le contenu si c'est une chaîne
         let codeData;
         if (Array.isArray(formData) && formData.length > 0) {
           try {
@@ -239,8 +238,6 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           codeData = formData;
         }
         
-        console.log("Code data before formatting:", codeData);
-        
         formattedAnswers = [{
           questionId: exam.questions[0].id,
           content: JSON.stringify({
@@ -252,26 +249,52 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             questionText: exam.questions[0].text
           })
         }];
-        
-        console.log("Formatted answers:", formattedAnswers);
-      } else {
-        // Pour PDF
+      } else if (exam.type === ExamType.DOCUMENT) {
+        // Pour les examens de type DOCUMENT
         formattedAnswers = [{
           questionId: exam.questions[0].id,
-          content: formData
+          content: formData // Le contenu extrait du PDF
         }];
+
+        window.alert(formattedAnswers)
+      }
+
+      if (!formattedAnswers || formattedAnswers.length === 0) {
+        throw new Error("Aucune réponse à soumettre");
       }
 
       const result = await submitExamAnswers(exam.id, userId, formattedAnswers, true);
       
       if (result.success) {
-        router.push(`/${local}/available-exams/${exam.id}/results`);
+        setAlert({
+          show: true,
+          title: t("submitSuccess.title"),
+          description: t("submitSuccess.description"),
+          variant: "default"
+        });
+        
+        // Rediriger vers la page des résultats après un court délai
+        setTimeout(() => {
+          router.push(`/${local}/available-exams/${exam.id}/results`);
+        }, 2000);
       } else {
-        setError("Erreur lors de la soumission de l'examen");
+        setError(result.error || "Erreur lors de la soumission de l'examen");
+        setAlert({
+          show: true,
+          title: t("submitError.title"),
+          description: t("submitError.description"),
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error("Error submitting exam:", error);
       setError("Erreur lors de la soumission de l'examen");
+      setAlert({
+        show: true,
+        title: t("submitError.title"),
+        description: t("submitError.description"),
+        variant: "destructive"
+      });
     } finally {
       setSubmitting(false);
     }
@@ -289,12 +312,12 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
     return exam.questions.map(q => ({
       id: q.id,
       text: q.text,
-      options: (q.choices || []).map((choice, ) => ({
+      options: (q.choices || []).map((choice) => ({
         id: choice,
         text: choice
       }))
-    }))
-  }
+    }));
+  };
 
   const handleQuizSubmit = (quizAnswers: Record<string, string | string[]>) => {
     const formattedAnswers = Object.entries(quizAnswers).map(([questionId, answer]) => ({
@@ -310,24 +333,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       })
     }));
 
-    setSubmitting(true);
-    console.log(formattedAnswers)
-    // Envoyer directement le tableau formattedAnswers
-    submitExamAnswers(exam.id, userId, formattedAnswers, true)
-      .then(result => {
-        if (result.success) {
-          router.push(`/${local}/available-exams/${exam.id}/results`);
-        } else {
-          setError("Erreur lors de la soumission de l'examen");
-        }
-      })
-      .catch(error => {
-        console.error("Error submitting exam:", error);
-        setError("Erreur lors de la soumission de l'examen");
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+    handleSubmit(formattedAnswers);
   };
   
   return (

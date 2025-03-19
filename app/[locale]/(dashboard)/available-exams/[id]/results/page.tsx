@@ -10,13 +10,15 @@ export default async function ExamResultsPage({ params }: { params: { id: Promis
   const session = await auth.api.getSession({
     headers: header,
   })
+
+  const parameters = await params
   
   if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=/available-exams/${await params.id}/results`)
+    redirect(`/auth/login?callbackUrl=/available-exams/${await parameters.id}/results`)
   }
   
   const exam = await prisma.exam.findUnique({
-    where: { id: await params.id },
+    where: { id: await parameters.id },
     include: {
       questions: true,
       grades:true,
@@ -43,7 +45,7 @@ export default async function ExamResultsPage({ params }: { params: { id: Promis
 
   // Vérifier si l'utilisateur a bien complété cet examen
   if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.COMPLETED) {
-    redirect(`/available-exams/${await params.id}`)
+    redirect(`/available-exams/${await parameters.id}`)
   }
 
   console.log(exam.grades)
