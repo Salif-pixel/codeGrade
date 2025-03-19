@@ -1,0 +1,1053 @@
+{
+  "404": {
+    "title": "404",
+    "error_message": "ES IST EIN FEHLER.",
+    "page_not_found": "DIE GESUCHTE SEITE EXISTIERT NICHT.",
+    "tetris_suggestion": "Während Sie warten, warum spielen Sie nicht eine Runde Tetris?",
+    "back_home": "ZURÜCK ZUR STARTSEITE →",
+    "footer": "Hausaufgabenorganisationsplattform für Lehrer"
+  },
+  "nav-items": {
+    "exit": "Zurück",
+    "settings": "Einstellungen",
+    "create_exam": "Bewertung erstellen",
+    "my_exams": "Meine Bewertungen",
+    "stats": "Dashboard",
+    "profile": "Profil",
+    "available_exams": "Aktive Bewertungen",
+    "results": "Leistungsbericht"
+  },
+  "HomePage": {
+    "title": "Titel der Startseite"
+  },
+  "LandingPage": {
+    "nav": {
+      "brand": "CodeGrade",
+      "login": "Anmelden",
+      "start": "Starten"
+    },
+    "hero": {
+      "title": "Transformieren Sie Ihre Programmierbewertungen",
+      "subtitle": "Automatisieren Sie die Bewertung, bieten Sie sofortiges Feedback und konzentrieren Sie sich auf den Unterricht."
+    },
+    "floating": {
+      "fileName": "test.py",
+      "aiAnalysis": "KI-Analyse",
+      "testsPassed": "Tests bestanden: 5/5",
+      "complexity": "Komplexität: O(2^n)",
+      "suggestion": "Vorschlag: Verwenden Sie Memoization, um die Leistung zu verbessern",
+      "satisfactionRate": "98%",
+      "assignment": "Aufgabe: Rekursive Algorithmen",
+      "deadline": "Frist: 15. Juni",
+      "studentsCount": "25 Schüler"
+    },
+    "features": {
+      "title": "Warum CodeGrade wählen?",
+      "aiGrading": {
+        "title": "KI-Bewertung",
+        "description": "Unsere KI analysiert den Code der Schüler, überprüft die Syntax, führt Tests aus und bietet personalisiertes Feedback."
+      },
+      "timeSaving": {
+        "title": "Zeitersparnis",
+        "description": "Automatisieren Sie repetitive Aufgaben und konzentrieren Sie sich auf die pädagogische Unterstützung Ihrer Schüler."
+      },
+      "fairEvaluation": {
+        "title": "Faire Bewertung",
+        "description": "Konsistente Bewertungskriterien für alle Schüler mit detaillierten und transparenten Berichten."
+      }
+    },
+    "stats": {
+      "studentsEvaluated": "Bewertete Schüler",
+      "institutions": "Institutionen",
+      "satisfaction": "Zufriedenheit"
+    },
+    "cta": {
+      "title": "Bereit, Ihre Programmierprüfungen zu transformieren?",
+      "subtitle": "Schließen Sie sich Hunderten von Institutionen an, die CodeGrade für ihre Bewertungen vertrauen.",
+      "button": "Kostenlos starten"
+    },
+    "footer": {
+      "description": "Die Code-Bewertungsplattform, die das Leben von Lehrern vereinfacht.",
+      "product": {
+        "title": "Produkt",
+        "features": "Funktionen",
+        "pricing": "Preise",
+        "testimonials": "Erfahrungsberichte",
+        "guide": "Benutzerhandbuch"
+      },
+      "company": {
+        "title": "Unternehmen",
+        "about": "Über uns",
+        "blog": "Blog",
+        "careers": "Karriere",
+        "contact": "Kontakt"
+      },
+      "legal": {
+        "title": "Rechtliches",
+        "privacy": "Datenschutz",
+        "terms": "Nutzungsbedingungen",
+        "cookies": "Cookies"
+      },
+      "copyright": "© {year} CodeGrade. Alle Rechte vorbehalten."
+    }
+  },
+  "exam": {
+    "deadline": "Frist",
+    "create": {
+      "title": "Neue Prüfung erstellen"
+    },
+    "form": {
+      "title": "Titel",
+      "description": "Beschreibung",
+      "format": "Format",
+      "select_format": "Format auswählen",
+      "max_attempts": "Maximale Versuche",
+      "deadline": "Frist",
+      "submit": "Prüfung erstellen"
+    },
+    "validation": {
+      "title_required": "Titel ist erforderlich",
+      "description_required": "Beschreibung ist erforderlich",
+      "format_required": "Bitte wählen Sie ein Format",
+      "max_attempts_required": "Die maximale Anzahl der Versuche muss mindestens 1 sein",
+      "deadline_required": "Frist ist erforderlich",
+      "deadline_invalid": "Bitte geben Sie ein gültiges Fristdatum ein"
+    }
+  },
+  "hero-section": {
+    "tagline": "Revolutionieren wir die Bildung",
+    "headline": "Planen. Bewerten. Automatisieren",
+    "description": "Erstellen, verteilen und bewerten Sie automatisch Programmierbewertungen mit Multiple-Choice-Fragen, integriertem Code-Editor oder PDF-Einreichung, alles analysiert von KI.",
+    "cta": {
+      "learnMore": "Mehr erfahren",
+      "tryFree": "Kostenlos testen"
+    },
+    "features": [
+      "Vertrauen von über 500 Schulen",
+      "99,8% Genauigkeit",
+      "24/7 Support"
+    ],
+    "instantFeedback": {
+      "title": "Sofortiges Feedback",
+      "description": "Schüler erhalten Feedback in weniger als 5 Minuten."
+    },
+    "timeSaved": {
+      "title": "Gesparte Zeit",
+      "description": "Lehrer sparen 3 Stunden pro Woche."
+    }
+  },
+  "workflow-section": {
+    "title": "Pädagogischer Workflow",
+    "description": "Von der Erstellung von Übungen bis zur Notenvergabe automatisieren Sie alle Schritte und behalten die pädagogische Kontrolle.",
+    "features": {
+      "title": "Schlüsselfunktionen",
+      "list": {
+        "instantDeployment": {
+          "name": "Sofortige Bereitstellung von Übungen",
+          "description": "Veröffentlichen Sie Ihre Aufgaben mit einem Klick. Schüler können sofort in ihrer integrierten Entwicklungsumgebung darauf zugreifen."
+        },
+        "automatedGrading": {
+          "name": "Sichere automatisierte Bewertung",
+          "description": "Unser System führt Tests in einer isolierten Umgebung durch mit Betrugsprüfung und Code-Ähnlichkeitsanalyse."
+        },
+        "deadlineManagement": {
+          "name": "Fristen- und Verspätungsmanagement",
+          "description": "Legen Sie Fristen für Aufgaben fest und automatisieren Sie die Verwaltung von verspäteten Einreichungen und Strafen."
+        },
+        "automaticBackup": {
+          "name": "Automatische Sicherung",
+          "description": "Alle Einreichungen und Bewertungen werden automatisch gesichert und sind jederzeit ohne Datenverlust zugänglich."
+        },
+        "aiFeedback": {
+          "name": "Personalisiertes KI-Feedback",
+          "description": "Unsere KI analysiert den Code und bietet personalisiertes Feedback zu Qualität, Best Practices und möglichen Optimierungen."
+        }
+      }
+    },
+    "exercise": {
+      "title": "Schülerumgebung - Code-Übung",
+      "deadline": "Frist: Noch 2 Tage",
+      "description": "Implementieren Sie eine Funktion, die die Fakultät einer ganzen Zahl n berechnet. Die Fakultät von n (bezeichnet als n!) ist das Produkt aller positiven ganzen Zahlen kleiner oder gleich n.",
+      "file": "solution.py",
+      "testFile": "tests.py",
+      "autosaved": "Automatisch gespeichert",
+      "language": "Python",
+      "feedback": {
+        "title": "KI-Tipps",
+        "content": [
+          "Sie haben den Basisfall (n=0) gut behandelt, müssen aber die Funktion für den allgemeinen Fall vervollständigen.",
+          "Erwägen Sie die Verwendung von Rekursion oder einer Schleife, um das Produkt aller Zahlen von 1 bis n zu berechnen.",
+          "Hinweis: Für n > 0, factorial(n) = n * factorial(n-1)"
+        ]
+      },
+      "tests": {
+        "testResult": "Testergebnisse",
+        "result": "2/4 Tests bestanden",
+        "test1": {
+          "name": "Test #1: Basisfall",
+          "description": "factorial(0) sollte 1 zurückgeben ✓"
+        },
+        "test2": {
+          "name": "Test #2: Einfacher Fall",
+          "description": "factorial(1) sollte 1 zurückgeben ✓"
+        },
+        "test3": {
+          "name": "Test #3: Allgemeiner Fall",
+          "description": "Fehler: Erwartet, dass factorial(5) 120 zurückgibt, aber erhielt undefined"
+        },
+        "test4": {
+          "name": "Test #4: Große Zahl",
+          "description": "Fehler: Erwartet, dass factorial(10) 3628800 zurückgibt, aber erhielt undefined"
+        }
+      },
+      "aiFeedback": {
+        "title": "KI-Vorschläge",
+        "content": {
+          "first": "Sie haben den Basisfall (n=0) gut behandelt, müssen aber die Funktion für den allgemeinen Fall vervollständigen.",
+          "second": "Erwägen Sie die Verwendung von Rekursion oder einer Schleife, um das Produkt aller Zahlen von 1 bis n zu berechnen.",
+          "third": "Hinweis: Für n > 0, factorial(n) = n * factorial(n-1)"
+        },
+        "hint": "Hinweis: Für n > 0, factorial(n) = n * factorial(n-1)",
+        "hintDescription": "Sie haben den Basisfall (n=0) gut behandelt, müssen aber die Funktion für den allgemeinen Fall vervollständigen. Erwägen Sie die Verwendung von Rekursion oder einer Schleife, um das Produkt aller Zahlen von 1 bis n zu berechnen."
+      }
+    },
+    "progress": {
+      "title": "Fortschritt der Übung",
+      "description": "Sie haben 50% der Übung abgeschlossen. Machen Sie weiter so!"
+    }
+  },
+  "workflow-grade": {
+    "title": "Pädagogische Flexibilität",
+    "heading": "Alle Arten von Aufgaben werden unterstützt",
+    "description": "Passen Sie Ihre Bewertungsmodalitäten an jedes Fach und jede Übungsart an.",
+    "assignment-types": {
+      "coding": {
+        "title": "Programmieraufgaben",
+        "status": "In Bearbeitung",
+        "file": "solution.js",
+        "code": "function factorial(n) {\n  return n <= 1 ? 1 : n * factorial(n - 1);\n}"
+      },
+      "qcm": {
+        "title": "Automatisierte Fragebögen",
+        "status": "✓ Beantwortet",
+        "question": "Frage 1/5",
+        "prompt": "Welche HTTP-Methode wird verwendet, um eine Ressource zu erstellen?",
+        "options": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ]
+      },
+      "pdf": {
+        "title": "Dokumentenabgabe",
+        "status": "Hochgeladen",
+        "file": "Java-Aufgabe.pdf",
+        "placeholder": "bericht_polymorphismus.pdf",
+        "date": "Hochgeladen am 12.06. um 14:30"
+      }
+    },
+    "details": "Details anzeigen",
+    "click-to-show": "Klicken Sie, um anzuzeigen"
+  },
+  "for-teachers": {
+    "badge": "Für Lehrer",
+    "title": "Sparen Sie Zeit und verbessern Sie Ihren Unterricht",
+    "description": "Unsere KI-Bewertungsplattform ermöglicht es Lehrern, sich auf das zu konzentrieren, was sie am besten können: Schüler inspirieren und unterrichten, ohne Stunden mit der Korrektur von Arbeiten zu verbringen.",
+    "benefits": [
+      "Erstellen Sie Prüfungen und Aufgaben mit wenigen Klicks",
+      "Bewerten Sie Schüler objektiv und konsistent",
+      "Automatische Korrektur von Arbeiten durch fortschrittliche KI",
+      "Verfolgen Sie den Fortschritt der Schüler mit detaillierten Analysen",
+      "Identifizieren Sie Lernlücken für gezielte Interventionen",
+      "Einfache Integration mit Ihrem Lernmanagementsystem (LMS)"
+    ],
+    "cta": "Dashboard anzeigen",
+    "image-alt": "Lehrer, der die KI-Bewertungsplattform verwendet",
+    "stats": {
+      "time-saved": {
+        "label": "Gesparte Zeit",
+        "value": "6+ h/Woche"
+      },
+      "correction-speed": {
+        "label": "Korrekturgeschwindigkeit",
+        "value": "100x schneller"
+      }
+    }
+  },
+  "for-students": {
+    "badge": "Für Schüler",
+    "title": "Beschleunigen Sie Ihr Lernen mit sofortigem Feedback",
+    "description": "Schüler machen schneller Fortschritte dank personalisiertem Feedback, das ihnen hilft, Konzepte zu verstehen und Vertrauen zu gewinnen.",
+    "benefits": [
+      "Erhalten Sie sofortiges und detailliertes Feedback zu Ihren Aufgaben",
+      "Verstehen Sie genau, wo Sie sich verbessern müssen",
+      "Verfolgen Sie Ihren Fortschritt mit visuellen Analysen",
+      "Erhalten Sie personalisierte Lernempfehlungen",
+      "Üben Sie mit ähnlichen Übungen, die von KI generiert wurden",
+      "Gewinnen Sie Vertrauen durch regelmäßiges Feedback"
+    ],
+    "cta": "Entdecken Sie die Schülerexperience",
+    "image-alt": "Schüler, der sofortiges Feedback erhält",
+    "stats": {
+      "feedback-time": {
+        "label": "Feedback-Zeit",
+        "value": "< 10 Sek."
+      },
+      "improvement": {
+        "label": "Verbesserung",
+        "value": "+27%"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Was Lehrer und Schüler sagen",
+    "description": "Unsere KI-Bewertungsplattform macht einen echten Unterschied in Klassenzimmern auf der ganzen Welt.",
+    "testimonials": [
+      {
+        "quote": "Diese KI-Bewertungsplattform hat mein Klassenmanagement komplett verändert. Ich spare jede Woche Stunden und kann meinen Schülern relevanteres Feedback geben.",
+        "author": "Sarah Johnson",
+        "role": "Französischlehrerin in der Oberstufe",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Als Mathematiklehrer war ich skeptisch gegenüber der KI-Bewertung, aber diese Plattform ist unglaublich genau. Sie erkennt sogar subtile Fehler in der Argumentation, die ich übersehen könnte.",
+        "author": "Michael Chen",
+        "role": "Mathematiklehrer in der Mittelstufe",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Das sofortige Feedback hat einen großen Unterschied für meine Schüler gemacht. Sie sind motivierter und engagierter, wenn sie nicht Tage auf ihre Ergebnisse warten müssen.",
+        "author": "Emily Rodriguez",
+        "role": "Grundschullehrerin",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Unsere Akademie hat messbare Verbesserungen in den Schülerergebnissen seit der Einführung dieses KI-Bewertungssystems festgestellt. Es war eine echte Veränderung für unsere Lehrer.",
+        "author": "Dr. James Wilson",
+        "role": "Akademischer Direktor",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Als Schüler liebe ich es, sofortiges Feedback zu meiner Arbeit zu erhalten. Es hilft mir zu verstehen, was ich gut mache und wo ich mich sofort verbessern muss.",
+        "author": "Aisha Patel",
+        "role": "Schülerin der Oberstufe",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      }
+    ],
+    "go-to-testimonial": "Gehe zu Zeugnis {index}"
+  },
+  "authentication": {
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "email": "E-Mail",
+    "email-placeholder": "Geben Sie Ihre E-Mail-Adresse ein",
+    "password": "Passwort",
+    "password-placeholder": "Geben Sie Ihr Passwort ein",
+    "name": "Name",
+    "name-placeholder": "Geben Sie Ihren Namen ein",
+    "or": "ODER",
+    "login-with-google": "Mit Google anmelden",
+    "login-with-github": "Mit GitHub anmelden",
+    "signup-with-google": "Mit Google registrieren",
+    "signup-with-github": "Mit GitHub registrieren",
+    "auth-message": "Melden Sie sich an, um auf Ihr Konto zuzugreifen.",
+    "auth-image-alt": "Authentifizierungsillustration",
+    "invalid-email": "Ungültige E-Mail",
+    "password-min-length": "Das Passwort muss mindestens 6 Zeichen lang sein",
+    "name-required": "Name ist erforderlich",
+    "login-auth": {
+      "pending": "Anmeldung läuft...",
+      "pendingDescription": "Bitte warten Sie, während wir Sie mit Ihrem Konto verbinden.",
+      "success": "Anmeldung erfolgreich! 🎉",
+      "successDescription": "Sie sind jetzt in Ihrem Konto angemeldet.",
+      "error": "Anmeldefehler",
+      "invalidCredentials": "Ihre Anmeldedaten sind falsch. Bitte versuchen Sie es erneut.",
+      "unknownError": "Bei der Anmeldung ist ein Fehler aufgetreten.",
+      "networkError": "Ein Netzwerkfehler ist aufgetreten. Bitte überprüfen Sie Ihre Internetverbindung."
+    },
+    "signup-auth": {
+      "pending": "Konto wird erstellt...",
+      "pendingDescription": "Bitte warten Sie, während wir Ihr Konto erstellen...",
+      "success": "Konto erstellt",
+      "successDescription": "Ihr Konto wurde erfolgreich erstellt. Sie können sich jetzt anmelden.",
+      "error": "Registrierungsfehler",
+      "emailInUse": "Diese E-Mail-Adresse wird bereits verwendet. Bitte versuchen Sie eine andere Adresse oder melden Sie sich mit Ihrem bestehenden Konto an.",
+      "networkError": "Netzwerkverbindungsproblem. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+      "unknownError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+      "passwordWeak": "Das Passwort ist zu schwach. Bitte wählen Sie ein sichereres Passwort.",
+      "passwordTooShort": "Das Passwort ist zu kurz. Bitte wählen Sie ein Passwort mit mindestens 6 Zeichen."
+    }
+  },
+  "dropdown-user": {
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "search": "Suchen"
+  },
+  "common": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "finish": "Fertig",
+    "required": "Erforderlich",
+    "needHelp": "Brauchen Sie Hilfe?",
+    "contactSupport": "Kontaktieren Sie unseren Support",
+    "search": {
+      "title": "Suchen",
+      "placeholder": "Suchen...",
+      "noResults": "Keine Ergebnisse gefunden.",
+      "navigation": "Navigation",
+      "results": "Ergebnisse",
+      "searching": "Suche läuft..."
+    },
+    "navigation": {
+      "available-exams": "Verfügbare Prüfungen",
+      "my-exams": "Meine Prüfungen",
+      "results": "Ergebnisse",
+      "dashboard": "Dashboard",
+      "settings": "Einstellungen",
+      "profile": "Profil"
+    }
+  },
+  "steps": {
+    "welcome": "Willkommen",
+    "userType": "Benutzertyp",
+    "verification": "Verifizierung",
+    "profile": "Profil",
+    "completion": "Abschluss",
+    "step": "Schritt {current} von {total}"
+  },
+  "welcome": {
+    "title": "Willkommen auf der KI-Bewertungsplattform",
+    "subtitle": "Unsere KI-gestützte Bewertungsplattform revolutioniert die Bildung durch präzise Bewertungen, personalisiertes Feedback und detaillierte Analysen.",
+    "features": {
+      "intelligentGrading": {
+        "title": "Intelligente Bewertung",
+        "description": "Unsere KI analysiert die Arbeiten der Schüler tiefgehend, um präzise und konsistente Bewertungen zu liefern."
+      },
+      "personalizedFeedback": {
+        "title": "Personalisiertes Feedback",
+        "description": "Erhalten Sie detaillierte und maßgeschneiderte Rückmeldungen, die Stärken und Verbesserungsbereiche identifizieren."
+      },
+      "advancedAnalytics": {
+        "title": "Erweiterte Analysen",
+        "description": "Visualisieren Sie den Fortschritt und identifizieren Sie Trends mit unseren intuitiven Analyse-Dashboards."
+      }
+    },
+    "onboardingProcess": "Wie der Onboarding-Prozess funktioniert",
+    "onboardingSteps": {
+      "step1": "Wählen Sie Ihre Rolle - Geben Sie an, ob Sie Lehrer oder Schüler sind.",
+      "step2": "Verifizieren Sie Ihre Identität - Eine einfache Überprüfung zur Sicherheit.",
+      "step3": "Richten Sie Ihr Profil ein - Fügen Sie Ihre persönlichen Informationen hinzu.",
+      "step4": "Beginnen Sie mit der Nutzung der Plattform - Greifen Sie auf alle Funktionen unserer KI-Bewertungslösung zu."
+    }
+  },
+  "userType": {
+    "title": "Ich bin ein...",
+    "subtitle": "Wählen Sie Ihre Rolle, um Ihr Erlebnis zu personalisieren",
+    "teacher": {
+      "title": "Lehrer",
+      "description": "Erstellen Sie Prüfungen, bewerten Sie Arbeiten und verfolgen Sie den Fortschritt der Schüler",
+      "features": [
+        "Automatische Bewertung von Arbeiten",
+        "Generierung von personalisiertem Feedback",
+        "Detaillierte Leistungsanalysen"
+      ]
+    },
+    "student": {
+      "title": "Schüler",
+      "description": "Reichen Sie Ihre Antworten ein, erhalten Sie Feedback und verbessern Sie Ihre Fähigkeiten",
+      "features": [
+        "Sofortiges Feedback zu Ihren Arbeiten",
+        "Gezielte Verbesserungsvorschläge",
+        "Persönliche Fortschrittsverfolgung"
+      ]
+    },
+    "whyWeAsk": {
+      "title": "Warum fragen wir das?",
+      "description": "Ihre Rolle bestimmt die Funktionen und Tools, auf die Sie Zugriff haben. Lehrer können Prüfungen erstellen und bewerten, während Schüler Antworten einreichen und Feedback erhalten können.",
+      "canChange": "Kann ich meine Rolle später ändern?",
+      "changeAnswer": "Nein, der Benutzertyp kann nach der Einrichtung nicht geändert werden. Bitte wählen Sie sorgfältig."
+    },
+    "error": "Bitte wählen Sie einen Benutzertyp"
+  },
+  "verification": {
+    "title": "Verifizieren Sie Ihr Konto",
+    "subtitle": "Wir müssen sicherstellen, dass Sie eine echte Person sind, bevor wir fortfahren",
+    "succes": "Verifizierung erfolgreich!",
+    "methods": {
+      "connect-the-dot": "Verbinden Sie die Punkte",
+      "reset": "Captcha zurücksetzen",
+      "captcha": "Schließen Sie das Minispiel ab, um fortzufahren",
+      "email": "E-Mail",
+      "phone": "Telefon"
+    },
+    "captcha": {
+      "title": "Menschliche Verifizierung",
+      "description": "Diese Verifizierung hilft uns, automatisierte Konten zu verhindern und unsere Plattform zu schützen.",
+      "instruction": "Aktivieren Sie das Kästchen 'Ich bin kein Roboter'",
+      "verify": "Jetzt verifizieren"
+    },
+    "email": {
+      "title": "Verifizierung per E-Mail",
+      "description": "Wir senden Ihnen einen Verifizierungscode an Ihre E-Mail-Adresse.",
+      "emailLabel": "E-Mail-Adresse",
+      "codeLabel": "Verifizierungscode",
+      "sendCode": "Code senden",
+      "verifyCode": "Code verifizieren",
+      "resend": "Code erneut senden",
+      "resendTimer": "Erneut senden ({seconds}s)",
+      "demoNote": "Für Demo-Zwecke verwenden Sie den Code: 123456"
+    },
+    "success": {
+      "title": "Verifizierung erfolgreich",
+      "description": "Vielen Dank, dass Sie Ihr Konto verifiziert haben. Sie können jetzt mit dem Onboarding-Prozess fortfahren.",
+      "status": "Konto erfolgreich verifiziert"
+    },
+    "whyNeeded": {
+      "title": "Warum ist die Verifizierung notwendig?",
+      "description": "Die Verifizierung hilft uns, unsere Plattform vor automatisierten Konten zu schützen und sicherzustellen, dass nur echte Personen auf unsere Dienste zugreifen können. Ihre Daten sind sicher und werden niemals an Dritte weitergegeben."
+    },
+    "error": "Bitte schließen Sie die Verifizierung ab"
+  },
+  "profile": {
+    "title": "Persönliches Profil",
+    "subtitle": "Erzählen Sie uns von sich",
+    "profilePicture": {
+      "title": "Profilbild",
+      "description": "Fügen Sie ein Bild hinzu, um Ihr Profil zu personalisieren"
+    },
+    "name": {
+      "label": "Vollständiger Name",
+      "placeholder": "Geben Sie Ihren vollständigen Namen ein",
+      "error": "Name ist erforderlich"
+    },
+    "email": {
+      "label": "E-Mail",
+      "placeholder": "your@email.com",
+      "error": "E-Mail ist erforderlich",
+      "invalidError": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+    },
+    "background": {
+      "label": "Hintergrund",
+      "placeholder": "Erzählen Sie uns von Ihrem Hintergrund",
+      "counter": "{length}/500 Zeichen"
+    },
+    "privacy": {
+      "title": "Datenschutzinformationen",
+      "description": "Ihre persönlichen Daten sind gemäß unserer Datenschutzrichtlinie geschützt. Die mit einem Sternchen (*) markierten Felder sind für die Kontoerstellung obligatorisch."
+    }
+  },
+  "completion": {
+    "title": "Herzlichen Glückwunsch!",
+    "subtitle": "Ihr Profil ist vollständig und Sie können jetzt unsere KI-Bewertungsplattform nutzen. Wir freuen uns, Sie in unserer Community begrüßen zu dürfen.",
+    "nextSteps": {
+      "title": "Nächste Schritte",
+      "teacher": [
+        "Erstellen Sie Ihre erste Prüfung",
+        "Konfigurieren Sie die Fragen",
+        "Laden Sie Ihre Schüler ein",
+        "Erkunden Sie die KI-Bewertungsfunktionen",
+        "Überprüfen Sie die Leistungsanalysen"
+      ],
+      "student": [
+        "Treten Sie Ihren Klassen bei",
+        "Überprüfen Sie die verfügbaren Prüfungen",
+        "Reichen Sie Ihre Antworten ein",
+        "Erhalten Sie personalisiertes KI-Feedback",
+        "Verfolgen Sie Ihren akademischen Fortschritt"
+      ],
+      "button": {
+        "teacher": "Prüfung erstellen",
+        "student": "Prüfungen anzeigen"
+      }
+    },
+    "platformBenefits": {
+      "title": "Vorteile der Plattform",
+      "benefits": [
+        {
+          "title": "Präzise KI-Bewertung",
+          "description": "Konsistente und objektive Bewertungen basierend auf pädagogischen Kriterien"
+        },
+        {
+          "title": "Personalisiertes Feedback",
+          "description": "Detaillierte und maßgeschneiderte Rückmeldungen für das Niveau jedes Schülers"
+        },
+        {
+          "title": "Erweiterte Analysen",
+          "description": "Visualisieren Sie Trends und verfolgen Sie den Fortschritt im Laufe der Zeit"
+        },
+        {
+          "title": "Zeitersparnis",
+          "description": "Automatisieren Sie repetitive Aufgaben, um sich auf den Unterricht zu konzentrieren"
+        }
+      ]
+    },
+    "resourceCenter": {
+      "teacher": {
+        "title": "Ressourcenzentrum für Lehrer",
+        "description": "Wir haben Anleitungen und Tutorials vorbereitet, um Ihnen zu helfen, das Beste aus unserer KI-Bewertungsplattform herauszuholen."
+      },
+      "student": {
+        "title": "Hilfezentrum für Schüler",
+        "description": "Wir haben Ressourcen vorbereitet, um Ihnen zu helfen, erfolgreich zu sein und das Beste aus unserer Plattform herauszuholen."
+      },
+      "buttons": [
+        "Nutzungsanleitungen",
+        "Video-Tutorials",
+        "FAQ",
+        "Support kontaktieren"
+      ]
+    }
+  },
+  "error": {
+    "title": "Ein Fehler ist aufgetreten",
+    "description": "Entschuldigung, beim Laden der Seite ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "tryAgain": "Erneut versuchen"
+  },
+  "exams": {
+    "choices": {
+      "QCM": "Multiple-Choice",
+      "document": "Dokument",
+      "code": "Code"
+    },
+    "aiGeneration-generate": "Antworten generieren",
+    "addChoice": "Auswahl hinzufügen",
+    "choice": "Prüfungsauswahl",
+    "createNew": "Neue Prüfung erstellen",
+    "createDescription": "Erstellen Sie eine neue Prüfung, Aufgabe oder ein Projekt für Ihre Schüler.",
+    "type": "Typ",
+    "selectType": "Wählen Sie den Prüfungstyp",
+    "typeExam": "Prüfung",
+    "typeAssignment": "Aufgabe",
+    "typeProject": "Projekt",
+    "required": "Erforderlich",
+    "selectFormat": "Bitte wählen Sie ein Prüfungsformat",
+    "formatDescription": "Wählen Sie das Format, das am besten zu Ihren Bewertungsanforderungen passt",
+    "selected": "Format erfolgreich ausgewählt",
+    "basicInfo": "Grundlegende Informationen",
+    "title": "Titel",
+    "titlePlaceholder": "Geben Sie den Prüfungstitel ein",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Geben Sie Details zu dieser Prüfung an",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "endDateHelp": "Die Frist bestimmt, wann Schüler ihre Antworten nicht mehr einreichen können",
+    "edit": "Bearbeiten",
+    "formatSettings": "Formateinstellungen",
+    "qcm": "QCM",
+    "qcmDescription": "Multiple-Choice-Fragen",
+    "pdf": "PDF",
+    "pdfDescription": "PDF-Dokument zum Ausfüllen",
+    "code": "Code",
+    "codeDescription": "Programmierübung",
+    "maxAttempts": "Maximale Versuche",
+    "maxAttemptsDescription": "Anzahl der Versuche, die ein Schüler für die Prüfung hat",
+    "uploadFile": "Datei hochladen",
+    "chooseFile": "Datei auswählen",
+    "fileAdded": "Datei erfolgreich hinzugefügt",
+    "questions": "Fragen",
+    "addQuestion": "Frage hinzufügen",
+    "question": "Frage",
+    "remove": "Entfernen",
+    "questionText": "Fragetext",
+    "questionTextPlaceholder": "Geben Sie hier Ihre Frage ein",
+    "correctionAi": "KI-Bewertungsleitfaden",
+    "correctionAiPlaceholder": "Geben Sie Hinweise für die KI-Bewertung ein",
+    "maxPoints": "Maximale Punkte",
+    "review": "Überprüfung",
+    "format": "Format",
+    "deadline": "Frist",
+    "attachedFile": "Angehängte Datei",
+    "questionCount": "Anzahl der Fragen",
+    "finalConfirmation": "Bitte überprüfen Sie alle Informationen, bevor Sie die Prüfung erstellen",
+    "back": "Zurück",
+    "next": "Nächster Schritt",
+    "step1": "Informationen",
+    "step2": "Format",
+    "step3": "Fragen",
+    "step4": "Überprüfung",
+    "warning": "Warnung",
+    "needOneQuestion": "Sie müssen mindestens eine Frage haben",
+    "error": "Fehler",
+    "titleRequired": "Titel ist erforderlich",
+    "fileRequired": "Datei ist erforderlich",
+    "questionsIncomplete": "Alle Fragen müssen ausgefüllt werden",
+    "success": "Erfolg",
+    "examCreated": "Prüfung erfolgreich erstellt",
+    "createFailed": "Fehler beim Erstellen der Prüfung",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+    "saving": "Wird gespeichert...",
+    "saveExam": "Prüfung speichern",
+    "documentUploadNotAllowed": "Das Hochladen von Dokumenten ist für diesen Prüfungstyp nicht erlaubt",
+    "programmingLanguage": "Programmiersprache",
+    "questionsNotRequiredForPDF": "Fragen sind für PDF-Prüfungen nicht erforderlich",
+    "uploadDocument": "Dokument hochladen",
+    "aiGeneration": {
+      "title": "Antwortgenerierung",
+      "generating": "Wird generiert...",
+      "editAnswer": "Antwort bearbeiten",
+      "saveAnswer": "Antwort speichern",
+      "answer": "Antwort",
+      "answerPlaceholder": "Von KI generierte Antwort",
+      "regenerate": "Neu generieren",
+      "preview": "Vorschau der Fragen und Antworten",
+      "error": "Fehler beim Generieren der Antworten",
+      "generate": "Antworten generieren",
+      "generating": "Antworten werden generiert...",
+      "selectModel": "Modell auswählen",
+      "regenerating": "Wird neu generiert..."
+    },
+    "details": {
+      "title": "Prüfungsdetails",
+      "suggestedAnswer": "Vorgeschlagene Antwort"
+    },
+    "finalize": "Fertigstellen und beenden",
+    "answersUpdated": "Antworten erfolgreich aktualisiert",
+    "updateAnswersError": "Fehler beim Aktualisieren der Antworten",
+    "examAlreadyCreated": "Prüfung wurde bereits erstellt"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "appearance": {
+      "title": "Erscheinungsbild",
+      "description": "Passen Sie das Erscheinungsbild der Anwendung an",
+      "theme": {
+        "title": "Thema",
+        "light": "Hell",
+        "dark": "Dunkel",
+        "system": "System"
+      },
+      "profile": {
+        "title": "Profil",
+        "description": "Passen Sie Ihr Profil an"
+      },
+      "colorTheme": {
+        "title": "Farbthema",
+        "jade": "Jade",
+        "obsidian": "Obsidian",
+        "amber": "Bernstein"
+      }
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Konfigurieren Sie den Empfang von Benachrichtigungen",
+      "email": {
+        "title": "E-Mail-Benachrichtigungen",
+        "description": "Benachrichtigungen per E-Mail erhalten"
+      },
+      "security": {
+        "title": "Sicherheitsbenachrichtigungen",
+        "description": "Sicherheitswarnungen erhalten"
+      },
+      "promotional": {
+        "title": "Werbe-Benachrichtigungen",
+        "description": "Werbeaktionen und Updates erhalten"
+      }
+    },
+    "layout": {
+      "title": "Layout",
+      "description": "Wählen Sie, wie die Anwendung angezeigt wird",
+      "sidebar": "Seitennavigation",
+      "topnav": "Obere Navigation"
+    }
+  },
+  "calendar": {
+    "title": "Bewertungskalender",
+    "navigation": {
+      "previous": "Vorherige",
+      "next": "Nächste",
+      "today": "Heute"
+    },
+    "views": {
+      "day": "Tag",
+      "week": "Woche",
+      "month": "Monat",
+      "agenda": "Agenda",
+      "year": "Jahr"
+    },
+    "assignment": {
+      "add": "Bewertung hinzufügen",
+      "details": "Details",
+      "delete": "Löschen",
+      "close": "Schließen",
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Code",
+        "DOCUMENT": "Dokument"
+      }
+    },
+    "edit": {
+      "enable": "Bearbeitungsmodus aktivieren",
+      "disable": "Bearbeitungsmodus deaktivieren",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "details": {
+      "title": "Bewertungsdetails",
+      "info": {
+        "type": "Typ",
+        "questions": "Fragen",
+        "duration": "Dauer",
+        "status": "Status",
+        "description": "Beschreibung"
+      },
+      "status": {
+        "PENDING": "Ausstehend",
+        "ACTIVE": "Aktiv",
+        "COMPLETED": "Abgeschlossen"
+      },
+      "close": "Schließen"
+    },
+    "sheet": {
+      "format": "Einreichungsformat",
+      "deadline": "Frist",
+      "maxAttempts": "Maximale Versuche",
+      "deleteConfirm": "Sind Sie sicher, dass Sie diese Bewertung löschen möchten?",
+      "type": "Typ",
+      "questions": "Fragen",
+      "duration": "Dauer",
+      "status": "Status",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum"
+    },
+    "toast": {
+      "updateSuccess": "Bewertung erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren der Bewertung",
+      "deleteSuccess": "Bewertung erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen der Bewertung",
+      "cannotEdit": "Sie können diese Bewertung nicht bearbeiten, da sie bereits begonnen hat"
+    },
+    "dates": {
+      "days": {
+        "monday": "Montag",
+        "tuesday": "Dienstag",
+        "wednesday": "Mittwoch",
+        "thursday": "Donnerstag",
+        "friday": "Freitag",
+        "saturday": "Samstag",
+        "sunday": "Sonntag"
+      },
+      "months": {
+        "january": "Januar",
+        "february": "Februar",
+        "march": "März",
+        "april": "April",
+        "may": "Mai",
+        "june": "Juni",
+        "july": "Juli",
+        "august": "August",
+        "september": "September",
+        "october": "Oktober",
+        "november": "November",
+        "december": "Dezember"
+      },
+      "format": {
+        "full": "EEEE d MMMM yyyy",
+        "monthYear": "MMMM yyyy"
+      }
+    }
+  },
+  "exams-component": {
+    "title": "Prüfungen",
+    "noExams": {
+      "title": "Keine Prüfungen verfügbar",
+      "description": "Sie haben noch keine zugewiesenen Prüfungen."
+    },
+    "tabs": {
+      "list": "Liste",
+      "calendar": "Kalender"
+    },
+    "assignment": {
+      "deadline": "Frist",
+      "viewDetails": "Details anzeigen",
+      "invite": "Einladen",
+      "status": {
+        "pending": "Ausstehend",
+        "active": "Aktiv",
+        "completed": "Abgeschlossen"
+      },
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Code",
+        "DOCUMENT": "Dokument"
+      },
+      "inviteLink": {
+        "title": "Einladungslink",
+        "description": "Teilen Sie diesen Link mit Ihren Schülern, damit sie dieser Aufgabe beitreten können.",
+        "button": "Einladungslink",
+        "copy": "Kopieren"
+      },
+      "questions": "Fragen",
+      "submissions": "Einreichungen",
+      "students": "Schüler",
+      "participation": "Teilnahme",
+      "upcoming": "Bevorstehend",
+      "expired": "Abgelaufen",
+      "notStarted": "Noch nicht gestartet",
+      "starts": "Beginnt am",
+      "grade": "Note",
+      "loading": "Wird geladen...",
+      "viewResults": "Ergebnisse anzeigen",
+      "takeQuiz": "Quiz machen",
+      "uploadFile": "Datei hochladen",
+      "writeCode": "Code schreiben"
+    },
+    "details": {
+      "title": "Aufgabendetails",
+      "back": "Zurück",
+      "information": {
+        "title": "Informationen",
+        "type": "Typ",
+        "questions": "Fragen",
+        "duration": "Dauer",
+        "status": "Status",
+        "description": "Beschreibung"
+      },
+      "results": {
+        "title": "Schülerergebnisse",
+        "submissions": "Einreichungen",
+        "students": "Schüler",
+        "table": {
+          "student": "Schüler",
+          "email": "E-Mail",
+          "status": "Status",
+          "submissionDate": "Einreichungsdatum",
+          "score": "Punktzahl"
+        },
+        "status": {
+          "completed": "Abgeschlossen",
+          "accepted": "Akzeptiert",
+          "declined": "Abgelehnt",
+          "pending": "Ausstehend"
+        }
+      }
+    },
+    "duration": {
+      "day": "Tag",
+      "days": "Tage",
+      "hour": "Stunde",
+      "hours": "Stunden",
+      "minute": "Minute",
+      "minutes": "Minuten",
+      "undefined": "Dauer nicht definiert"
+    },
+    "toast": {
+      "linkCopied": {
+        "title": "Link kopiert",
+        "description": "Einladungslink wurde in die Zwischenablage kopiert"
+      },
+      "statusUpdate": {
+        "success": "Status aktualisiert",
+        "error": "Status konnte nicht aktualisiert werden"
+      }
+    },
+    "status": {
+      "undefined": "Nicht definiert"
+    },
+    "score": {
+      "percentage": "%"
+    }
+  },
+  "dashboard": {
+    "teacher": {
+      "title": "Lehrer-Dashboard",
+      "description": "Verwalten Sie Ihre Bewertungen und verfolgen Sie den Fortschritt Ihrer Schüler",
+      "metrics": {
+        "total_exams": "Gesamtzahl der Bewertungen",
+        "total_exams_description": "Gesamtzahl der erstellten Bewertungen",
+        "exams_in_progress": "In Bearbeitung",
+        "exams_in_progress_description": "Aktuell aktive Bewertungen",
+        "graded_exams": "Bewertete Prüfungen",
+        "graded_exams_description": "Abgeschlossene und bewertete Prüfungen",
+        "average_score": "Durchschnittliche Punktzahl",
+        "average_score_description": "Gesamtdurchschnitt der Schüler"
+      },
+      "recent_exams": {
+        "title": "Aktuelle Bewertungen",
+        "view_all": "Alle Bewertungen anzeigen",
+        "no_exams": "Keine aktuellen Bewertungen"
+      },
+      "quick_actions": {
+        "title": "Schnelle Aktionen",
+        "create_exam": "Bewertung erstellen",
+        "create_exam_description": "Beginnen Sie mit der Erstellung einer neuen Bewertung",
+        "view_exams": "Meine Bewertungen anzeigen",
+        "view_exams_description": "Greifen Sie auf alle Ihre Bewertungen zu",
+        "view_settings": "Einstellungen",
+        "view_settings_description": "Konfigurieren Sie Ihre Einstellungen"
+      }
+    },
+    "student": {
+      "title": "Schüler-Dashboard",
+      "description": "Verfolgen Sie Ihre Bewertungen und Ihren Fortschritt",
+      "metrics": {
+        "completed_exams": "Abgeschlossene Prüfungen",
+        "completed_exams_description": "Prüfungen, die Sie abgeschlossen haben",
+        "pending_exams": "Ausstehende Prüfungen",
+        "pending_exams_description": "Prüfungen, die noch abgeschlossen werden müssen",
+        "average_score": "Durchschnittliche Punktzahl",
+        "average_score_description": "Ihr Gesamtdurchschnitt",
+        "next_deadline": "Nächste Frist",
+        "next_deadline_description": "Ihre nächste Bewertung"
+      },
+      "upcoming_exams": {
+        "title": "Bevorstehende Prüfungen",
+        "view_all": "Alle Prüfungen anzeigen",
+        "no_exams": "Keine bevorstehenden Prüfungen",
+        "submit": "Starten"
+      },
+      "quick_actions": {
+        "title": "Schnelle Aktionen",
+        "view_available": "Verfügbare Prüfungen anzeigen",
+        "view_available_description": "Greifen Sie auf Ihre aktiven Prüfungen zu",
+        "view_results": "Meine Ergebnisse anzeigen",
+        "view_results_description": "Überprüfen Sie Ihre Leistung"
+      }
+    }
+  },
+  "exam-taking": {
+    "instructions": {
+      "title": "Anweisungen",
+      "qcm": "Wählen Sie die richtige Antwort für jede Frage aus.",
+      "code": "Schreiben Sie Ihren Code in den bereitgestellten Bereich.",
+      "document": "Beantworten Sie die Fragen in den bereitgestellten Textbereichen."
+    },
+    "maxPoints": "Maximale Punkte",
+    "answerPlaceholder": "Schreiben Sie hier Ihre Antwort...",
+    "codePlaceholder": "Schreiben Sie hier Ihren {language}-Code...",
+    "save": "Speichern",
+    "saving": "Wird gespeichert...",
+    "submit": "Einreichen",
+    "submitting": "Wird eingereicht...",
+    "autoSaving": "Automatisch speichern...",
+    "autoSaved": "Automatisch gespeichert",
+    "allQuestionsAnswered": "Alle Fragen wurden beantwortet",
+    "notAllQuestionsAnswered": "Einige Fragen wurden noch nicht beantwortet",
+    "timeUp": {
+      "title": "Zeit abgelaufen!",
+      "description": "Ihre Zeit ist abgelaufen. Ihre Antworten werden eingereicht."
+    },
+    "timeWarning": {
+      "title": "Achtung!",
+      "description": "Sie haben weniger als 5 Minuten, um die Prüfung abzuschließen."
+    },
+    "saveSuccess": {
+      "title": "Gespeichert",
+      "description": "Ihre Antworten wurden erfolgreich gespeichert."
+    },
+    "saveError": {
+      "title": "Fehler",
+      "description": "Beim Speichern Ihrer Antworten ist ein Fehler aufgetreten."
+    },
+    "submitSuccess": {
+      "title": "Eingereicht",
+      "description": "Ihre Prüfung wurde erfolgreich eingereicht."
+    },
+    "submitError": {
+      "title": "Fehler",
+      "description": "Beim Einreichen Ihrer Prüfung ist ein Fehler aufgetreten."
+    },
+    "confirmSubmitIncomplete": "Einige Fragen wurden noch nicht beantwortet. Möchten Sie die Prüfung trotzdem einreichen?"
+  }
+}

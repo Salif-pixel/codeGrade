@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from 'lucide-react';
 import {cn} from "@/lib/utils";
-import { FrFlag, UsFlag } from '../flags';
+import {ArFlag, DeFlag, EsFlag, FrFlag, JaFlag, UsFlag} from '../flags';
 
 const LanguageSwitcher = ({className }: { className?: string }) => {
     const pathname = usePathname();
@@ -20,11 +20,15 @@ const LanguageSwitcher = ({className }: { className?: string }) => {
     const locales = [
         { code: 'fr', flag: <FrFlag />, name: 'Français' },
         { code: 'en', flag: <UsFlag />, name: 'English' },
+        {code:  'es', flag: <EsFlag/>, name: 'Spanish'},
+        {code:  'ar', flag: <ArFlag/>, name: 'Arabe'},
+        {code:  'ja', flag: <JaFlag/>, name: 'Japon'},
+        {code:  'de', flag: <DeFlag/>, name: 'deutsh'}
     ];
 
     // Détermine la langue actuelle à partir de l'URL
-    const currentLocale = pathname.startsWith('/en') ? 'en' : 'fr';
-    const currentLanguage = locales.find(lang => lang.code === currentLocale);
+    const currentLocale = pathname.substring(1,3);
+    const currentLanguage = locales.find(lang => lang.code === currentLocale) ?? locales[0];
 
     return (
         <DropdownMenu>

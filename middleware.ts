@@ -5,37 +5,41 @@ import { getSessionCookie } from "better-auth/cookies";
 import { navigationConfigForMiddleware } from "./src/lib/nav-config";
 import { Role, User } from "@prisma/client";
 
-// Middleware pour gérer l'authentification et l'internationalisation
 export default async function middleware(request: NextRequest) {
+    const pathname = request.nextUrl.pathname;
 
-       // Obtenir le chemin sans le préfixe de langue
-       const pathname = request.nextUrl.pathname;
+    // Vérifier si c'est une racine localisée
+    const isLocalizedRoot = pathname === '/fr/' || pathname === '/en/' || pathname === '/es/' || pathname === '/de/' || pathname === '/ar/' || pathname === '/ja/' ||
+        pathname === '/fr' || pathname === '/en' || pathname === '/es' || pathname === '/de' || pathname === '/ar' || pathname === '/ja';
 
-       // Vérifier si c'est une racine localisée (/fr/ ou /en/)
-       const isLocalizedRoot = pathname === '/fr/' || pathname === '/en/' || pathname === '/fr' || pathname === '/en';
-   
-       // Permettre l'accès à la racine principale et aux racines localisées sans redirection
-       if (pathname === '/' || isLocalizedRoot) {
-           // Gestion de l'internationalisation
-           const intlMiddleware = createMiddleware(routing);
-           return intlMiddleware(request);
-       }
-   
-       // Extraire le chemin sans le préfixe de langue pour les autres routes
-       const pathnameWithoutLocale = pathname.replace(/^\/(fr|en)/, '');
+    // Permettre l'accès à la racine principale et aux racines localisées sans redirection
+    if (pathname === '/' || isLocalizedRoot) {
+        const intlMiddleware = createMiddleware(routing);
+        return intlMiddleware(request);
+    }
+
+    // Extraire le chemin sans le préfixe de langue
+    const pathnameWithoutLocale = pathname.replace(/^\/(fr|en|es|de|ar|ja)/, '');
+
     // Récupérer la session
     const session = getSessionCookie(request);
-   
+
+    // Récupérer la locale actuelle
+    const locale = pathname.startsWith('/fr') ? '/fr' :
+        pathname.startsWith('/en') ? '/en' :
+            pathname.startsWith('/es') ? '/es' :
+                pathname.startsWith('/de') ? '/de' :
+                    pathname.startsWith('/ar') ? '/ar' :
+                        pathname.startsWith('/ja') ? '/ja' : '/fr'; // Par défaut, utiliser 'en'
+
     if (session) {
         const response = await fetch(`${request.nextUrl.origin}/api/session?token=${session.split(".")[0]}`);
         if (response.ok) {
             const existingSession = await response.json();
-            
-            // Vérifier si l'utilisateur a vérifié son email
             const user = existingSession.session?.user as User;
+
+            // Vérifier si l'utilisateur a vérifié son email
             if (user && !user.profileCompleted) {
-                const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
-                // Si l'utilisateur n'est pas sur la page onboarding, le rediriger
                 if (pathnameWithoutLocale !== '/onboarding') {
                     return NextResponse.redirect(new URL(`${locale}/onboarding`, request.url));
                 }
@@ -45,37 +49,30 @@ export default async function middleware(request: NextRequest) {
             if (user && user.role) {
                 const navItems = navigationConfigForMiddleware();
                 const pathSegments = pathnameWithoutLocale.split('/').filter(Boolean);
-                
-                // Convertir le chemin actuel en pattern de route
                 const currentPathPattern = pathSegments.map(segment => {
-                    // Si le segment ressemble à un UUID, le considérer comme un paramètre dynamique
-                    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment) 
-                        ? '[id]' 
+                    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)
+                        ? '[id]'
                         : segment;
                 }).join('/');
 
-                // Trouver la route correspondante
                 const matchingRoute = navItems.find(item => {
                     const routePath = item.href.startsWith('/') ? item.href.slice(1) : item.href;
-                    
-                    // Gérer les routes dynamiques
+
                     if (routePath.includes('[id]')) {
                         const routePattern = routePath.split('/');
                         const currentPattern = currentPathPattern.split('/');
-                        
+
                         if (routePattern.length !== currentPattern.length) return false;
-                        
+
                         return routePattern.every((segment, index) => {
                             return segment === '[id]' || segment === currentPattern[index];
                         });
                     }
-                    
-                    // Pour les routes statiques, comparaison directe
+
                     return routePath === currentPathPattern;
                 });
 
                 if (matchingRoute && !matchingRoute.roles.includes(user.role as Role)) {
-                    const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
                     return NextResponse.redirect(new URL(`${locale}/not-found`, request.url));
                 }
             }
@@ -88,20 +85,17 @@ export default async function middleware(request: NextRequest) {
 
     // Si l'utilisateur est sur la page de login mais est déjà connecté, rediriger vers le dashboard
     if (pathnameWithoutLocale === '/login' && session) {
-        const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
         return NextResponse.redirect(new URL(`${locale}/dashboard`, request.url));
     }
 
     // Si ce n'est pas une route publique et que l'utilisateur n'est pas connecté, rediriger vers login
     if (!isPublicRoute && !session) {
-        const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
         return NextResponse.redirect(new URL(`${locale}/login`, request.url));
     }
 
     // Protection de la route onboarding
     if (pathnameWithoutLocale === '/onboarding') {
         if (!session) {
-            const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
             return NextResponse.redirect(new URL(`${locale}/login`, request.url));
         }
 
@@ -109,9 +103,8 @@ export default async function middleware(request: NextRequest) {
         if (response.ok) {
             const existingSession = await response.json();
             const user = existingSession.session?.user as User;
-            
+
             if (user?.profileCompleted) {
-                const locale = pathname.startsWith('/fr') ? '/fr' : '/en';
                 return NextResponse.redirect(new URL(`${locale}/dashboard`, request.url));
             }
         }
@@ -123,5 +116,5 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/(fr|en)/:path*'],
+    matcher: ['/', '/(fr|en|es|de|ar|ja)/:path*'],
 };

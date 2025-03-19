@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import {
   Bell,
@@ -28,62 +29,23 @@ import {
   Moon,
   Globe,
   type LucideIcon,
+  User2,
 } from "lucide-react"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import type { User } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import { SignOut } from "@/actions/signOutactions"
 import {ModeToggle} from "@/components/theme/button-theme"
 import LanguageSwitcher from "@/components/internalization/language-switcher"
-
-
-interface NavItem {
-  title: string
-  href: string
-  icon: LucideIcon
-  badge?: number
-  isActive?: boolean
-}
-
+import { navigationConfig } from "@/lib/nav-config"
+import { useTranslations } from "next-intl"
 export default function UserDrawer({ user }: { user: User }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
-  const navItems: NavItem[] = [
-    {
-      title: "Tableau de bord",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-      isActive: pathname === "/dashboard",
-    },
-    {
-      title: "Devoirs",
-      href: "/assignments",
-      icon: ClipboardCheck,
-      badge: 3,
-      isActive: pathname === "/assignments",
-    },
-    {
-      title: "Soumissions",
-      href: "/submissions",
-      icon: FileDown,
-      isActive: pathname === "/submissions",
-    },
-    {
-      title: "Statistiques",
-      href: "/statistics",
-      icon: BarChart3,
-      isActive: pathname === "/statistics",
-    },
-    {
-      title: "Paramètres",
-      href: "/settings",
-      icon: Settings,
-      isActive: pathname === "/settings",
-    },
-  ]
-
+  const navItems = navigationConfig().filter(item => item.roles.includes(user.role))
+  const t = useTranslations("dropdown-user")
   return (
       <div>
         <Sheet open={open} onOpenChange={setOpen}>
@@ -101,49 +63,61 @@ export default function UserDrawer({ user }: { user: User }) {
             {/* User Profile Section */}
             <div className="px-4 py-3 bg-muted/30">
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 border">
-                  <AvatarImage src={user?.image || "/placeholder.svg?height=40&width=40"} alt={user?.name || "User"} />
-                  <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
-                </Avatar>
+              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                                        <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-background">
+                                            <AvatarImage src={user?.image ?? ""} alt="User" />
+                                            <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                                                {user?.email?.[0]}
+                                                {user?.email?.[1]}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56" align="end" forceMount>
+                                    <DropdownMenuLabel className="font-normal">
+                                        <div className="flex flex-col space-y-1">
+                                            <p className="text-sm font-medium leading-none">{user?.name}</p>
+                                            <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                                        </div>
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <User2 className="mr-2 h-4 w-4" />
+                                        <span>{t("profile")}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Link className={" w-full flex flex-row"} href={"/settings"}>
+                                            <Settings className="mr-4 h-4 w-4" />
+                                            <span >{t("settings")}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-destructive focus:text-destructive">
+
+                                        <form action={SignOut}>
+                                            <Button
+                                                type="submit"
+                                                variant="outline"
+                                                className={cn(
+                                                    "text-destructive  w-full hover:text-destructive hover:bg-destructive/10 border-destructive/20"
+                                                )}
+                                            >
+                                                <LogOut className="mr-2 h-4 w-4"/>
+                                                <span>{t("logout")}</span>
+                                            </Button>
+                                        </form>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                 </DropdownMenu>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{user?.name || "Guest User"}</span>
                   <span className="text-xs text-muted-foreground truncate max-w-[160px]">
                   {user?.email || "No email"}
                 </span>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="ml-auto h-8 w-8 rounded-full">
-                      <UserIcon className="h-4 w-4" />
-                      <span className="sr-only">User menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                        onClick={() => {
-                          router.push("/profile")
-                          setOpen(false)
-                        }}
-                    >
-                      <UserIcon className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => {
-                          router.push("/settings")
-                          setOpen(false)
-                        }}
-                    >
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setOpen(false)}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                
               </div>
             </div>
 
@@ -152,29 +126,27 @@ export default function UserDrawer({ user }: { user: User }) {
               <div className="px-3 py-2">
                 <h3 className="mb-2 px-4 text-xs font-semibold text-muted-foreground">Navigation</h3>
                 <nav className="space-y-1">
-                  {navItems.map((item, index) => (
+                  {navItems.map((item) => (
                       <Link
-                          key={index}
+                          key={item.id}
                           href={item.href}
                           className={cn(
                               "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                              item.isActive
+                              pathname.endsWith(item.href)
                                   ? "bg-primary/10 text-primary"
                                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
                           )}
                           onClick={() => setOpen(false)}
                       >
                         <div className="flex items-center gap-3">
-                          <item.icon className={cn("h-4 w-4", item.isActive ? "text-primary" : "text-muted-foreground")} />
+                          {item.icon}
                           <span>{item.title}</span>
                         </div>
-                        {item.badge ? (
+                        {item.badge && (
                             <Badge variant="default" className="ml-auto h-5 min-w-5 px-1 flex items-center justify-center">
                               {item.badge}
                             </Badge>
-                        ) : item.isActive ? (
-                            <ChevronRight className="ml-auto h-4 w-4 text-primary" />
-                        ) : null}
+                        )}
                       </Link>
                   ))}
                 </nav>

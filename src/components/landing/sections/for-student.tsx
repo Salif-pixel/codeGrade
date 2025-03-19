@@ -6,7 +6,8 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger"
 import { Button } from "@/components/ui/button"
 import { CheckCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
-
+import Image from "next/image";
+import feedbackDark from "../../../../public/assets/feedback-dark.png"
 export default function ForStudents() {
     const t = useTranslations('for-students')
     const sectionRef = useRef<HTMLDivElement>(null)
@@ -67,8 +68,8 @@ export default function ForStudents() {
                     <div ref={imageRef} className="relative order-2 lg:order-1">
                         <div className="relative rounded-xl overflow-hidden shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent z-10"></div>
-                            <img
-                                src="/assets/placeholder-dark.svg?height=600&width=800"
+                            <Image
+                                src={feedbackDark}
                                 alt={t('image-alt')}
                                 className="w-full h-auto"
                             />

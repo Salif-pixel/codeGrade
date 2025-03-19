@@ -70,6 +70,11 @@ export function EditProfileDialog({ isOpen, onClose, user, onUpdate }: EditProfi
         }, 1500)
     }
 
+    const handleUpdate = () => {
+        onUpdate(formData)
+        onClose()
+    }
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="bg-[#161b22] border border-[#30363d] text-[#c9d1d9] sm:max-w-[500px]">
