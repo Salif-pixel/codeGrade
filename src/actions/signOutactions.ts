@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { cookies } from "next/headers";
+import {revalidatePath} from "next/cache";
 
 export async function SignOut() {
     // Déconnecter via l'API auth
@@ -24,6 +25,7 @@ export async function SignOut() {
             cookieStore.set(cookie.name, "", { expires: new Date(0), path: "/" });
         }
     }
+    revalidatePath(`[locale]/(dashboard)/dashbaord`)
 
     redirect("/");
 }
