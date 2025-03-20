@@ -1,0 +1,1054 @@
+{
+  "404": {
+    "title": "404",
+    "error_message": "エラーです。",
+    "page_not_found": "お探しのページは存在しません。",
+    "tetris_suggestion": "待っている間に、テトリスをプレイしてみませんか？",
+    "back_home": "ホームに戻る →",
+    "footer": "教師向け課題管理プラットフォーム"
+  },
+  "nav-items": {
+    "exit": "戻る",
+    "settings": "設定",
+    "create_exam": "評価を作成",
+    "my_exams": "私の評価",
+    "stats": "ダッシュボード",
+    "profile": "プロフィール",
+    "available_exams": "アクティブな評価",
+    "results": "パフォーマンスレポート"
+  },
+  "HomePage": {
+    "title": "ホームページのタイトル"
+  },
+  "LandingPage": {
+    "nav": {
+      "brand": "CodeGrade",
+      "login": "ログイン",
+      "start": "開始"
+    },
+    "hero": {
+      "title": "プログラミング評価を変革する",
+      "subtitle": "採点を自動化し、即座にフィードバックを提供し、教育に集中します。"
+    },
+    "floating": {
+      "fileName": "test.py",
+      "aiAnalysis": "AI分析",
+      "testsPassed": "テスト合格: 5/5",
+      "complexity": "複雑度: O(2^n)",
+      "suggestion": "提案: メモ化を使用してパフォーマンスを向上させます",
+      "satisfactionRate": "98%",
+      "assignment": "課題: 再帰アルゴリズム",
+      "deadline": "締切: 6月15日",
+      "studentsCount": "25人の学生"
+    },
+    "features": {
+      "title": "CodeGradeを選ぶ理由",
+      "aiGrading": {
+        "title": "AI採点",
+        "description": "私たちのAIは学生のコードを分析し、構文をチェックし、テストを実行し、個別のフィードバックを提供します。"
+      },
+      "timeSaving": {
+        "title": "時間の節約",
+        "description": "繰り返しのタスクを自動化し、学生の教育的サポートに集中します。"
+      },
+      "fairEvaluation": {
+        "title": "公平な評価",
+        "description": "すべての学生に一貫した評価基準を提供し、詳細で透明性のあるレポートを提供します。"
+      }
+    },
+    "stats": {
+      "studentsEvaluated": "評価された学生",
+      "institutions": "機関",
+      "satisfaction": "満足度"
+    },
+    "cta": {
+      "title": "プログラミング試験を変革する準備はできていますか？",
+      "subtitle": "CodeGradeを信頼する何百もの機関に参加してください。",
+      "button": "無料で始める"
+    },
+    "footer": {
+      "description": "教師の生活を簡素化するコード評価プラットフォーム。",
+      "product": {
+        "title": "製品",
+        "features": "機能",
+        "pricing": "価格",
+        "testimonials": "お客様の声",
+        "guide": "使用ガイド"
+      },
+      "company": {
+        "title": "会社",
+        "about": "会社概要",
+        "blog": "ブログ",
+        "careers": "採用情報",
+        "contact": "お問い合わせ"
+      },
+      "legal": {
+        "title": "法的情報",
+        "privacy": "プライバシー",
+        "terms": "利用規約",
+        "cookies": "クッキー"
+      },
+      "copyright": "© {year} CodeGrade. 全著作権所有。"
+    }
+  },
+  "exam": {
+    "deadline": "締切",
+    "create": {
+      "title": "新しい試験を作成"
+    },
+    "form": {
+      "title": "タイトル",
+      "description": "説明",
+      "format": "フォーマット",
+      "select_format": "フォーマットを選択",
+      "max_attempts": "最大試行回数",
+      "deadline": "締切",
+      "submit": "試験を作成"
+    },
+    "validation": {
+      "title_required": "タイトルは必須です",
+      "description_required": "説明は必須です",
+      "format_required": "フォーマットを選択してください",
+      "max_attempts_required": "最大試行回数は1以上である必要があります",
+      "deadline_required": "締切は必須です",
+      "deadline_invalid": "有効な締切を入力してください"
+    }
+  },
+  "hero-section": {
+    "tagline": "教育に革命を",
+    "headline": "計画。評価。自動化",
+    "description": "多肢選択問題、組み込みコードエディタ、またはPDF提出を使用して、プログラミング評価を作成、配布、自動採点します。すべてAIによって分析されます。",
+    "cta": {
+      "learnMore": "詳細を見る",
+      "tryFree": "無料で試す"
+    },
+    "features": [
+      "500以上の学校で信頼されています",
+      "99.8%の精度",
+      "24/7サポート"
+    ],
+    "instantFeedback": {
+      "title": "即時フィードバック",
+      "description": "学生は5分以内にフィードバックを受け取ります。"
+    },
+    "timeSaved": {
+      "title": "節約された時間",
+      "description": "教師は週に3時間を節約します。"
+    }
+  },
+  "workflow-section": {
+    "title": "教育ワークフロー",
+    "description": "演習の作成から成績の提出まで、すべてのステップを自動化し、教育的なコントロールを維持します。",
+    "features": {
+      "title": "主な機能",
+      "list": {
+        "instantDeployment": {
+          "name": "演習の即時展開",
+          "description": "ワンクリックで課題を公開します。学生はすぐに統合開発環境でアクセスできます。"
+        },
+        "automatedGrading": {
+          "name": "安全な自動採点",
+          "description": "私たちのシステムは、隔離された環境でテストを実行し、不正防止とコード類似性分析を行います。"
+        },
+        "deadlineManagement": {
+          "name": "締切と遅延の管理",
+          "description": "課題の締切を設定し、遅延提出とペナルティの管理を自動化します。"
+        },
+        "automaticBackup": {
+          "name": "自動バックアップ",
+          "description": "すべての提出と評価は自動的に保存され、データの損失なしにいつでもアクセスできます。"
+        },
+        "aiFeedback": {
+          "name": "AIによる個別フィードバック",
+          "description": "私たちのAIはコードを分析し、品質、ベストプラクティス、可能な最適化について個別のフィードバックを提供します。"
+        }
+      }
+    },
+    "exercise": {
+      "title": "学生環境 - コード演習",
+      "deadline": "締切: 残り2日",
+      "description": "整数nの階乗を計算する関数を実装してください。nの階乗（n!と表記）は、n以下のすべての正の整数の積です。",
+      "file": "solution.py",
+      "testFile": "tests.py",
+      "autosaved": "自動保存",
+      "language": "Python",
+      "feedback": {
+        "title": "AIのヒント",
+        "content": [
+          "基本ケース（n=0）はうまく処理されていますが、一般ケースの関数を完成させる必要があります。",
+          "再帰またはループを使用して、1からnまでのすべての数の積を計算することを考えてください。",
+          "ヒント: n > 0の場合、factorial(n) = n * factorial(n-1)"
+        ]
+      },
+      "tests": {
+        "testResult": "テスト結果",
+        "result": "2/4テスト合格",
+        "test1": {
+          "name": "テスト #1: 基本ケース",
+          "description": "factorial(0) は1を返すべきです ✓"
+        },
+        "test2": {
+          "name": "テスト #2: 単純なケース",
+          "description": "factorial(1) は1を返すべきです ✓"
+        },
+        "test3": {
+          "name": "テスト #3: 一般ケース",
+          "description": "エラー: factorial(5) は120を返すべきですが、undefinedが返されました"
+        },
+        "test4": {
+          "name": "テスト #4: 大きな数",
+          "description": "エラー: factorial(10) は3628800を返すべきですが、undefinedが返されました"
+        }
+      },
+      "aiFeedback": {
+        "title": "AIの提案",
+        "content": {
+          "first": "基本ケース（n=0）はうまく処理されていますが、一般ケースの関数を完成させる必要があります。",
+          "second": "再帰またはループを使用して、1からnまでのすべての数の積を計算することを考えてください。",
+          "third": "ヒント: n > 0の場合、factorial(n) = n * factorial(n-1)"
+        },
+        "hint": "ヒント: n > 0の場合、factorial(n) = n * factorial(n-1)",
+        "hintDescription": "基本ケース（n=0）はうまく処理されていますが、一般ケースの関数を完成させる必要があります。再帰またはループを使用して、1からnまでのすべての数の積を計算することを考えてください。"
+      }
+    },
+    "progress": {
+      "title": "演習の進捗",
+      "description": "演習の50%を完了しました。その調子で続けてください！"
+    }
+  },
+  "workflow-grade": {
+    "title": "教育の柔軟性",
+    "heading": "すべてのタイプの課題をサポート",
+    "description": "各科目と演習タイプに合わせて評価方法を調整します。",
+    "assignment-types": {
+      "coding": {
+        "title": "プログラミング課題",
+        "status": "進行中",
+        "file": "solution.js",
+        "code": "function factorial(n) {\n  return n <= 1 ? 1 : n * factorial(n - 1);\n}"
+      },
+      "qcm": {
+        "title": "自動化されたアンケート",
+        "status": "✓ 回答済み",
+        "question": "質問 1/5",
+        "prompt": "リソースを作成するために使用するHTTPメソッドはどれですか？",
+        "options": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ]
+      },
+      "pdf": {
+        "title": "ドキュメントのアップロード",
+        "status": "アップロード済み",
+        "file": "Javaの課題.pdf",
+        "placeholder": "ポリモーフィズムのレポート.pdf",
+        "date": "6月12日 14:30にアップロード"
+      }
+    },
+    "details": "詳細を表示",
+    "click-to-show": "クリックして表示"
+  },
+  "for-teachers": {
+    "badge": "教師向け",
+    "title": "時間を節約し、教育を改善する",
+    "description": "私たちのAI採点プラットフォームは、教師が最も得意なことに集中できるようにします：学生をインスパイアし、教育すること。採点に何時間も費やす必要はありません。",
+    "benefits": [
+      "数クリックで試験と課題を作成",
+      "学生を客観的かつ一貫して評価",
+      "高度なAIによる自動採点",
+      "詳細な分析で学生の進捗を追跡",
+      "学習のギャップを特定し、ターゲットを絞った介入を実施",
+      "学習管理システム（LMS）との簡単な統合"
+    ],
+    "cta": "ダッシュボードを表示",
+    "image-alt": "AI採点プラットフォームを使用する教師",
+    "stats": {
+      "time-saved": {
+        "label": "節約された時間",
+        "value": "週6時間以上"
+      },
+      "correction-speed": {
+        "label": "採点速度",
+        "value": "100倍速い"
+      }
+    }
+  },
+  "for-students": {
+    "badge": "学生向け",
+    "title": "即時フィードバックで学習を加速",
+    "description": "学生は、概念を理解し、自信をつけるのに役立つ個別のフィードバックのおかげで、より速く進歩します。",
+    "benefits": [
+      "課題に対する即時で詳細なフィードバックを受け取る",
+      "どこを改善する必要があるかを正確に理解する",
+      "視覚的な分析で進捗を追跡する",
+      "個別の学習推奨事項を受け取る",
+      "AIが生成した類似の演習で練習する",
+      "定期的なフィードバックで自信をつける"
+    ],
+    "cta": "学生体験を発見",
+    "image-alt": "即時フィードバックを受け取る学生",
+    "stats": {
+      "feedback-time": {
+        "label": "フィードバック時間",
+        "value": "< 10秒"
+      },
+      "improvement": {
+        "label": "改善",
+        "value": "+27%"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "教師と学生の声",
+    "description": "私たちのAI採点プラットフォームは、世界中の教室で本当の違いを生んでいます。",
+    "testimonials": [
+      {
+        "quote": "このAI採点プラットフォームは、私のクラス管理を完全に変えました。毎週何時間も節約でき、学生により適切なフィードバックを提供できます。",
+        "author": "サラ・ジョンソン",
+        "role": "高校のフランス語教師",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "数学教師として、AI採点には懐疑的でしたが、このプラットフォームは信じられないほど正確です。私が見逃すかもしれない微妙な推論の誤りさえ検出します。",
+        "author": "マイケル・チェン",
+        "role": "中学校の数学教師",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "即時フィードバックは、私の学生にとって大きな違いを生みました。結果を何日も待つ必要がないため、彼らはよりやる気を持ち、積極的です。",
+        "author": "エミリー・ロドリゲス",
+        "role": "小学校教師",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "私たちのアカデミーは、このAI採点システムの導入以来、学生の成績に測定可能な改善が見られました。教師にとって真の変化でした。",
+        "author": "ジェームズ・ウィルソン博士",
+        "role": "学術ディレクター",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "学生として、自分の仕事に対する即時のフィードバックを受け取るのが大好きです。何がうまくいっているのか、どこを改善する必要があるのかをすぐに理解するのに役立ちます。",
+        "author": "アイシャ・パテル",
+        "role": "高校生",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      }
+    ],
+    "go-to-testimonial": "証言 {index} に移動"
+  },
+  "authentication": {
+    "login": "ログイン",
+    "signup": "サインアップ",
+    "email": "メール",
+    "email-placeholder": "メールアドレスを入力してください",
+    "password": "パスワード",
+    "password-placeholder": "パスワードを入力してください",
+    "name": "名前",
+    "name-placeholder": "名前を入力してください",
+    "or": "または",
+    "login-with-google": "Googleでログイン",
+    "login-with-github": "GitHubでログイン",
+    "signup-with-google": "Googleでサインアップ",
+    "signup-with-github": "GitHubでサインアップ",
+    "auth-message": "アカウントにアクセスするにはログインしてください。",
+    "auth-image-alt": "認証のイラスト",
+    "invalid-email": "無効なメールアドレス",
+    "password-min-length": "パスワードは6文字以上である必要があります",
+    "name-required": "名前は必須です",
+    "login-auth": {
+      "pending": "ログイン中...",
+      "pendingDescription": "アカウントに接続しています。お待ちください。",
+      "success": "ログイン成功！ 🎉",
+      "successDescription": "アカウントにログインしました。",
+      "error": "ログインエラー",
+      "invalidCredentials": "認証情報が正しくありません。もう一度お試しください。",
+      "unknownError": "ログイン中にエラーが発生しました。",
+      "networkError": "ネットワークエラーが発生しました。インターネット接続を確認してください。"
+    },
+    "signup-auth": {
+      "pending": "アカウント作成中...",
+      "pendingDescription": "アカウントを作成しています。お待ちください...",
+      "success": "アカウントが作成されました",
+      "successDescription": "アカウントが正常に作成されました。ログインできます。",
+      "error": "サインアップエラー",
+      "emailInUse": "このメールアドレスは既に使用されています。別のアドレスを試すか、既存のアカウントでログインしてください。",
+      "networkError": "ネットワーク接続の問題。インターネット接続を確認し、もう一度お試しください。",
+      "unknownError": "予期せぬエラーが発生しました。後でもう一度お試しください。",
+      "passwordWeak": "パスワードが弱すぎます。より安全なパスワードを選択してください。",
+      "passwordTooShort": "パスワードが短すぎます。6文字以上のパスワードを選択してください。"
+    }
+  },
+  "dropdown-user": {
+    "profile": "プロフィール",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "search": "検索"
+  },
+  "common": {
+    "next": "次へ",
+    "back": "戻る",
+    "finish": "完了",
+    "required": "必須",
+    "needHelp": "助けが必要ですか？",
+    "contactSupport": "サポートに連絡",
+    "search": {
+      "title": "検索",
+      "placeholder": "検索...",
+      "noResults": "結果が見つかりませんでした。",
+      "navigation": "ナビゲーション",
+      "results": "結果",
+      "searching": "検索中..."
+    },
+    "navigation": {
+      "available-exams": "利用可能な試験",
+      "my-exams": "私の試験",
+      "results": "結果",
+      "dashboard": "ダッシュボード",
+      "settings": "設定",
+      "profile": "プロフィール"
+    }
+  },
+  "steps": {
+    "welcome": "ようこそ",
+    "userType": "ユーザータイプ",
+    "verification": "検証",
+    "profile": "プロフィール",
+    "completion": "完了",
+    "step": "ステップ {current} / {total}"
+  },
+  "welcome": {
+    "title": "AI採点プラットフォームへようこそ",
+    "subtitle": "私たちのAI駆動の採点プラットフォームは、正確な評価、個別のフィードバック、詳細な分析を提供することで教育に革命をもたらします。",
+    "features": {
+      "intelligentGrading": {
+        "title": "インテリジェント採点",
+        "description": "私たちのAIは、学生の作品を深く分析し、正確で一貫した評価を提供します。"
+      },
+      "personalizedFeedback": {
+        "title": "個別フィードバック",
+        "description": "強みと改善点を特定する詳細でカスタマイズされたフィードバックを受け取ります。"
+      },
+      "advancedAnalytics": {
+        "title": "高度な分析",
+        "description": "直感的な分析ダッシュボードを使用して進捗を視覚化し、傾向を特定します。"
+      }
+    },
+    "onboardingProcess": "オンボーディングプロセスの仕組み",
+    "onboardingSteps": {
+      "step1": "役割を選択 - 教師または学生かを指定します。",
+      "step2": "身元を確認 - セキュリティを確保するための簡単な確認。",
+      "step3": "プロフィールを設定 - 個人情報を追加します。",
+      "step4": "プラットフォームの使用を開始 - 私たちのAI採点ソリューションのすべての機能にアクセスします。"
+    }
+  },
+  "userType": {
+    "title": "私は...",
+    "subtitle": "体験をカスタマイズするために役割を選択してください",
+    "teacher": {
+      "title": "教師",
+      "description": "試験を作成し、作品を採点し、学生の進捗を追跡します",
+      "features": [
+        "作品の自動採点",
+        "個別フィードバックの生成",
+        "パフォーマンスの詳細な分析"
+      ]
+    },
+    "student": {
+      "title": "学生",
+      "description": "回答を送信し、フィードバックを受け取り、スキルを向上させます",
+      "features": [
+        "作品に対する即時フィードバック",
+        "特定の改善提案",
+        "個人の進捗追跡"
+      ]
+    },
+    "whyWeAsk": {
+      "title": "なぜこれを尋ねるのですか？",
+      "title": "なぜこれを尋ねるのですか？",
+      "description": "あなたの役割は、利用可能な機能とツールを決定します。教師は試験を作成して採点できますが、学生は回答を送信してフィードバックを受け取ることができます。",
+      "canChange": "後で役割を変更できますか？",
+      "changeAnswer": "いいえ、ユーザータイプは一度設定すると変更できません。慎重に選択してください。"
+    },
+    "error": "ユーザータイプを選択してください"
+  },
+  "verification": {
+    "title": "アカウントを確認してください",
+    "subtitle": "続行する前に、あなたが実在する人物であることを確認する必要があります",
+    "succes": "確認成功！",
+    "methods": {
+      "connect-the-dot": "点をつなぐ",
+      "reset": "キャプチャをリセット",
+      "captcha": "続行するためにミニゲームを完了してください",
+      "email": "メール",
+      "phone": "電話"
+    },
+    "captcha": {
+      "title": "人間確認",
+      "description": "この確認は、自動化されたアカウントを防ぎ、プラットフォームを保護するのに役立ちます。",
+      "instruction": "'私はロボットではありません'のチェックボックスを選択してください",
+      "verify": "今すぐ確認"
+    },
+    "email": {
+      "title": "メールによる確認",
+      "description": "確認コードをメールアドレスに送信します。",
+      "emailLabel": "メールアドレス",
+      "codeLabel": "確認コード",
+      "sendCode": "コードを送信",
+      "verifyCode": "コードを確認",
+      "resend": "コードを再送",
+      "resendTimer": "再送 ({seconds}s)",
+      "demoNote": "デモの目的で、コードを使用してください: 123456"
+    },
+    "success": {
+      "title": "確認成功",
+      "description": "アカウントの確認に成功しました。オンボーディングプロセスを続行できます。",
+      "status": "アカウントが正常に確認されました"
+    },
+    "whyNeeded": {
+      "title": "なぜ確認が必要なのですか？",
+      "description": "確認は、自動化されたアカウントからプラットフォームを保護し、実在の人物のみがサービスにアクセスできるようにするのに役立ちます。あなたのデータは安全で、第三者と共有されることはありません。"
+    },
+    "error": "確認を完了してください"
+  },
+  "profile": {
+    "title": "個人プロフィール",
+    "subtitle": "あなたについて教えてください",
+    "profilePicture": {
+      "title": "プロフィール写真",
+      "description": "プロフィールをカスタマイズするために写真を追加してください"
+    },
+    "name": {
+      "label": "フルネーム",
+      "placeholder": "フルネームを入力してください",
+      "error": "名前は必須です"
+    },
+    "email": {
+      "label": "メール",
+      "placeholder": "your@email.com",
+      "error": "メールは必須です",
+      "invalidError": "有効なメールアドレスを入力してください"
+    },
+    "background": {
+      "label": "背景",
+      "placeholder": "あなたの背景について教えてください",
+      "counter": "{length}/500文字"
+    },
+    "privacy": {
+      "title": "プライバシー情報",
+      "description": "あなたの個人情報は、プライバシーポリシーに従って保護されています。アスタリスク（*）が付いているフィールドは、アカウント作成に必須です。"
+    }
+  },
+  "completion": {
+    "title": "おめでとうございます！",
+    "subtitle": "あなたのプロフィールが完成し、AI採点プラットフォームの使用を開始する準備が整いました。私たちのコミュニティにようこそ。",
+    "nextSteps": {
+      "title": "次のステップ",
+      "teacher": [
+        "最初の試験を作成",
+        "質問を設定",
+        "学生を招待",
+        "AI採点機能を探索",
+        "パフォーマンス分析を確認"
+      ],
+      "student": [
+        "クラスに参加",
+        "利用可能な試験を確認",
+        "回答を送信",
+        "AIによる個別フィードバックを受け取る",
+        "学業の進捗を追跡"
+      ],
+      "button": {
+        "teacher": "試験を作成",
+        "student": "試験を表示"
+      }
+    },
+    "platformBenefits": {
+      "title": "プラットフォームの利点",
+      "benefits": [
+        {
+          "title": "正確なAI採点",
+          "description": "教育的基準に基づいた一貫した客観的な評価"
+        },
+        {
+          "title": "個別フィードバック",
+          "description": "各学生のレベルに合わせた詳細でカスタマイズされたフィードバック"
+        },
+        {
+          "title": "高度な分析",
+          "description": "時間の経過とともに進捗を視覚化し、傾向を追跡"
+        },
+        {
+          "title": "時間の節約",
+          "description": "繰り返しのタスクを自動化し、教育に集中"
+        }
+      ]
+    },
+    "resourceCenter": {
+      "teacher": {
+        "title": "教師向けリソースセンター",
+        "description": "私たちのAI採点プラットフォームを最大限に活用するためのガイドとチュートリアルを用意しています。"
+      },
+      "student": {
+        "title": "学生向けヘルプセンター",
+        "description": "成功し、プラットフォームを最大限に活用するためのリソースを用意しています。"
+      },
+      "buttons": [
+        "使用ガイド",
+        "ビデオチュートリアル",
+        "FAQ",
+        "サポートに連絡"
+      ]
+    }
+  },
+  "error": {
+    "title": "エラーが発生しました",
+    "description": "申し訳ありませんが、ページの読み込み中にエラーが発生しました。後でもう一度お試しください。",
+    "tryAgain": "再試行"
+  },
+  "exams": {
+    "choices": {
+      "QCM": "多肢選択",
+      "document": "ドキュメント",
+      "code": "コード"
+    },
+    "aiGeneration-generate": "回答を生成",
+    "addChoice": "選択肢を追加",
+    "choice": "試験の選択肢",
+    "createNew": "新しい試験を作成",
+    "createDescription": "学生向けの新しい試験、課題、またはプロジェクトを作成します。",
+    "type": "タイプ",
+    "selectType": "試験のタイプを選択",
+    "typeExam": "試験",
+    "typeAssignment": "課題",
+    "typeProject": "プロジェクト",
+    "required": "必須",
+    "selectFormat": "試験のフォーマットを選択してください",
+    "formatDescription": "評価ニーズに最適なフォーマットを選択してください",
+    "selected": "フォーマットが正常に選択されました",
+    "basicInfo": "基本情報",
+    "title": "タイトル",
+    "titlePlaceholder": "試験のタイトルを入力してください",
+    "description": "説明",
+    "descriptionPlaceholder": "この試験についての詳細を提供してください",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "endDateHelp": "締切は、学生が回答を送信できなくなる時間を決定します",
+    "edit": "編集",
+    "formatSettings": "フォーマット設定",
+    "qcm": "QCM",
+    "qcmDescription": "多肢選択問題",
+    "pdf": "PDF",
+    "pdfDescription": "記入するPDFドキュメント",
+    "code": "コード",
+    "codeDescription": "プログラミング演習",
+    "maxAttempts": "最大試行回数",
+    "maxAttemptsDescription": "学生が試験を試行できる回数",
+    "uploadFile": "ファイルをアップロード",
+    "chooseFile": "ファイルを選択",
+    "fileAdded": "ファイルが正常に追加されました",
+    "questions": "質問",
+    "addQuestion": "質問を追加",
+    "question": "質問",
+    "remove": "削除",
+    "questionText": "質問テキスト",
+    "questionTextPlaceholder": "ここに質問を入力してください",
+    "correctionAi": "AI採点ガイド",
+    "correctionAiPlaceholder": "AI採点のためのヒントを入力してください",
+    "maxPoints": "最大ポイント",
+    "review": "レビュー",
+    "format": "フォーマット",
+    "deadline": "締切",
+    "attachedFile": "添付ファイル",
+    "questionCount": "質問数",
+    "finalConfirmation": "試験を作成する前にすべての情報を確認してください",
+    "back": "戻る",
+    "next": "次のステップ",
+    "step1": "情報",
+    "step2": "フォーマット",
+    "step3": "質問",
+    "step4": "レビュー",
+    "warning": "警告",
+    "needOneQuestion": "少なくとも1つの質問が必要です",
+    "error": "エラー",
+    "titleRequired": "タイトルは必須です",
+    "fileRequired": "ファイルは必須です",
+    "questionsIncomplete": "すべての質問を完了する必要があります",
+    "success": "成功",
+    "examCreated": "試験が正常に作成されました",
+    "createFailed": "試験の作成に失敗しました",
+    "unknownError": "不明なエラーが発生しました",
+    "saving": "保存中...",
+    "saveExam": "試験を保存",
+    "documentUploadNotAllowed": "このタイプの試験ではドキュメントのアップロードは許可されていません",
+    "programmingLanguage": "プログラミング言語",
+    "questionsNotRequiredForPDF": "PDF試験では質問は必須ではありません",
+    "uploadDocument": "ドキュメントをアップロード",
+    "aiGeneration": {
+      "title": "回答の生成",
+      "generating": "生成中...",
+      "editAnswer": "回答を編集",
+      "saveAnswer": "回答を保存",
+      "answer": "回答",
+      "answerPlaceholder": "AIによって生成された回答",
+      "regenerate": "再生成",
+      "preview": "質問と回答のプレビュー",
+      "error": "回答の生成中にエラーが発生しました",
+      "generate": "回答を生成",
+      "generating": "回答を生成中...",
+      "selectModel": "モデルを選択",
+      "regenerating": "再生成中..."
+    },
+    "details": {
+      "title": "試験の詳細",
+      "suggestedAnswer": "提案された回答"
+    },
+    "finalize": "完了して終了",
+    "answersUpdated": "回答が正常に更新されました",
+    "updateAnswersError": "回答の更新中にエラーが発生しました",
+    "examAlreadyCreated": "試験は既に作成されています"
+  },
+  "settings": {
+    "title": "設定",
+    "appearance": {
+      "title": "外観",
+      "description": "アプリケーションの外観をカスタマイズ",
+      "theme": {
+        "title": "テーマ",
+        "light": "ライト",
+        "dark": "ダーク",
+        "system": "システム"
+      },
+      "profile": {
+        "title": "プロフィール",
+        "description": "プロフィールをカスタマイズ"
+      },
+      "colorTheme": {
+        "title": "カラーテーマ",
+        "jade": "ジェード",
+        "obsidian": "オブシディアン",
+        "amber": "アンバー"
+      }
+    },
+    "notifications": {
+      "title": "通知",
+      "description": "通知の受信を設定",
+      "email": {
+        "title": "メール通知",
+        "description": "メールで通知を受信"
+      },
+      "security": {
+        "title": "セキュリティ通知",
+        "description": "セキュリティアラートを受信"
+      },
+      "promotional": {
+        "title": "プロモーション通知",
+        "description": "プロモーションと更新を受信"
+      }
+    },
+    "layout": {
+      "title": "レイアウト",
+      "description": "アプリケーションの表示方法を選択",
+      "sidebar": "サイドナビゲーション",
+      "topnav": "トップナビゲーション"
+    }
+  },
+  "calendar": {
+    "title": "評価カレンダー",
+    "navigation": {
+      "previous": "前",
+      "next": "次",
+      "today": "今日"
+    },
+    "views": {
+      "day": "日",
+      "week": "週",
+      "month": "月",
+      "agenda": "予定",
+      "year": "年"
+    },
+    "assignment": {
+      "add": "評価を追加",
+      "details": "詳細",
+      "delete": "削除",
+      "close": "閉じる",
+      "type": {
+        "QCM": "QCM",
+        "CODE": "コード",
+        "DOCUMENT": "ドキュメント"
+      }
+    },
+    "edit": {
+      "enable": "編集モードを有効にする",
+      "disable": "編集モードを無効にする",
+      "save": "保存",
+      "cancel": "キャンセル"
+    },
+    "details": {
+      "title": "評価の詳細",
+      "info": {
+        "type": "タイプ",
+        "questions": "質問",
+        "duration": "期間",
+        "status": "ステータス",
+        "description": "説明"
+      },
+      "status": {
+        "PENDING": "保留中",
+        "ACTIVE": "アクティブ",
+        "COMPLETED": "完了"
+      },
+      "close": "閉じる"
+    },
+    "sheet": {
+      "format": "提出フォーマット",
+      "deadline": "締切",
+      "maxAttempts": "最大試行回数",
+      "deleteConfirm": "この評価を削除してもよろしいですか？",
+      "type": "タイプ",
+      "questions": "質問",
+      "duration": "期間",
+      "status": "ステータス",
+      "startDate": "開始日",
+      "endDate": "終了日"
+    },
+    "toast": {
+      "updateSuccess": "評価が正常に更新されました",
+      "updateError": "評価の更新中にエラーが発生しました",
+      "deleteSuccess": "評価が正常に削除されました",
+      "deleteError": "評価の削除中にエラーが発生しました",
+      "cannotEdit": "この評価は既に開始されているため編集できません"
+    },
+    "dates": {
+      "days": {
+        "monday": "月曜日",
+        "tuesday": "火曜日",
+        "wednesday": "水曜日",
+        "thursday": "木曜日",
+        "friday": "金曜日",
+        "saturday": "土曜日",
+        "sunday": "日曜日"
+      },
+      "months": {
+        "january": "1月",
+        "february": "2月",
+        "march": "3月",
+        "april": "4月",
+        "may": "5月",
+        "june": "6月",
+        "july": "7月",
+        "august": "8月",
+        "september": "9月",
+        "october": "10月",
+        "november": "11月",
+        "december": "12月"
+      },
+      "format": {
+        "full": "EEEE d MMMM yyyy",
+        "monthYear": "MMMM yyyy"
+      }
+    }
+  },
+  "exams-component": {
+    "title": "試験",
+    "noExams": {
+      "title": "利用可能な試験はありません",
+      "description": "まだ割り当てられた試験はありません。"
+    },
+    "tabs": {
+      "list": "リスト",
+      "calendar": "カレンダー"
+    },
+    "assignment": {
+      "deadline": "締切",
+      "viewDetails": "詳細を表示",
+      "invite": "招待",
+      "status": {
+        "pending": "保留中",
+        "active": "アクティブ",
+        "completed": "完了"
+      },
+      "type": {
+        "QCM": "QCM",
+        "CODE": "コード",
+        "DOCUMENT": "ドキュメント"
+      },
+      "inviteLink": {
+        "title": "招待リンク",
+        "description": "このリンクを学生と共有して、この課題に参加させてください。",
+        "button": "招待リンク",
+        "copy": "コピー"
+      },
+      "questions": "質問",
+      "submissions": "提出",
+      "students": "学生",
+      "participation": "参加",
+      "upcoming": "予定",
+      "expired": "期限切れ",
+      "notStarted": "まだ開始されていません",
+      "starts": "開始日",
+      "grade": "成績",
+      "loading": "読み込み中...",
+      "viewResults": "結果を表示",
+      "takeQuiz": "クイズを受ける",
+      "uploadFile": "ファイルをアップロード",
+      "writeCode": "コードを書く"
+    },
+    "details": {
+      "title": "課題の詳細",
+      "back": "戻る",
+      "information": {
+        "title": "情報",
+        "type": "タイプ",
+        "questions": "質問",
+        "duration": "期間",
+        "status": "ステータス",
+        "description": "説明"
+      },
+      "results": {
+        "title": "学生の結果",
+        "submissions": "提出",
+        "students": "学生",
+        "table": {
+          "student": "学生",
+          "email": "メール",
+          "status": "ステータス",
+          "submissionDate": "提出日",
+          "score": "スコア"
+        },
+        "status": {
+          "completed": "完了",
+          "accepted": "承認済み",
+          "declined": "拒否",
+          "pending": "保留中"
+        }
+      }
+    },
+    "duration": {
+      "day": "日",
+      "days": "日",
+      "hour": "時間",
+      "hours": "時間",
+      "minute": "分",
+      "minutes": "分",
+      "undefined": "期間が定義されていません"
+    },
+    "toast": {
+      "linkCopied": {
+        "title": "リンクがコピーされました",
+        "description": "招待リンクがクリップボードにコピーされました"
+      },
+      "statusUpdate": {
+        "success": "ステータスが更新されました",
+        "error": "ステータスを更新できませんでした"
+      }
+    },
+    "status": {
+      "undefined": "未定義"
+    },
+    "score": {
+      "percentage": "%"
+    }
+  },
+  "dashboard": {
+    "teacher": {
+      "title": "教師ダッシュボード",
+      "description": "評価を管理し、学生の進捗を追跡します",
+      "metrics": {
+        "total_exams": "総評価数",
+        "total_exams_description": "作成された評価の総数",
+        "exams_in_progress": "進行中",
+        "exams_in_progress_description": "現在アクティブな評価",
+        "graded_exams": "採点済み評価",
+        "graded_exams_description": "完了して採点された評価",
+        "average_score": "平均スコア",
+        "average_score_description": "学生の全体的な平均"
+      },
+      "recent_exams": {
+        "title": "最近の評価",
+        "view_all": "すべての評価を表示",
+        "no_exams": "最近の評価はありません"
+      },
+      "quick_actions": {
+        "title": "クイックアクション",
+        "create_exam": "評価を作成",
+        "create_exam_description": "新しい評価の作成を開始",
+        "view_exams": "私の評価を表示",
+        "view_exams_description": "すべての評価にアクセス",
+        "view_settings": "設定",
+        "view_settings_description": "設定を構成"
+      }
+    },
+    "student": {
+      "title": "学生ダッシュボード",
+      "description": "評価と進捗を追跡します",
+      "metrics": {
+        "completed_exams": "完了した評価",
+        "completed_exams_description": "完了した評価",
+        "pending_exams": "保留中の評価",
+        "pending_exams_description": "完了する必要がある評価",
+        "average_score": "平均スコア",
+        "average_score_description": "あなたの全体的な平均",
+        "next_deadline": "次の締切",
+        "next_deadline_description": "次の評価"
+      },
+      "upcoming_exams": {
+        "title": "今後の評価",
+        "view_all": "すべての評価を表示",
+        "no_exams": "今後の評価はありません",
+        "submit": "開始"
+      },
+      "quick_actions": {
+        "title": "クイックアクション",
+        "view_available": "利用可能な評価を表示",
+        "view_available_description": "アクティブな評価にアクセス",
+        "view_results": "結果を表示",
+        "view_results_description": "パフォーマンスを確認"
+      }
+    }
+  },
+  "exam-taking": {
+    "instructions": {
+      "title": "指示",
+      "qcm": "各質問の正しい答えを選択してください。",
+      "code": "提供されたスペースにコードを書いてください。",
+      "document": "提供されたテキスト領域で質問に答えてください。"
+    },
+    "maxPoints": "最大ポイント",
+    "answerPlaceholder": "ここに答えを書いてください...",
+    "codePlaceholder": "ここに{language}コードを書いてください...",
+    "save": "保存",
+    "saving": "保存中...",
+    "submit": "提出",
+    "submitting": "提出中...",
+    "autoSaving": "自動保存中...",
+    "autoSaved": "自動保存されました",
+    "allQuestionsAnswered": "すべての質問に答えました",
+    "notAllQuestionsAnswered": "まだ答えられていない質問があります",
+    "timeUp": {
+      "title": "時間切れ！",
+      "description": "時間が終了しました。回答を提出しています。"
+    },
+    "timeWarning": {
+      "title": "注意！",
+      "description": "試験を終了するまで5分未満です。"
+    },
+    "saveSuccess": {
+      "title": "保存されました",
+      "description": "回答が正常に保存されました。"
+    },
+    "saveError": {
+      "title": "エラー",
+      "description": "回答の保存中にエラーが発生しました。"
+    },
+    "submitSuccess": {
+      "title": "提出されました",
+      "description": "試験が正常に提出されました。"
+    },
+    "submitError": {
+      "title": "エラー",
+      "description": "試験の提出中にエラーが発生しました。"
+    },
+    "confirmSubmitIncomplete": "いくつかの質問にまだ答えていません。それでも試験を提出しますか？"
+  }
+}

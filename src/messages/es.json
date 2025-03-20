@@ -1,0 +1,1053 @@
+{
+  "404": {
+    "title": "404",
+    "error_message": "ES UN ERROR.",
+    "page_not_found": "LA PÁGINA QUE BUSCAS NO EXISTE.",
+    "tetris_suggestion": "Mientras esperas, ¿por qué no juegas una partida de Tetris?",
+    "back_home": "VOLVER AL INICIO →",
+    "footer": "Plataforma de organización de tareas para profesores"
+  },
+  "nav-items": {
+    "exit": "Volver",
+    "settings": "Preferencias",
+    "create_exam": "Crear una evaluación",
+    "my_exams": "Mis evaluaciones",
+    "stats": "Tablero de control",
+    "profile": "Perfil",
+    "available_exams": "Evaluaciones activas",
+    "results": "Informe de rendimiento"
+  },
+  "HomePage": {
+    "title": "Título de la página de inicio"
+  },
+  "LandingPage": {
+    "nav": {
+      "brand": "CodeGrade",
+      "login": "Iniciar sesión",
+      "start": "Comenzar"
+    },
+    "hero": {
+      "title": "Transforma tus evaluaciones de programación",
+      "subtitle": "Automatiza la corrección, proporciona retroalimentación instantánea y concéntrate en la enseñanza."
+    },
+    "floating": {
+      "fileName": "test.py",
+      "aiAnalysis": "Análisis de IA",
+      "testsPassed": "Pruebas aprobadas: 5/5",
+      "complexity": "Complejidad: O(2^n)",
+      "suggestion": "Sugerencia: Usa memoización para mejorar el rendimiento",
+      "satisfactionRate": "98%",
+      "assignment": "Tarea: Algoritmos recursivos",
+      "deadline": "Fecha límite: 15 de junio",
+      "studentsCount": "25 estudiantes"
+    },
+    "features": {
+      "title": "¿Por qué elegir CodeGrade?",
+      "aiGrading": {
+        "title": "Corrección con IA",
+        "description": "Nuestra IA analiza el código de los estudiantes, verifica la sintaxis, ejecuta pruebas y proporciona comentarios personalizados."
+      },
+      "timeSaving": {
+        "title": "Ahorro de tiempo",
+        "description": "Automatiza tareas repetitivas y concéntrate en el acompañamiento pedagógico de tus estudiantes."
+      },
+      "fairEvaluation": {
+        "title": "Evaluación justa",
+        "description": "Criterios de evaluación consistentes para todos los estudiantes, con informes detallados y transparentes."
+      }
+    },
+    "stats": {
+      "studentsEvaluated": "Estudiantes evaluados",
+      "institutions": "Instituciones",
+      "satisfaction": "Satisfacción"
+    },
+    "cta": {
+      "title": "¿Listo para transformar tus exámenes de programación?",
+      "subtitle": "Únete a cientos de instituciones que confían en CodeGrade para sus evaluaciones.",
+      "button": "Comenzar gratis"
+    },
+    "footer": {
+      "description": "La plataforma de evaluación de código que simplifica la vida de los profesores.",
+      "product": {
+        "title": "Producto",
+        "features": "Funcionalidades",
+        "pricing": "Precios",
+        "testimonials": "Testimonios",
+        "guide": "Guía de uso"
+      },
+      "company": {
+        "title": "Empresa",
+        "about": "Sobre nosotros",
+        "blog": "Blog",
+        "careers": "Carreras",
+        "contact": "Contacto"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacidad",
+        "terms": "Términos de uso",
+        "cookies": "Cookies"
+      },
+      "copyright": "© {year} CodeGrade. Todos los derechos reservados."
+    }
+  },
+  "exam": {
+    "deadline": "Fecha límite",
+    "create": {
+      "title": "Crear un nuevo examen"
+    },
+    "form": {
+      "title": "Título",
+      "description": "Descripción",
+      "format": "Formato",
+      "select_format": "Selecciona un formato",
+      "max_attempts": "Número máximo de intentos",
+      "deadline": "Fecha límite",
+      "submit": "Crear examen"
+    },
+    "validation": {
+      "title_required": "El título es obligatorio",
+      "description_required": "La descripción es obligatoria",
+      "format_required": "Por favor, selecciona un formato",
+      "max_attempts_required": "El número máximo de intentos debe ser al menos 1",
+      "deadline_required": "La fecha límite es obligatoria",
+      "deadline_invalid": "Por favor, introduce una fecha límite válida"
+    }
+  },
+  "hero-section": {
+    "tagline": "Revolucionemos la educación",
+    "headline": "Planifica. Evalúa. Automatiza",
+    "description": "Crea, distribuye y corrige automáticamente evaluaciones de programación con preguntas de opción múltiple, editor de código integrado o envío de PDF, todo analizado por IA.",
+    "cta": {
+      "learnMore": "Saber más",
+      "tryFree": "Probar gratis"
+    },
+    "features": [
+      "Confiable para más de 500 escuelas",
+      "Precisión del 99,8%",
+      "Soporte 24/7"
+    ],
+    "instantFeedback": {
+      "title": "Retroalimentación instantánea",
+      "description": "Los estudiantes reciben retroalimentación en menos de 5 minutos."
+    },
+    "timeSaved": {
+      "title": "Tiempo ahorrado",
+      "description": "Los profesores ahorran 3 horas por semana."
+    }
+  },
+  "workflow-section": {
+    "title": "Flujo de trabajo educativo",
+    "description": "Desde la creación de ejercicios hasta la entrega de calificaciones, automatiza todos los pasos manteniendo el control pedagógico.",
+    "features": {
+      "title": "Funcionalidades clave",
+      "list": {
+        "instantDeployment": {
+          "name": "Despliegue instantáneo de ejercicios",
+          "description": "Publica tus tareas con un clic. Los estudiantes pueden acceder de inmediato en su entorno de desarrollo integrado."
+        },
+        "automatedGrading": {
+          "name": "Evaluación automatizada segura",
+          "description": "Nuestro sistema ejecuta pruebas en un entorno aislado con verificación anti-trampas y análisis de similitud de código."
+        },
+        "deadlineManagement": {
+          "name": "Gestión de plazos y retrasos",
+          "description": "Define plazos para las tareas y automatiza la gestión de entregas tardías y penalizaciones."
+        },
+        "automaticBackup": {
+          "name": "Copia de seguridad automática",
+          "description": "Todas las entregas y evaluaciones se guardan automáticamente y están accesibles en cualquier momento sin pérdida de datos."
+        },
+        "aiFeedback": {
+          "name": "Retroalimentación personalizada de IA",
+          "description": "Nuestra IA analiza el código y proporciona retroalimentación personalizada sobre la calidad, buenas prácticas y optimizaciones posibles."
+        }
+      }
+    },
+    "exercise": {
+      "title": "Entorno del estudiante - Ejercicio de código",
+      "deadline": "Plazo: 2 días restantes",
+      "description": "Implementa una función que calcule el factorial de un número entero n. El factorial de n (denotado como n!) es el producto de todos los enteros positivos menores o iguales a n.",
+      "file": "solución.py",
+      "testFile": "pruebas.py",
+      "autosaved": "Guardado automático",
+      "language": "Python",
+      "feedback": {
+        "title": "Consejos de la IA",
+        "content": [
+          "Has manejado bien el caso base (n=0), pero debes completar la función para el caso general.",
+          "Considera usar recursión o un bucle para calcular el producto de todos los números de 1 a n.",
+          "Pista: Para n > 0, factorial(n) = n * factorial(n-1)"
+        ]
+      },
+      "tests": {
+        "testResult": "Resultados de las pruebas",
+        "result": "2/4 pruebas aprobadas",
+        "test1": {
+          "name": "Prueba #1: Caso base",
+          "description": "factorial(0) debería devolver 1 ✓"
+        },
+        "test2": {
+          "name": "Prueba #2: Caso simple",
+          "description": "factorial(1) debería devolver 1 ✓"
+        },
+        "test3": {
+          "name": "Prueba #3: Caso general",
+          "description": "Error: Se esperaba que factorial(5) fuera 120, pero se obtuvo undefined"
+        },
+        "test4": {
+          "name": "Prueba #4: Número grande",
+          "description": "Error: Se esperaba que factorial(10) fuera 3628800, pero se obtuvo undefined"
+        }
+      },
+      "aiFeedback": {
+        "title": "Sugerencias de la IA",
+        "content": {
+          "first": "Has manejado bien el caso base (n=0), pero debes completar la función para el caso general.",
+          "second": "Considera usar recursión o un bucle para calcular el producto de todos los números de 1 a n.",
+          "third": "Pista: Para n > 0, factorial(n) = n * factorial(n-1)"
+        },
+        "hint": "Pista: Para n > 0, factorial(n) = n * factorial(n-1)",
+        "hintDescription": "Has manejado bien el caso base (n=0), pero debes completar la función para el caso general. Considera usar recursión o un bucle para calcular el producto de todos los números de 1 a n."
+      }
+    },
+    "progress": {
+      "title": "Progreso del ejercicio",
+      "description": "Has completado el 50% del ejercicio. ¡Sigue así!"
+    }
+  },
+  "workflow-grade": {
+    "title": "Flexibilidad pedagógica",
+    "heading": "Todos los tipos de tareas soportados",
+    "description": "Adapta tus modalidades de evaluación a cada materia y tipo de ejercicio.",
+    "assignment-types": {
+      "coding": {
+        "title": "Tareas de programación",
+        "status": "En curso",
+        "file": "solución.js",
+        "code": "function factorial(n) {\n  return n <= 1 ? 1 : n * factorial(n - 1);\n}"
+      },
+      "qcm": {
+        "title": "Cuestionarios automatizados",
+        "status": "✓ Respondido",
+        "question": "Pregunta 1/5",
+        "prompt": "¿Qué método HTTP se usa para crear un recurso?",
+        "options": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ]
+      },
+      "pdf": {
+        "title": "Subida de documentos",
+        "status": "Subido",
+        "file": "Tarea de java.pdf",
+        "placeholder": "informe_polimorfismo.pdf",
+        "date": "Subido el 12/06 a las 14:30"
+      }
+    },
+    "details": "Ver detalles",
+    "click-to-show": "Haz clic para mostrar"
+  },
+  "for-teachers": {
+    "badge": "Para profesores",
+    "title": "Ahorra tiempo y mejora tu enseñanza",
+    "description": "Nuestra plataforma de corrección con IA permite a los profesores concentrarse en lo que hacen mejor: inspirar y educar a los estudiantes, sin pasar horas corrigiendo exámenes.",
+    "benefits": [
+      "Crea exámenes y tareas en unos clics",
+      "Evalúa a los estudiantes de manera objetiva y consistente",
+      "Corrección automática de exámenes con IA avanzada",
+      "Sigue el progreso de los estudiantes con análisis detallados",
+      "Identifica lagunas de aprendizaje para una intervención dirigida",
+      "Integración fácil con tu sistema de gestión de cursos (LMS)"
+    ],
+    "cta": "Ver el tablero de control",
+    "image-alt": "Profesor usando la plataforma de corrección con IA",
+    "stats": {
+      "time-saved": {
+        "label": "Tiempo ahorrado",
+        "value": "6+ h/sem"
+      },
+      "correction-speed": {
+        "label": "Velocidad de corrección",
+        "value": "100x más rápido"
+      }
+    }
+  },
+  "for-students": {
+    "badge": "Para estudiantes",
+    "title": "Acelera tu aprendizaje con retroalimentación instantánea",
+    "description": "Los estudiantes progresan más rápido gracias a retroalimentación personalizada que les ayuda a entender conceptos y ganar confianza.",
+    "benefits": [
+      "Recibe retroalimentación instantánea y detallada sobre tus tareas",
+      "Entiende exactamente dónde necesitas mejorar",
+      "Sigue tu progreso con análisis visuales",
+      "Obtén recomendaciones de aprendizaje personalizadas",
+      "Practica con ejercicios similares generados por IA",
+      "Gana confianza con retroalimentación regular"
+    ],
+    "cta": "Descubre la experiencia del estudiante",
+    "image-alt": "Estudiante recibiendo retroalimentación instantánea",
+    "stats": {
+      "feedback-time": {
+        "label": "Tiempo de retroalimentación",
+        "value": "< 10 seg"
+      },
+      "improvement": {
+        "label": "Mejora",
+        "value": "+27%"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Lo que dicen profesores y estudiantes",
+    "description": "Nuestra plataforma de corrección con IA marca una diferencia real en las aulas de todo el mundo.",
+    "testimonials": [
+      {
+        "quote": "Esta plataforma de corrección con IA ha transformado completamente mi gestión de clase. Ahorro horas cada semana y puedo proporcionar retroalimentación más relevante a mis estudiantes.",
+        "author": "Sarah Johnson",
+        "role": "Profesora de Francés en Secundaria",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Como profesor de matemáticas, era escéptico sobre la corrección con IA, pero esta plataforma es increíblemente precisa. Detecta incluso errores sutiles en los razonamientos que yo podría pasar por alto.",
+        "author": "Michael Chen",
+        "role": "Profesor de Matemáticas en Secundaria",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "La retroalimentación instantánea ha marcado una gran diferencia para mis estudiantes. Están más motivados y comprometidos cuando no tienen que esperar días para obtener sus resultados.",
+        "author": "Emily Rodriguez",
+        "role": "Profesora de Primaria",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Nuestra academia ha visto mejoras medibles en los resultados de los estudiantes desde la implementación de este sistema de corrección con IA. Ha sido un verdadero cambio para nuestros profesores.",
+        "author": "Dr. James Wilson",
+        "role": "Director Académico",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      },
+      {
+        "quote": "Como estudiante, me encanta recibir retroalimentación inmediata sobre mi trabajo. Me ayuda a entender lo que hago bien y dónde necesito mejorar de inmediato.",
+        "author": "Aisha Patel",
+        "role": "Estudiante de Secundaria",
+        "image": "/assets/placeholder.svg?height=100&width=100"
+      }
+    ],
+    "go-to-testimonial": "Ir al testimonio {index}"
+  },
+  "authentication": {
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "email": "Correo electrónico",
+    "email-placeholder": "Introduce tu correo electrónico",
+    "password": "Contraseña",
+    "password-placeholder": "Introduce tu contraseña",
+    "name": "Nombre",
+    "name-placeholder": "Introduce tu nombre",
+    "or": "O",
+    "login-with-google": "Iniciar sesión con Google",
+    "login-with-github": "Iniciar sesión con GitHub",
+    "signup-with-google": "Registrarse con Google",
+    "signup-with-github": "Registrarse con GitHub",
+    "auth-message": "Inicia sesión para acceder a tu cuenta.",
+    "auth-image-alt": "Ilustración de autenticación",
+    "invalid-email": "Correo electrónico inválido",
+    "password-min-length": "La contraseña debe tener al menos 6 caracteres",
+    "name-required": "El nombre es obligatorio",
+    "login-auth": {
+      "pending": "Iniciando sesión...",
+      "pendingDescription": "Por favor, espera mientras te conectamos a tu cuenta.",
+      "success": "¡Inicio de sesión exitoso! 🎉",
+      "successDescription": "Ahora estás conectado a tu cuenta.",
+      "error": "Error al iniciar sesión",
+      "invalidCredentials": "Tus credenciales son incorrectas. Por favor, inténtalo de nuevo.",
+      "unknownError": "Ocurrió un error al iniciar sesión.",
+      "networkError": "Ocurrió un error de red. Por favor, verifica tu conexión a Internet."
+    },
+    "signup-auth": {
+      "pending": "Creando cuenta",
+      "pendingDescription": "Por favor, espera mientras creamos tu cuenta...",
+      "success": "Cuenta creada",
+      "successDescription": "Tu cuenta ha sido creada con éxito. Ahora puedes iniciar sesión.",
+      "error": "Error al registrarse",
+      "emailInUse": "Esta dirección de correo electrónico ya está en uso. Por favor, intenta con una dirección diferente o inicia sesión con tu cuenta existente.",
+      "networkError": "Problema de conexión de red. Por favor, verifica tu conexión a Internet e inténtalo de nuevo.",
+      "unknownError": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.",
+      "passwordWeak": "La contraseña es demasiado débil. Por favor, elige una contraseña más segura.",
+      "passwordTooShort": "La contraseña es demasiado corta. Por favor, elige una contraseña de al menos 6 caracteres."
+    }
+  },
+  "dropdown-user": {
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "search": "Buscar"
+  },
+  "common": {
+    "next": "Siguiente",
+    "back": "Volver",
+    "finish": "Terminar",
+    "required": "Requerido",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contacta con nuestro soporte",
+    "search": {
+      "title": "Buscar",
+      "placeholder": "Buscar...",
+      "noResults": "No se encontraron resultados.",
+      "navigation": "Navegación",
+      "results": "Resultados",
+      "searching": "Buscando..."
+    },
+    "navigation": {
+      "available-exams": "Exámenes disponibles",
+      "my-exams": "Mis exámenes",
+      "results": "Resultados",
+      "dashboard": "Tablero de control",
+      "settings": "Configuración",
+      "profile": "Perfil"
+    }
+  },
+  "steps": {
+    "welcome": "Bienvenido",
+    "userType": "Tipo de usuario",
+    "verification": "Verificación",
+    "profile": "Perfil",
+    "completion": "Finalización",
+    "step": "Paso {current} de {total}"
+  },
+  "welcome": {
+    "title": "Bienvenido a la Plataforma de Evaluación con IA",
+    "subtitle": "Nuestra plataforma de evaluación impulsada por IA revoluciona la educación ofreciendo evaluaciones precisas, retroalimentación personalizada y análisis detallados.",
+    "features": {
+      "intelligentGrading": {
+        "title": "Evaluación Inteligente",
+        "description": "Nuestra IA analiza en profundidad los trabajos de los estudiantes para proporcionar evaluaciones precisas y consistentes."
+      },
+      "personalizedFeedback": {
+        "title": "Retroalimentación Personalizada",
+        "description": "Recibe comentarios detallados y adaptados que identifican puntos fuertes y áreas de mejora."
+      },
+      "advancedAnalytics": {
+        "title": "Análisis Avanzados",
+        "description": "Visualiza el progreso e identifica tendencias con nuestros paneles analíticos intuitivos."
+      }
+    },
+    "onboardingProcess": "Cómo funciona el proceso de incorporación",
+    "onboardingSteps": {
+      "step1": "Elige tu rol - Indica si eres profesor o estudiante.",
+      "step2": "Verifica tu identidad - Una simple verificación para garantizar la seguridad.",
+      "step3": "Configura tu perfil - Añade tu información personal.",
+      "step4": "Comienza a usar la plataforma - Accede a todas las funcionalidades de nuestra solución de evaluación con IA."
+    }
+  },
+  "userType": {
+    "title": "Soy un...",
+    "subtitle": "Selecciona tu rol para personalizar tu experiencia",
+    "teacher": {
+      "title": "Profesor",
+      "description": "Crea exámenes, califica trabajos y sigue el progreso de los estudiantes",
+      "features": [
+        "Calificación automática de trabajos",
+        "Generación de retroalimentación personalizada",
+        "Análisis detallados del rendimiento"
+      ]
+    },
+    "student": {
+      "title": "Estudiante",
+      "description": "Envía tus respuestas, recibe retroalimentación y mejora tus habilidades",
+      "features": [
+        "Retroalimentación inmediata sobre tus trabajos",
+        "Sugerencias de mejora específicas",
+        "Seguimiento de progreso personalizado"
+      ]
+    },
+    "whyWeAsk": {
+      "title": "¿Por qué preguntamos esto?",
+      "description": "Tu rol determina las funcionalidades y herramientas a las que tendrás acceso. Los profesores pueden crear y calificar exámenes, mientras que los estudiantes pueden enviar respuestas y recibir retroalimentación.",
+      "canChange": "¿Puedo cambiar de rol más tarde?",
+      "changeAnswer": "No, el tipo de usuario no se puede cambiar una vez configurado. Por favor, elige con cuidado."
+    },
+    "error": "Por favor, selecciona un tipo de usuario"
+  },
+  "verification": {
+    "title": "Verifica tu cuenta",
+    "subtitle": "Necesitamos verificar que eres una persona real antes de continuar",
+    "succes": "¡Verificación exitosa!",
+    "methods": {
+      "connect-the-dot": "Conectar los puntos",
+      "reset": "Reiniciar el captcha",
+      "captcha": "Completa el minijuego para continuar",
+      "email": "Correo electrónico",
+      "phone": "Teléfono"
+    },
+    "captcha": {
+      "title": "Verificación Humana",
+      "description": "Esta verificación nos ayuda a prevenir cuentas automatizadas y proteger nuestra plataforma",
+      "instruction": "Marca la casilla 'No soy un robot'",
+      "verify": "Verificar ahora"
+    },
+    "email": {
+      "title": "Verificación por correo electrónico",
+      "description": "Te enviaremos un código de verificación a tu dirección de correo electrónico",
+      "emailLabel": "Dirección de correo electrónico",
+      "codeLabel": "Código de verificación",
+      "sendCode": "Enviar código",
+      "verifyCode": "Verificar código",
+      "resend": "Reenviar código",
+      "resendTimer": "Reenviar ({seconds}s)",
+      "demoNote": "Para fines de demostración, usa el código: 123456"
+    },
+    "success": {
+      "title": "Verificación exitosa",
+      "description": "Gracias por verificar tu cuenta. Ahora puedes continuar con el proceso de incorporación.",
+      "status": "Cuenta verificada con éxito"
+    },
+    "whyNeeded": {
+      "title": "¿Por qué es necesaria la verificación?",
+      "description": "La verificación nos ayuda a proteger nuestra plataforma contra cuentas automatizadas y garantizar que solo personas reales puedan acceder a nuestros servicios. Tus datos están seguros y nunca se compartirán con terceros."
+    },
+    "error": "Por favor, completa la verificación"
+  },
+  "profile": {
+    "title": "Perfil personal",
+    "subtitle": "Háblanos de ti",
+    "profilePicture": {
+      "title": "Foto de perfil",
+      "description": "Añade una foto para personalizar tu perfil"
+    },
+    "name": {
+      "label": "Nombre completo",
+      "placeholder": "Introduce tu nombre completo",
+      "error": "El nombre es obligatorio"
+    },
+    "email": {
+      "label": "Correo electrónico",
+      "placeholder": "tu@email.com",
+      "error": "El correo electrónico es obligatorio",
+      "invalidError": "Por favor, introduce una dirección de correo electrónico válida"
+    },
+    "background": {
+      "label": "Antecedentes",
+      "placeholder": "Háblanos de tu trayectoria",
+      "counter": "{length}/500 caracteres"
+    },
+    "privacy": {
+      "title": "Información sobre privacidad",
+      "description": "Tu información personal está protegida de acuerdo con nuestra política de privacidad. Los campos marcados con un asterisco (*) son obligatorios para la creación de tu cuenta."
+    }
+  },
+  "completion": {
+    "title": "¡Felicidades!",
+    "subtitle": "Tu perfil está completo y estás listo para comenzar a usar nuestra plataforma de evaluación con IA. Estamos encantados de darte la bienvenida a nuestra comunidad.",
+    "nextSteps": {
+      "title": "Próximos pasos",
+      "teacher": [
+        "Crea tu primer examen",
+        "Configura las preguntas",
+        "Invita a tus estudiantes",
+        "Explora las funcionalidades de evaluación con IA",
+        "Consulta los análisis de rendimiento"
+      ],
+      "student": [
+        "Únete a tus clases",
+        "Consulta los exámenes disponibles",
+        "Envía tus respuestas",
+        "Recibe retroalimentación personalizada por IA",
+        "Sigue tu progreso académico"
+      ],
+      "button": {
+        "teacher": "Crear examen",
+        "student": "Ver exámenes"
+      }
+    },
+    "platformBenefits": {
+      "title": "Beneficios de la plataforma",
+      "benefits": [
+        {
+          "title": "Evaluación precisa con IA",
+          "description": "Evaluaciones consistentes y objetivas basadas en criterios pedagógicos"
+        },
+        {
+          "title": "Retroalimentación personalizada",
+          "description": "Comentarios detallados y adaptados al nivel de cada estudiante"
+        },
+        {
+          "title": "Análisis avanzados",
+          "description": "Visualiza tendencias y sigue el progreso a lo largo del tiempo"
+        },
+        {
+          "title": "Ahorro de tiempo",
+          "description": "Automatiza tareas repetitivas para concentrarte en la enseñanza"
+        }
+      ]
+    },
+    "resourceCenter": {
+      "teacher": {
+        "title": "Centro de recursos para profesores",
+        "description": "Hemos preparado guías y tutoriales para ayudarte a sacar el máximo provecho de nuestra plataforma de evaluación con IA."
+      },
+      "student": {
+        "title": "Centro de ayuda para estudiantes",
+        "description": "Hemos preparado recursos para ayudarte a tener éxito y sacar el máximo provecho de nuestra plataforma."
+      },
+      "buttons": [
+        "Guías de uso",
+        "Tutoriales en vídeo",
+        "Preguntas frecuentes",
+        "Contactar con soporte"
+      ]
+    }
+  },
+  "error": {
+    "title": "Ha ocurrido un error",
+    "description": "Lo sentimos, ha ocurrido un error al cargar la página. Por favor, inténtalo de nuevo más tarde.",
+    "tryAgain": "Reintentar"
+  },
+  "exams": {
+    "choices": {
+      "QCM": "Opción múltiple",
+      "document": "Documento",
+      "code": "Código"
+    },
+    "aiGeneration-generate": "Generar respuestas",
+    "addChoice": "Añadir opción",
+    "choice": "Opción del examen",
+    "createNew": "Crear nuevo examen",
+    "createDescription": "Crea un nuevo examen, tarea o proyecto para tus estudiantes.",
+    "type": "Tipo",
+    "selectType": "Selecciona el tipo de examen",
+    "typeExam": "Examen",
+    "typeAssignment": "Tarea",
+    "typeProject": "Proyecto",
+    "required": "Obligatorio",
+    "selectFormat": "Por favor, selecciona un formato de examen",
+    "formatDescription": "Elige el formato que mejor se adapte a tus necesidades de evaluación",
+    "selected": "Formato seleccionado con éxito",
+    "basicInfo": "Información básica",
+    "title": "Título",
+    "titlePlaceholder": "Introduce el título del examen",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Proporciona detalles sobre este examen",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de finalización",
+    "endDateHelp": "La fecha límite determina cuándo los estudiantes ya no podrán enviar sus respuestas",
+    "edit": "Editar",
+    "formatSettings": "Configuración de formato",
+    "qcm": "QCM",
+    "qcmDescription": "Preguntas de opción múltiple",
+    "pdf": "PDF",
+    "pdfDescription": "Documento PDF para completar",
+    "code": "Código",
+    "codeDescription": "Ejercicio de programación",
+    "maxAttempts": "Intentos máximos",
+    "maxAttemptsDescription": "Número de veces que un estudiante puede intentar el examen",
+    "uploadFile": "Subir archivo",
+    "chooseFile": "Elegir archivo",
+    "fileAdded": "Archivo añadido con éxito",
+    "questions": "Preguntas",
+    "addQuestion": "Añadir pregunta",
+    "question": "Pregunta",
+    "remove": "Eliminar",
+    "questionText": "Texto de la pregunta",
+    "questionTextPlaceholder": "Introduce tu pregunta aquí",
+    "correctionAi": "Guía de corrección con IA",
+    "correctionAiPlaceholder": "Introduce consejos para la corrección con IA",
+    "maxPoints": "Puntos máximos",
+    "review": "Revisión",
+    "format": "Formato",
+    "deadline": "Fecha límite",
+    "attachedFile": "Archivo adjunto",
+    "questionCount": "Número de preguntas",
+    "finalConfirmation": "Por favor, revisa toda la información antes de crear el examen",
+    "back": "Volver",
+    "next": "Siguiente paso",
+    "step1": "Información",
+    "step2": "Formato",
+    "step3": "Preguntas",
+    "step4": "Revisión",
+    "warning": "Advertencia",
+    "needOneQuestion": "Debes tener al menos una pregunta",
+    "error": "Error",
+    "titleRequired": "El título es obligatorio",
+    "fileRequired": "El archivo es obligatorio",
+    "questionsIncomplete": "Todas las preguntas deben estar completas",
+    "success": "Éxito",
+    "examCreated": "Examen creado con éxito",
+    "createFailed": "Error al crear el examen",
+    "unknownError": "Ha ocurrido un error desconocido",
+    "saving": "Guardando...",
+    "saveExam": "Guardar examen",
+    "documentUploadNotAllowed": "La subida de documentos no está permitida para este tipo de examen",
+    "programmingLanguage": "Lenguaje de programación",
+    "questionsNotRequiredForPDF": "Las preguntas no son obligatorias para exámenes PDF",
+    "uploadDocument": "Subir documento",
+    "aiGeneration": {
+      "title": "Generación de respuestas",
+      "generating": "Generando...",
+      "editAnswer": "Editar respuesta",
+      "saveAnswer": "Guardar respuesta",
+      "answer": "Respuesta",
+      "answerPlaceholder": "Respuesta generada por IA",
+      "regenerate": "Regenerar",
+      "preview": "Vista previa de preguntas y respuestas",
+      "error": "Error al generar respuestas",
+      "generate": "Generar respuestas",
+      "generating": "Generando respuestas...",
+      "selectModel": "Seleccionar modelo",
+      "regenerating": "Regenerando..."
+    },
+    "details": {
+      "title": "Detalles del examen",
+      "suggestedAnswer": "Respuesta sugerida"
+    },
+    "finalize": "Finalizar y terminar",
+    "answersUpdated": "Respuestas actualizadas con éxito",
+    "updateAnswersError": "Error al actualizar respuestas",
+    "examAlreadyCreated": "El examen ya ha sido creado"
+  },
+  "settings": {
+    "title": "Preferencias",
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Personaliza la apariencia de la aplicación",
+      "theme": {
+        "title": "Tema",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      },
+      "profile": {
+        "title": "Perfil",
+        "description": "Personaliza tu perfil"
+      },
+      "colorTheme": {
+        "title": "Tema de color",
+        "jade": "Jade",
+        "obsidian": "Obsidiana",
+        "amber": "Ámbar"
+      }
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "description": "Configura la recepción de notificaciones",
+      "email": {
+        "title": "Notificaciones por correo electrónico",
+        "description": "Recibir notificaciones por correo electrónico"
+      },
+      "security": {
+        "title": "Notificaciones de seguridad",
+        "description": "Recibir alertas de seguridad"
+      },
+      "promotional": {
+        "title": "Notificaciones promocionales",
+        "description": "Recibir promociones y actualizaciones"
+      }
+    },
+    "layout": {
+      "title": "Disposición",
+      "description": "Elige cómo mostrar la aplicación",
+      "sidebar": "Navegación lateral",
+      "topnav": "Navegación superior"
+    }
+  },
+  "calendar": {
+    "title": "Calendario de evaluaciones",
+    "navigation": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "today": "Hoy"
+    },
+    "views": {
+      "day": "Día",
+      "week": "Semana",
+      "month": "Mes",
+      "agenda": "Agenda",
+      "year": "Año"
+    },
+    "assignment": {
+      "add": "Añadir evaluación",
+      "details": "Detalles",
+      "delete": "Eliminar",
+      "close": "Cerrar",
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Código",
+        "DOCUMENT": "Documento"
+      }
+    },
+    "edit": {
+      "enable": "Activar modo edición",
+      "disable": "Desactivar modo edición",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "details": {
+      "title": "Detalles de la evaluación",
+      "info": {
+        "type": "Tipo",
+        "questions": "Preguntas",
+        "duration": "Duración",
+        "status": "Estado",
+        "description": "Descripción"
+      },
+      "status": {
+        "PENDING": "Pendiente",
+        "ACTIVE": "En curso",
+        "COMPLETED": "Completado"
+      },
+      "close": "Cerrar"
+    },
+    "sheet": {
+      "format": "Formato de envío",
+      "deadline": "Fecha límite",
+      "maxAttempts": "Intentos máximos",
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar esta evaluación?",
+      "type": "Tipo",
+      "questions": "Preguntas",
+      "duration": "Duración",
+      "status": "Estado",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de finalización"
+    },
+    "toast": {
+      "updateSuccess": "La evaluación se ha actualizado correctamente",
+      "updateError": "Ha ocurrido un error al actualizar la evaluación",
+      "deleteSuccess": "La evaluación se ha eliminado correctamente",
+      "deleteError": "Ha ocurrido un error al eliminar la evaluación",
+      "cannotEdit": "No puedes editar esta evaluación porque ya ha comenzado"
+    },
+    "dates": {
+      "days": {
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      },
+      "months": {
+        "january": "Enero",
+        "february": "Febrero",
+        "march": "Marzo",
+        "april": "Abril",
+        "may": "Mayo",
+        "june": "Junio",
+        "july": "Julio",
+        "august": "Agosto",
+        "september": "Septiembre",
+        "october": "Octubre",
+        "november": "Noviembre",
+        "december": "Diciembre"
+      },
+      "format": {
+        "full": "EEEE d MMMM yyyy",
+        "monthYear": "MMMM yyyy"
+      }
+    }
+  },
+  "exams-component": {
+    "title": "Exámenes",
+    "noExams": {
+      "title": "No hay exámenes disponibles",
+      "description": "Aún no tienes ningún examen asignado."
+    },
+    "tabs": {
+      "list": "Lista",
+      "calendar": "Calendario"
+    },
+    "assignment": {
+      "deadline": "Fecha límite",
+      "viewDetails": "Ver detalles",
+      "invite": "Invitar",
+      "status": {
+        "pending": "Pendiente",
+        "active": "Activo",
+        "completed": "Completado"
+      },
+      "type": {
+        "QCM": "QCM",
+        "CODE": "Código",
+        "DOCUMENT": "Documento"
+      },
+      "inviteLink": {
+        "title": "Enlace de invitación",
+        "description": "Comparte este enlace con tus estudiantes para que puedan unirse a esta tarea.",
+        "button": "Enlace de invitación",
+        "copy": "Copiar"
+      },
+      "questions": "preguntas",
+      "submissions": "envíos",
+      "students": "estudiantes",
+      "participation": "participación",
+      "upcoming": "Próximos",
+      "expired": "Expirado",
+      "notStarted": "Aún no ha comenzado",
+      "starts": "Comienza el",
+      "grade": "Calificación",
+      "loading": "Cargando...",
+      "viewResults": "Ver resultados",
+      "takeQuiz": "Hacer el cuestionario",
+      "uploadFile": "Subir archivo",
+      "writeCode": "Escribir código"
+    },
+    "details": {
+      "title": "Detalles de la tarea",
+      "back": "Volver",
+      "information": {
+        "title": "Información",
+        "type": "Tipo",
+        "questions": "Preguntas",
+        "duration": "Duración",
+        "status": "Estado",
+        "description": "Descripción"
+      },
+      "results": {
+        "title": "Resultados de los estudiantes",
+        "submissions": "envíos",
+        "students": "estudiantes",
+        "table": {
+          "student": "Estudiante",
+          "email": "Correo electrónico",
+          "status": "Estado",
+          "submissionDate": "Fecha de envío",
+          "score": "Puntuación"
+        },
+        "status": {
+          "completed": "Completado",
+          "accepted": "Aceptado",
+          "declined": "Rechazado",
+          "pending": "Pendiente"
+        }
+      }
+    },
+    "duration": {
+      "day": "día",
+      "days": "días",
+      "hour": "hora",
+      "hours": "horas",
+      "minute": "minuto",
+      "minutes": "minutos",
+      "undefined": "Duración no definida"
+    },
+    "toast": {
+      "linkCopied": {
+        "title": "Enlace copiado",
+        "description": "El enlace de invitación se ha copiado al portapapeles"
+      },
+      "statusUpdate": {
+        "success": "El estado se ha actualizado",
+        "error": "No se pudo actualizar el estado"
+      }
+    },
+    "status": {
+      "undefined": "No definido"
+    },
+    "score": {
+      "percentage": "%"
+    }
+  },
+  "dashboard": {
+    "teacher": {
+      "title": "Tablero de control del profesor",
+      "description": "Gestiona tus evaluaciones y sigue el progreso de tus estudiantes",
+      "metrics": {
+        "total_exams": "Total de evaluaciones",
+        "total_exams_description": "Número total de evaluaciones creadas",
+        "exams_in_progress": "En curso",
+        "exams_in_progress_description": "Evaluaciones actualmente activas",
+        "graded_exams": "Evaluaciones calificadas",
+        "graded_exams_description": "Evaluaciones completadas y calificadas",
+        "average_score": "Calificación promedio",
+        "average_score_description": "Promedio general de los estudiantes"
+      },
+      "recent_exams": {
+        "title": "Evaluaciones recientes",
+        "view_all": "Ver todas las evaluaciones",
+        "no_exams": "No hay evaluaciones recientes"
+      },
+      "quick_actions": {
+        "title": "Acciones rápidas",
+        "create_exam": "Crear evaluación",
+        "create_exam_description": "Comienza a crear una nueva evaluación",
+        "view_exams": "Ver mis evaluaciones",
+        "view_exams_description": "Accede a todas tus evaluaciones",
+        "view_settings": "Configuración",
+        "view_settings_description": "Configura tus preferencias"
+      }
+    },
+    "student": {
+      "title": "Tablero de control del estudiante",
+      "description": "Sigue tus evaluaciones y tu progreso",
+      "metrics": {
+        "completed_exams": "Evaluaciones completadas",
+        "completed_exams_description": "Evaluaciones que has completado",
+        "pending_exams": "Evaluaciones pendientes",
+        "pending_exams_description": "Evaluaciones por completar",
+        "average_score": "Calificación promedio",
+        "average_score_description": "Tu promedio general",
+        "next_deadline": "Próxima fecha límite",
+        "next_deadline_description": "Tu próxima evaluación"
+      },
+      "upcoming_exams": {
+        "title": "Evaluaciones próximas",
+        "view_all": "Ver todas las evaluaciones",
+        "no_exams": "No hay evaluaciones próximas",
+        "submit": "Comenzar"
+      },
+      "quick_actions": {
+        "title": "Acciones rápidas",
+        "view_available": "Ver evaluaciones disponibles",
+        "view_available_description": "Accede a tus evaluaciones activas",
+        "view_results": "Ver mis resultados",
+        "view_results_description": "Consulta tu rendimiento"
+      }
+    }
+  },
+  "exam-taking": {
+    "instructions": {
+      "title": "Instrucciones",
+      "qcm": "Selecciona la respuesta correcta para cada pregunta.",
+      "code": "Escribe tu código en el espacio proporcionado.",
+      "document": "Responde a las preguntas en las áreas de texto proporcionadas."
+    },
+    "maxPoints": "Puntos máximos",
+    "answerPlaceholder": "Escribe tu respuesta aquí...",
+    "codePlaceholder": "Escribe tu código {language} aquí...",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "submit": "Enviar",
+    "submitting": "Enviando...",
+    "autoSaving": "Guardando automáticamente...",
+    "autoSaved": "Guardado automáticamente",
+    "allQuestionsAnswered": "Todas las preguntas han sido respondidas",
+    "notAllQuestionsAnswered": "Algunas preguntas aún no tienen respuesta",
+    "timeUp": {
+      "title": "¡Tiempo agotado!",
+      "description": "Tu tiempo ha terminado. Tus respuestas se están enviando."
+    },
+    "timeWarning": {
+      "title": "¡Atención!",
+      "description": "Te quedan menos de 5 minutos para completar el examen."
+    },
+    "saveSuccess": {
+      "title": "Guardado",
+      "description": "Tus respuestas se han guardado correctamente."
+    },
+    "saveError": {
+      "title": "Error",
+      "description": "Ha ocurrido un error al guardar tus respuestas."
+    },
+    "submitSuccess": {
+      "title": "Enviado",
+      "description": "Tu examen se ha enviado correctamente."
+    },
+    "submitError": {
+      "title": "Error",
+      "description": "Ha ocurrido un error al enviar tu examen."
+    },
+    "confirmSubmitIncomplete": "Algunas preguntas no han sido respondidas. ¿Aún quieres enviar el examen?"
+  }
+}

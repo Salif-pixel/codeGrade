@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-
+import dashboadImage from "../../../../public/assets/dashboard-dark.png"
+import Image from "next/image";
 
 export default function Hero() {
     const t = useTranslations("hero-section")
@@ -83,7 +84,7 @@ export default function Hero() {
                         <div className="relative rounded-xl overflow-hidden shadow-2xl">
                             <div
                                 className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent z-10"></div>
-                            <img src="/assets/placeholder-dark.svg?height=480&width=620" alt="AI Grading Platform Dashboard"
+                            <Image src={dashboadImage} width={500} height={500} alt="AI Grading Platform Dashboard"
                                 className="w-full h-auto aspect-video" />
                         </div>
 

@@ -26,7 +26,7 @@ import { useCustomToast } from "@/components/alert/alert";
 
 
 
-export function SignInView() {
+export default function LoginPage() {
     const t = useTranslations('authentication');
     const { showToast } = useCustomToast();
 
@@ -175,10 +175,10 @@ export function SignInView() {
     };
 
     const signInProvider = async (provider: 'google' | 'github') => {
-        const data = await authClient.signIn.social({
+        await authClient.signIn.social({
             provider,
             callbackURL: `/${locale}/dashboard`,
-        })
+        });
     }
 
     return (
@@ -435,4 +435,3 @@ export function SignInView() {
     );
 };
 
-export default SignInView;

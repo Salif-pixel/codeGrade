@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React, {useState} from "react"
 import { useEffect, useRef } from "react"
 import type { User } from "@prisma/client"
 import HeaderDashboard from "./header-dashboard"
@@ -8,6 +8,7 @@ import SidebarDashboard from "./sidebar-dashboard"
 import { gsap } from "gsap"
 import { cn } from "@/lib/utils"
 import { useLayoutValue } from "@/hooks/use-layout-store"
+import {useIsMobile} from "@/hooks/use-mobile";
 
 export default function NavigationLayout({
                                              user,
@@ -16,12 +17,18 @@ export default function NavigationLayout({
     user: User
     children: React.ReactNode
 }) {
-    const layout = useLayoutValue((state) => state.layout) as string
+    const isMobile: boolean = useIsMobile();
+    const layout: string = useLayoutValue((state) => state.layout) as string
+    const [layoutVal, setLayoutVal] = useState(isMobile ? 'top' : layout);
 
     const containerRef = useRef<HTMLDivElement>(null)
     const headerRef = useRef<HTMLDivElement>(null)
     const sidebarRef = useRef<HTMLDivElement>(null)
     const mainRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        setLayoutVal(isMobile ? 'top' : layout)
+    }, [isMobile, layout]);
 
     // Animation when layout changes
     useEffect(() => {
@@ -45,7 +52,7 @@ export default function NavigationLayout({
         )
 
         // Layout specific animations
-        if (layout === "top" && headerRef.current) {
+        if (layoutVal === "top" && headerRef.current) {
             timeline
                 .fromTo(
                     headerRef.current,
@@ -59,7 +66,7 @@ export default function NavigationLayout({
                     { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
                     "-=0.3",
                 )
-        } else if (layout === "side" && sidebarRef.current) {
+        } else if (layoutVal === "side" && sidebarRef.current) {
             timeline
                 .fromTo(
                     sidebarRef.current,
@@ -74,15 +81,15 @@ export default function NavigationLayout({
                     "-=0.3",
                 )
         }
-    }, [layout])
+    }, [layoutVal])
 
     return (
         <div
             ref={containerRef}
-            className={cn("flex min-h-screen bg-background dark:bg-zinc-950", layout === "top" ? "flex-col" : "flex-row")}
+            className={cn("flex min-h-screen bg-background dark:bg-zinc-950", layoutVal === "top" ? "flex-col" : "flex-row")}
         >
 
-            {layout === "top" ? (
+            {layoutVal === "top" ? (
                 <>
                     <div ref={headerRef} className="relative z-10">
                         <HeaderDashboard user={user} />

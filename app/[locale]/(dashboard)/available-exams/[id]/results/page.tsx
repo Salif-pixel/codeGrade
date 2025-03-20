@@ -7,7 +7,11 @@ import { cn } from "@/lib/utils"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
-export default async function ExamResultsPage({ params }: { params: { id: Promise<string> } }) {
+
+
+export default async function ExamResultsPage(props: {
+  params: Promise<{ id: string }>}) {
+  const params = await props.params
   const header = await headers()
   const session = await auth.api.getSession({
     headers: header,

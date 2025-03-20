@@ -11,7 +11,7 @@ import {
     Clock,
     List,
 } from "lucide-react";
-import { motion, AnimatePresence, useMotionValue } from "framer-motion";
+import { motion, AnimatePresence} from "framer-motion";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -265,7 +265,6 @@ export function Calendar({ viewMode }: { viewMode: string }) {
         }
     }, [calendarView]);
 
-    const [scrollPosition, setScrollPosition] = useState<number>(0);
 
     // Ajoutez ces fonctions avant le return
     const getTimePosition = (time: string) => {
@@ -370,7 +369,7 @@ export function Calendar({ viewMode }: { viewMode: string }) {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="text-[#c9d1d9] border-[#30363d] hover:bg-[#30363d] transition-colors duration-200"
+                            className="text-[#c9d1d9] bg-zinc-900 border-[#30363d] hover:bg-[#30363d] transition-colors duration-200 "
                             onClick={goToToday}
                         >
                             <Clock className="h-4 w-4 mr-1" />
@@ -511,7 +510,6 @@ export function Calendar({ viewMode }: { viewMode: string }) {
 
                             {days.map((day) => {
                                 const dayAssignments = getAssignmentsForDay(day);
-                                const hasAssignments = dayAssignments.length > 0;
                                 const isToday = isCurrentMonth && day === currentDate;
                                 const isSelected = day === currentDay && calendarView === "month";
                                 const isWeekend = (day + firstDay - 1) % 7 === 5 || (day + firstDay - 1) % 7 === 6;
@@ -674,7 +672,7 @@ export function Calendar({ viewMode }: { viewMode: string }) {
                     </div>
                     <div className="flex items-center gap-1">
                         <div className="w-3 h-3 rounded-sm bg-[#388bfd]/50"></div>
-                        <span className="text-xs text-[#8b949e]">Aujourd'hui</span>
+                        <span className="text-xs  text-[#8b949e]">Aujourd&apos;hui</span>
                     </div>
                 </div>
             </div>
