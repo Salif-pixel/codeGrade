@@ -32,16 +32,16 @@ export default async function TakeExamPage({ params }: { params: Promise<{ id: s
   }
 
   if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.ACCEPTED) {
-    redirect("/available-exams");
+    redirect(`/available-exams`);
   }
 
   const now = new Date();
   if (exam.startDate && new Date(exam.startDate) > now) {
-    redirect("/available-exams?error=not_started");
+    redirect(`/available-exams?error=not_started`);
   }
 
   if (exam.endDate && new Date(exam.endDate) < now) {
-    redirect("/available-exams?error=expired");
+    redirect(`/available-exams?error=expired`);
   }
 
   const examData = {
