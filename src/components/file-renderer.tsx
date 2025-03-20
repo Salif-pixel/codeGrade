@@ -15,10 +15,7 @@ export default function FileRenderer({ file, content }: FileRendererProps) {
   const [activeTab, setActiveTab] = useState<string>("preview")
   const [pdfUrl, setPdfUrl] = useState<string>("")
 
-  console.log("--------------------------------\n",content,"\n--------------------------------");
-  console.log("--------------------------------\n",file,"\n--------------------------------");
   const fileType = getFileType(file)
-  console.log("--------------------------------\n",fileType,"\n--------------------------------");
 
   // Gestion de l'URL blob pour le PDF
   useEffect(() => {

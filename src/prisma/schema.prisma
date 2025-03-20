@@ -141,7 +141,7 @@ model Question {
   maxPoints           Float
   choices             String[] // Pour les QCM : tableau des choix possibles
   programmingLanguage String? // Pour les questions de Code : langage à utiliser
-  answer              String?          @db.VarChar(5000)
+  answer              String?          @db.VarChar(15000)
   exam                Exam             @relation("ExamQuestions", fields: [examId], references: [id], onDelete: Cascade)
   examId              String
   answers             QuestionAnswer[]
@@ -155,7 +155,7 @@ model Answer {
   attemptNumber Int              @default(1)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
-  content       String?          @db.VarChar(5000)
+  content       String?          @db.VarChar(15000)
   status        SubmissionStatus @default(PENDING)
 
   // Relations existantes
@@ -176,7 +176,7 @@ model Answer {
 // Nouveau modèle pour stocker les réponses aux questions
 model QuestionAnswer {
   id        String   @id @default(uuid())
-  content   String   @db.VarChar(5000)
+  content   String   @db.VarChar(15000)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

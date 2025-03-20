@@ -544,6 +544,8 @@ export async function submitExamAnswers(
         .replace(/\s+/g, ' ');
     };
 
+    console.log(" ---------------- answers ----------------\n", answers,"\n------------------------------------");
+
     for (const answer of answers) {
       const question = exam.questions.find(q => q.id === answer.questionId);
       if (!question || !question.answer) continue;
@@ -551,7 +553,7 @@ export async function submitExamAnswers(
       try {
         // Vérifier si content est déjà un objet et le parser de manière sécurisée
         let studentAnswer;
-        console.log("answersssss", answer.content);
+        console.log(" ---------------- answer ----------------\n", answer,"\n------------------------------------");
 
         try {
           studentAnswer = typeof answer.content === 'string'

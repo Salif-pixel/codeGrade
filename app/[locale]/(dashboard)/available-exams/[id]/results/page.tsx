@@ -42,13 +42,15 @@ export default async function ExamResultsPage({ params }: { params: { id: Promis
     }
   })
 
+  console.log(exam)
+
   if (!exam) {
     redirect("/404")
   }
 
   // Vérifier si l'utilisateur a bien complété cet examen
   if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.COMPLETED) {
-    redirect(`/available-exams/${await parameters.id}`)
+    redirect(`/fr/available-exams/${await parameters.id}`)
   }
 
   console.log(exam)

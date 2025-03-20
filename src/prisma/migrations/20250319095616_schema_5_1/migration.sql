@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Answer" ALTER COLUMN "content" SET DATA TYPE VARCHAR(15000);
+
+-- AlterTable
+ALTER TABLE "Question" ALTER COLUMN "answer" SET DATA TYPE VARCHAR(15000);
+
+-- AlterTable
+ALTER TABLE "QuestionAnswer" ALTER COLUMN "content" SET DATA TYPE VARCHAR(15000);
