@@ -983,7 +983,7 @@ Fournis une évaluation détaillée au format JSON suivant (sans backticks, sans
           }),
           student: { connect: { id: studentId } },
           exam: { connect: { id: examId } },
-          correction: { connect: { id: correction.id } },s
+          correction: { connect: { id: correction.id } },
           answer: { connect: { id: examAnswer.id } }
         }
       });
