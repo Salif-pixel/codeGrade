@@ -3,7 +3,9 @@ import { routing } from "./src/i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 import { navigationConfigForMiddleware } from "./src/lib/nav-config";
-import { Role, User } from "@prisma/client";
+import { Role, User } from "@prisma/client"
+
+export const dynamic = "force-dynamic";
 
 export default async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
