@@ -212,7 +212,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
   }
   
   const handleSubmit = async (formData: any) => {
-
+    console.log("submidddt", formData)
     setSubmitting(true);
     
     try {

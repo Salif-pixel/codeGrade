@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import {useLocale} from "next-intl";
 
 type Params = { id: string };
 
@@ -13,6 +14,7 @@ export async function generateMetadata({ params }: { params: Params }) {
     where: { id: params.id },
     select: { title: true, description: true },
   });
+
 
   if (!exam) {
     return {
@@ -33,6 +35,7 @@ export default async function TakeExamPage({ params }: { params: Params }) {
   const session = await auth.api.getSession({
     headers: header,
   });
+  const local = 'fr'
 
   if (!session?.user) {
     redirect(`/auth/login?callbackUrl=/available-exams/${params.id}`);
@@ -53,16 +56,16 @@ export default async function TakeExamPage({ params }: { params: Params }) {
   }
 
   if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.ACCEPTED) {
-    redirect("/available-exams");
+    redirect(`/${local}/available-exams`);
   }
 
   const now = new Date();
   if (exam.startDate && new Date(exam.startDate) > now) {
-    redirect("/available-exams?error=not_started");
+    redirect(`/${local}/available-exams?error=not_started`);
   }
 
   if (exam.endDate && new Date(exam.endDate) < now) {
-    redirect("/available-exams?error=expired");
+    redirect(`/${local}/available-exams?error=expired`);
   }
 
   const examData = {
