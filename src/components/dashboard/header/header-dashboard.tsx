@@ -9,10 +9,6 @@ import {
     Settings,
     Terminal,
     User2,
-    LayoutDashboard,
-    ClipboardCheck,
-    FileDown,
-    BarChart3,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,13 +30,14 @@ import LanguageSwitcher from "@/components/internalization/language-switcher"
 import UserDrawer from "./user-drawer"
 import { useTranslations } from "next-intl"
 import Navigation from "@/components/navigation/Navigation"
-import {Link} from "@/i18n/navigation";
+import {Link, useRouter} from "@/i18n/navigation";
 import {SignOut} from "@/actions/signOutactions";
+import {authClient} from "@/lib/auth-client";
 
 export default function HeaderDashboard({ user }: { user: User }) {
     const [searchOpen, setSearchOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
-
+    const router = useRouter()
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -63,6 +60,15 @@ export default function HeaderDashboard({ user }: { user: User }) {
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
+    const handleSignOut = async (event:any) => {
+        event.preventDefault(); // Empêche le rechargement de la page
+        try {
+            await authClient.signOut();
+            router.push('/login'); // Redirige vers la page de connexion après la déconnexion
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion :', error);
+        }
+    };
     const t = useTranslations("dropdown-user")
 
     return (
@@ -154,7 +160,7 @@ export default function HeaderDashboard({ user }: { user: User }) {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-destructive focus:text-destructive">
 
-                                        <form action={SignOut}>
+                                        <form onSubmit={(e) => handleSignOut(e)}>
                                             <Button
                                                 type="submit"
                                                 variant="outline"

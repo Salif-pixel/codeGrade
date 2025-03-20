@@ -7,8 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/theme/button-theme"
 import LanguageSwitcher from "@/components/internalization/language-switcher"
-import { usePathname } from "next/navigation"
-import { Link } from "@/i18n/navigation"
+import {Link, useRouter} from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
 import {
     Bell,
@@ -19,16 +18,17 @@ import {
     ChevronLeft,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { SignOut } from "@/actions/signOutactions"
 import SearchDialog from "../search/search-dialog"
 import { navigationConfig } from "@/lib/nav-config"
+import {authClient} from "@/lib/auth-client";
+import {usePathname} from "@/i18n/navigation";
 
 export default function SidebarDashboard({ user }: { user: User }) {
     const [collapsed, setCollapsed] = useState(false)
     const [searchOpen, setSearchOpen] = useState(false)
     const pathname = usePathname()
     const t = useTranslations("dropdown-user")
-
+    const router = useRouter()
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -44,7 +44,15 @@ export default function SidebarDashboard({ user }: { user: User }) {
     const filteredNavigation = navigationConfig().filter((item) => 
         item.roles.includes(user.role) && !item.isProtectedRoute
     )
-
+    const handleSignOut = async (event:any) => {
+        event.preventDefault(); // Empêche le rechargement de la page
+        try {
+            await authClient.signOut();
+            router.push('/login'); // Redirige vers la page de connexion après la déconnexion
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion :', error);
+        }
+    };
     return (
         <>
             <div
@@ -162,24 +170,21 @@ export default function SidebarDashboard({ user }: { user: User }) {
 
                 {/* Logout */}
                 <div className="border-t p-4">
-                    <form action={SignOut}>
+                    <form onSubmit={(e) => handleSignOut(e)}>
                         <Button
                             type="submit"
                             variant="outline"
-                            className={cn(
-                                "text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20",
-                                collapsed ? "w-full px-0 justify-center" : "w-full justify-start gap-3",
-                            )}
+                            className="w-full justify-start gap-3 h-10 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
                         >
-                            <LogOut className="h-4 w-4" />
-                            {!collapsed && <span>Déconnexion</span>}
+                            <LogOut className="h-4 w-4"/>
+                            <span>{t('logout')}</span>
                         </Button>
                     </form>
                 </div>
             </div>
 
             {/* Search Dialog */}
-            <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+            <SearchDialog open={searchOpen} onOpenChange={setSearchOpen}/>
         </>
     )
 }

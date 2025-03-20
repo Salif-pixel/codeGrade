@@ -105,7 +105,7 @@ export default function UserDrawer({ user }: { user: User }) {
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-destructive focus:text-destructive">
 
-                                        <form action={SignOut}>
+                                        <form onSubmit={(e) => handleSignOut(e)}>
                                             <Button
                                                 type="submit"
                                                 variant="outline"
@@ -217,7 +217,7 @@ export default function UserDrawer({ user }: { user: User }) {
                     className="w-full justify-start gap-3 h-10 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Déconnexion</span>
+                  <span>{t('logout')}</span>
                 </Button>
               </form>
             </div>
