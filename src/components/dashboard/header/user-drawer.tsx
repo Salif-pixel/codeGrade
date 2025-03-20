@@ -39,11 +39,20 @@ import {ModeToggle} from "@/components/theme/button-theme"
 import LanguageSwitcher from "@/components/internalization/language-switcher"
 import { navigationConfig } from "@/lib/nav-config"
 import { useTranslations } from "next-intl"
+import {authClient} from "@/lib/auth-client";
 export default function UserDrawer({ user }: { user: User }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
-
+    const handleSignOut = async (event:any) => {
+        event.preventDefault(); // Empêche le rechargement de la page
+        try {
+            await authClient.signOut();
+            router.push('/login'); // Redirige vers la page de connexion après la déconnexion
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion :', error);
+        }
+    };
   const navItems = navigationConfig().filter(item => item.roles.includes(user.role))
   const t = useTranslations("dropdown-user")
   return (
@@ -201,7 +210,7 @@ export default function UserDrawer({ user }: { user: User }) {
 
             {/* Logout Button */}
             <div className="border-t p-4 mt-auto">
-              <form action={SignOut}>
+              <form onSubmit={(e) => handleSignOut(e)}>
                 <Button
                     type="submit"
                     variant="outline"
