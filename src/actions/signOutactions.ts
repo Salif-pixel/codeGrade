@@ -21,7 +21,7 @@ export async function SignOut() {
         if (cookie.name.toLowerCase().includes('auth') ||
             cookie.name.toLowerCase().includes('session') ||
             cookie.name.toLowerCase().includes('token')) {
-            cookieStore.delete(cookie.name);
+            cookieStore.set(cookie.name, "", { expires: new Date(0), path: "/" });
         }
     }
 
