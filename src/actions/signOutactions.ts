@@ -22,7 +22,11 @@ export async function SignOut() {
         if (cookie.name.toLowerCase().includes('auth') ||
             cookie.name.toLowerCase().includes('session') ||
             cookie.name.toLowerCase().includes('token')) {
-            cookieStore.set(cookie.name, "", { expires: new Date(0), path: "/" });
+            cookieStore.set(cookie.name, "", {
+                expires: new Date(0),
+                path: "/",
+                domain: '.vercel.app', // Domaine correct pour Vercel
+            });
         }
     }
     revalidatePath(`[locale]/(dashboard)/dashbaord`)
