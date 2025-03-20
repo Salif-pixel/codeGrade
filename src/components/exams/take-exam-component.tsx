@@ -219,15 +219,17 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       let formattedAnswers : any;
       
       if (exam.type == ExamType.QCM) {
-        formattedAnswers = Object.entries(formData).map(([questionId, answer]) => ({
-          questionId,
-          content: JSON.stringify({
-            type: Array.isArray(answer) ? "multiple" : "single",
-            correctAnswers: answer,
-            explanation: "",
-            feedback: { correct: "", incorrect: "" }
-          })
-        }));
+        // formattedAnswers = Object.entries(formData).map(([questionId, answer]) => ({
+        //   questionId,
+        //   content: JSON.stringify({
+        //     type: Array.isArray(answer) ? "multiple" : "single",
+        //     correctAnswers: answer,
+        //     explanation: "",
+        //     feedback: { correct: "", incorrect: "" }
+        //   })
+        // }));
+        formattedAnswers=formData
+        console.log("-------------------formatedanswer--------------",formattedAnswers+"\n-----------------")
       } else if (exam.type == ExamType.CODE) {
         let codeData;
         if (Array.isArray(formData) && formData.length > 0) {
@@ -281,8 +283,11 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       let result;
       if (exam.type == ExamType.DOCUMENT) {
         result = await evaluatePdfSubmission(exam.id, userId, formattedAnswers, true);
+      } else if (exam.type== ExamType.QCM) {
+        result = await submitExamAnswers(exam.id, userId, formData, true);
       } else {
-        result = await submitExamAnswers(exam.id, userId, formattedAnswers, false);
+        result = await submitExamAnswers(exam.id, userId, formattedAnswers, true);
+
       }
       
       if (result.success) {

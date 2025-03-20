@@ -564,7 +564,7 @@ export async function submitExamAnswers(
           studentAnswer = answer.content; // Utiliser la réponse brute si le parsing échoue
         }
 
-        console.log("studentAnswer parsed:", studentAnswer);
+
 
         let correctAnswerData;
         try {
@@ -646,7 +646,8 @@ Retourne UNIQUEMENT un objet JSON sans formatage markdown, sans backticks \`\`\`
 
           totalScore += evaluation.score;
         } else {
-          // Logique existante pour QCM
+          console.log("studentAnswer parsed:", studentAnswer);
+          console.log("correctAnswer parsed:", correctAnswerData);
           let isCorrect = false;
 
           if (correctAnswerData.type === "single") {
