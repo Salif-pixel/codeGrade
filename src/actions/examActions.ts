@@ -983,13 +983,13 @@ Fournis une évaluation détaillée au format JSON suivant (sans backticks, sans
           }),
           student: { connect: { id: studentId } },
           exam: { connect: { id: examId } },
-          correction: { connect: { id: correction.id } },
+          correction: { connect: { id: correction.id } },s
           answer: { connect: { id: examAnswer.id } }
         }
       });
     }
 
-    revalidatePath(`/available-exams/${examId}`);
+    revalidatePath(`/[locale]/available-exams/${examId}`);
     return { success: true, evaluation };
   } catch (error) {
     console.error('Error evaluating PDF submission:', error);

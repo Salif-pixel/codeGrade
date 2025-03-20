@@ -68,7 +68,7 @@ export default async function ExamPage({ params }: { params: { id: string } }) {
   }
 
   // Si l'utilisateur est déjà participant et a accepté, rediriger vers l'examen
-  if (existingParticipant?.status === ParticipantStatus.ACCEPTED) {
+  if (existingParticipant?.status !== ParticipantStatus.PENDING) {
     redirect(`/${local}/available-exams/`)
   }
 

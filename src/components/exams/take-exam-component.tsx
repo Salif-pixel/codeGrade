@@ -298,10 +298,9 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           variant: "default"
         });
         
-        // Rediriger vers la page des résultats après un court délai
-        setTimeout(() => {
+
           router.push(`/${local}/available-exams/${exam.id}/results`);
-        }, 500);
+
       } else {
         setAlert({
           show: true,
