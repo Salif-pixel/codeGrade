@@ -4,12 +4,12 @@ import { navigationConfig } from "@/lib/nav-config";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import { Role } from "@prisma/client";
-import { Badge } from "../ui/badge";
+import { Badge } from "../../ui/badge";
 import { usePathname } from "next/navigation";
 import { log } from "console";
 
 const Navigation = ({ userRole }: { userRole: Role }) => {
-    const filteredNavigation = navigationConfig().filter((item) => 
+    const filteredNavigation = navigationConfig().filter((item) =>
         item.roles.includes(userRole) && !item.isProtectedRoute
     );
 

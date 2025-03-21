@@ -5,8 +5,8 @@ import type { User } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { ModeToggle } from "@/components/theme/button-theme"
-import LanguageSwitcher from "@/components/internalization/language-switcher"
+import { ModeToggle } from "@/components/utilities/theme/button-theme"
+import LanguageSwitcher from "@/components/utilities/internalization/language-switcher"
 import {Link, useRouter} from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
 import {
@@ -41,7 +41,7 @@ export default function SidebarDashboard({ user }: { user: User }) {
         return () => document.removeEventListener("keydown", down)
     }, [])
 
-    const filteredNavigation = navigationConfig().filter((item) => 
+    const filteredNavigation = navigationConfig().filter((item) =>
         item.roles.includes(user.role) && !item.isProtectedRoute
     )
     const handleSignOut = async (event:any) => {
@@ -102,7 +102,7 @@ export default function SidebarDashboard({ user }: { user: User }) {
                                 </div>
                                 {!collapsed &&
                                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-                                 <span className="text-xs">⌘</span>K 
+                                 <span className="text-xs">⌘</span>K
                                 </kbd>}
                             </button>
                 </div>
@@ -145,15 +145,15 @@ export default function SidebarDashboard({ user }: { user: User }) {
                                 3
                             </span>
                         </Button>
-                        <div className={cn("overflow-hidden transition-all duration-300", 
+                        <div className={cn("overflow-hidden transition-all duration-300",
                             collapsed ? "w-0" : "w-auto"
                         )}>
                             <span className="text-sm font-medium whitespace-nowrap">Notifications</span>
                         </div>
                         <div className={cn(
                             "flex transition-all duration-300",
-                            collapsed 
-                                ? "opacity-0 w-0" 
+                            collapsed
+                                ? "opacity-0 w-0"
                                 : "opacity-100 items-center justify-between gap-3"
                         )}>
                             <ModeToggle className="bg-background" />

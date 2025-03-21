@@ -25,11 +25,11 @@ import SearchDialog from "../search/search-dialog"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { type User } from "@prisma/client"
-import { ModeToggle } from "@/components/theme/button-theme"
-import LanguageSwitcher from "@/components/internalization/language-switcher"
+import { ModeToggle } from "@/components/utilities/theme/button-theme"
+import LanguageSwitcher from "@/components/utilities/internalization/language-switcher"
 import UserDrawer from "./user-drawer"
 import { useTranslations } from "next-intl"
-import Navigation from "@/components/navigation/Navigation"
+import Navigation from "@/components/utilities/navigation/Navigation"
 import {Link, useRouter} from "@/i18n/navigation";
 import {SignOut} from "@/actions/signOutactions";
 import {authClient} from "@/lib/auth-client";

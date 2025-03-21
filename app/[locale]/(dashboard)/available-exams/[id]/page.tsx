@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import {  ParticipantStatus } from "@prisma/client"
-import TakeExamComponent from "@/components/exams/take-exam-component"
+import TakeExamComponent from "@/components/dashboard/exams/take-exam-component"
 
 export default async function TakeExamPage({ params }: { params: Promise<{ id: string }> }) {
   const header = await headers()

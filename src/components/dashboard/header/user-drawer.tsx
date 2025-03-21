@@ -35,8 +35,8 @@ import { Link } from "@/i18n/navigation"
 import type { User } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import { SignOut } from "@/actions/signOutactions"
-import {ModeToggle} from "@/components/theme/button-theme"
-import LanguageSwitcher from "@/components/internalization/language-switcher"
+import {ModeToggle} from "@/components/utilities/theme/button-theme"
+import LanguageSwitcher from "@/components/utilities/internalization/language-switcher"
 import { navigationConfig } from "@/lib/nav-config"
 import { useTranslations } from "next-intl"
 import {authClient} from "@/lib/auth-client";
@@ -126,7 +126,7 @@ export default function UserDrawer({ user }: { user: User }) {
                   {user?.email || "No email"}
                 </span>
                 </div>
-                
+
               </div>
             </div>
 

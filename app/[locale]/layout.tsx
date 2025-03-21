@@ -8,7 +8,7 @@ import { Metadata } from "next";
 import { Locale } from "@/i18n/routing";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
-import TopLoader from "@/components/top-loader";
+import TopLoader from "@/components/utilities/top-loader";
 import { EdgeStoreProvider } from "@/lib/edgestore";
 
 const geistSans = Geist({

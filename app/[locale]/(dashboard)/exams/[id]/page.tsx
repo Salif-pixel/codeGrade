@@ -1,6 +1,6 @@
 
 
-import ExamInvitation from "@/components/exams/exam-invitation"
+import ExamInvitation from "@/components/dashboard/exams/exam-invitation"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers";

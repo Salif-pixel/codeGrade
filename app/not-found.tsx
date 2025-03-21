@@ -2,7 +2,7 @@
 import "./[locale]/globals.css";
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import TetrisGame from "@/components/NotFound/tetris-game";
+import TetrisGame from "@/components/pages/NotFound/tetris-game";
 
 
 export default function NotFound() {

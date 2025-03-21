@@ -12,9 +12,9 @@ import { ExamType } from "@prisma/client"
 import { Clock, Save, Send, AlertCircle, CheckCircle, XCircle } from "lucide-react"
 import { evaluatePdfSubmission, extractContentFromDocument, submitExamAnswers } from "@/actions/examActions"
 import { cn } from "@/lib/utils"
-import QuizForm from "../dashboard/test/Qcm/qcm";
-import PdfComponent from "../dashboard/test/Document/pdf-component"
-import CodeComponent from "../dashboard/test/Code/code-component"
+import QuizForm from "../test/Qcm/qcm";
+import PdfComponent from "../test/Document/pdf-component"
+import CodeComponent from "../test/Code/code-component"
 
 
 type Question = {
@@ -59,11 +59,11 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: string[] }>({});
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("instructions")
-  
+
   // Initialiser les réponses à partir des réponses existantes
   useEffect(() => {
     const initialAnswers: Record<string, string | string[]> = {}
-    
+
     exam.questions.forEach(question => {
       if (question.studentAnswer) {
         if (question.choices && question.choices.length > 0) {
@@ -77,23 +77,23 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         initialAnswers[question.id] = question.choices && question.choices.length > 0 ? [] : ""
       }
     })
-    
+
     setAnswers(initialAnswers)
   }, [exam.questions])
-  
+
   // Gérer le compte à rebours
   useEffect(() => {
     if (!exam.timeRemaining) return
-    
+
     const updateTimeLeft = () => {
       const now = new Date().getTime()
       const distance = exam.timeRemaining ? exam.timeRemaining - (now - startTime): 0
-      
+
       if (distance <= 0) {
         setTimeLeft("00:00:00")
         clearInterval(timer)
         handleSubmit({})
-        
+
         setAlert({
           show: true,
           title: t("timeUp.title"),
@@ -104,13 +104,13 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         const hours = Math.floor(distance / (1000 * 60 * 60))
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
         const seconds = Math.floor((distance % (1000 * 60)) / 1000)
-        
+
         setTimeLeft(
           `${hours.toString().padStart(2, "0")}:${minutes
             .toString()
             .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
         )
-        
+
         // Avertissement 5 minutes avant la fin
         if (distance <= 5 * 60 * 1000 && distance > 4.9 * 60 * 1000) {
           setAlert({
@@ -122,47 +122,47 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         }
       }
     }
-    
+
     const startTime = new Date().getTime()
     updateTimeLeft()
     const timer = setInterval(updateTimeLeft, 1000)
-    
+
     return () => clearInterval(timer)
   }, [exam.timeRemaining, t])
-  
+
   // Auto-sauvegarde toutes les 2 minutes
   useEffect(() => {
     if (Object.keys(answers).length === 0) return
-    
+
     const timer = setInterval(() => {
       handleSave(true)
     }, 2 * 60 * 1000)
-    
+
     return () => clearInterval(timer)
   }, [answers])
-  
+
   const handleAnswerChange = (questionId: string, selectedAnswers: string[]) => {
     setQuizAnswers(prev => ({
       ...prev,
       [questionId]: selectedAnswers
     }));
   };
-  
+
   const handleSave = async (isAutoSave = false) => {
     if (isAutoSave) {
       setAutoSaveMessage(t("autoSaving"))
     } else {
       setSaving(true)
     }
-    
+
     try {
       const answersToSave = Object.entries(answers).map(([questionId, value]) => ({
         questionId,
         content: Array.isArray(value) ? value.join(', ') : value as string
       }))
-      
+
       const result = await submitExamAnswers(exam.id, userId, answersToSave, false)
-      
+
       if (result.success) {
         if (!isAutoSave) {
           setAlert({
@@ -171,7 +171,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             description: t("saveSuccess.description"),
             variant: "default"
           })
-          
+
           // Masquer l'alerte après 3 secondes
           setTimeout(() => setAlert({ show: false, title: "", description: "" }), 3000)
         } else {
@@ -186,7 +186,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
             description: t("saveError.description"),
             variant: "destructive"
           })
-          
+
           // Masquer l'alerte après 3 secondes
           setTimeout(() => setAlert({ show: false, title: "", description: "" }), 3000)
         }
@@ -200,7 +200,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           description: t("saveError.description"),
           variant: "destructive"
         })
-        
+
         // Masquer l'alerte après 3 secondes
         setTimeout(() => setAlert({ show: false, title: "", description: "" }), 3000)
       }
@@ -210,14 +210,14 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       }
     }
   }
-  
+
   const handleSubmit = async (formData: any) => {
     console.log("submidddt", formData)
     setSubmitting(true);
-    
+
     try {
       let formattedAnswers : any;
-      
+
       if (exam.type == ExamType.QCM) {
         // formattedAnswers = Object.entries(formData).map(([questionId, answer]) => ({
         //   questionId,
@@ -242,7 +242,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         } else {
           codeData = formData;
         }
-        
+
         formattedAnswers = [{
           questionId: exam.questions[0].id,
           content: JSON.stringify({
@@ -264,7 +264,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         }
         const blob = await response.blob();
         const file = new File([blob], "exam.pdf", { type: "application/pdf" });
-        
+
         const examText = await extractContentFromDocument(file, "pdf")
         // console.log(exam)
         formattedAnswers = {
@@ -289,7 +289,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
         result = await submitExamAnswers(exam.id, userId, formattedAnswers, true);
 
       }
-      
+
       if (result.success) {
         setAlert({
           show: true,
@@ -297,7 +297,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           description: t("submitSuccess.description"),
           variant: "default"
         });
-        
+
 
           router.push(`/${local}/available-exams/${exam.id}/results`);
 
@@ -320,7 +320,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       setSubmitting(false);
     }
   };
-  
+
   const isFormComplete = () => {
     return exam.questions.every(q => {
       const answer = answers[q.id]
@@ -356,7 +356,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
 
     handleSubmit(formattedAnswers);
   };
-  
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       {alert.show && (
@@ -366,13 +366,13 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           <AlertDescription>{alert.description}</AlertDescription>
         </Alert>
       )}
-      
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{exam.title}</h1>
           <p className="text-muted-foreground">{exam.description}</p>
         </div>
-        
+
         {timeLeft && (
           <div className="flex items-center gap-2 text-lg font-semibold">
             <Clock className={cn(
@@ -387,12 +387,12 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
           </div>
         )}
       </div>
-      
+
       {exam.type === ExamType.QCM ? (
-        <QuizForm 
-          questions={formatQuestionsForQuizForm()} 
-          onSubmit={handleQuizSubmit} 
-          isSubmitting={submitting} 
+        <QuizForm
+          questions={formatQuestionsForQuizForm()}
+          onSubmit={handleQuizSubmit}
+          isSubmitting={submitting}
         />
       ) : exam.type === ExamType.DOCUMENT ? (
         <PdfComponent
@@ -433,7 +433,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
                       </p>
                     </div>
                   </div>
-                  
+
                   {question.programmingLanguage ? (
                     <Textarea
                       value={answers[question.id] as string || ""}
@@ -454,13 +454,13 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
                             onChange={(e) => {
                               const currentAnswers = quizAnswers[question.id] || [];
                               let newAnswers;
-                              
+
                               if (e.target.checked) {
                                 newAnswers = [...currentAnswers, choice];
                               } else {
                                 newAnswers = currentAnswers.filter(a => a !== choice);
                               }
-                              
+
                               handleAnswerChange(question.id, newAnswers);
                             }}
                             className="h-4 w-4"
@@ -474,7 +474,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
               ))}
             </CardContent>
           </Card>
-          
+
           <div className="flex justify-between items-center">
             <div className="text-sm">
               {autoSaveMessage && (
@@ -496,7 +496,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
                 </span>
               )}
             </div>
-            
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -506,7 +506,7 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
                 <Save className="mr-2 h-4 w-4" />
                 {saving ? t("saving") : t("save")}
               </Button>
-              
+
               <Button
                 onClick={handleSubmit}
                 disabled={submitting}
@@ -527,4 +527,4 @@ export default function TakeExamComponent({ exam, userId }: { exam: ExamData; us
       )}
     </div>
   )
-} 
+}

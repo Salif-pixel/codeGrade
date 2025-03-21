@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,46 +20,45 @@ enum ExamType {
 }
 
 enum ExamStatus {
-  PENDING // En attente de la date de début
-  ACTIVE // En cours
-  COMPLETED // Terminé (date de fin dépassée)
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum ParticipationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
 }
 
 enum SubmissionStatus {
-  PENDING // En attente de correction
-  CORRECTED // Corrigé
-  REVISED // Révisé après correction
-}
-
-enum ParticipantStatus {
-  PENDING // En attente de réponse
-  ACCEPTED // A accepté l'invitation
-  DECLINED // A refusé l'invitation
-  COMPLETED // A terminé l'examen
+  PENDING
+  CORRECTED
+  REVISED
 }
 
 model User {
-  id                 String            @id
-  email              String            @unique
-  name               String?
-  profileCompleted   Boolean           @default(false)
-  emailVerified      Boolean
-  image              String?
-  background         String?
-  role               Role              @default(STUDENT)
-  createdAt          DateTime
-  updatedAt          DateTime
-  website            String?
-  preferredLanguage  String?
-  technologies       String[]
-  passions           String[]
-  sessions           Session[]
-  accounts           Account[]
-  exams              Exam[]            @relation("ExamsCreated")
-  answers            Answer[]
-  grades             Grade[]
-  Correction         Correction[]
-  participatingExams ExamParticipant[]
+  id                String    @id
+  email             String    @unique
+  name              String?
+  profileCompleted  Boolean   @default(false)
+  emailVerified     Boolean
+  image             String?
+  background        String?
+  role              Role      @default(STUDENT)
+  createdAt         DateTime
+  updatedAt         DateTime
+  website           String?
+  preferredLanguage String?
+  technologies      String[]
+  passions          String[]
+  sessions          Session[]
+  accounts          Account[]
+
+  createdExams   Exam[]
+  participations ExamParticipation[]
+  submissions    Submission[]
 
   @@map("user")
 }
@@ -113,122 +109,114 @@ model Verification {
 }
 
 model Exam {
-  id             String     @id @default(uuid())
-  title          String
-  description    String?
-  filePath       String?
-  format         String?
-  type           ExamType
-  maxAttempts    Int        @default(1)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  startDate      DateTime?
-  endDate        DateTime?
-  status         ExamStatus @default(PENDING)
-  fileCorrection String?
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  type        ExamType
+  status      ExamStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  questions    Question[]        @relation("ExamQuestions")
-  createdBy    User              @relation("ExamsCreated", fields: [createdById], references: [id])
-  createdById  String
-  answers      Answer[]          @relation("ExamAnswers")
-  grades       Grade[]           @relation("ExamGrades")
-  participants ExamParticipant[]
+  // Fichiers et corrections
+  examDocumentPath      String?
+  teacherCorrectionPath String?
+  aiCorrection          String?
+
+  // Questions (uniquement pour QCM/CODE)
+  questions Question[]
+
+  // Gestion des invitations
+  inviteCode   String?   @unique
+  inviteExpiry DateTime?
+
+  // Relations
+  creator      User                @relation(fields: [creatorId], references: [id])
+  creatorId    String
+  submissions  Submission[]
+  participants ExamParticipation[]
+  corrections  Correction[]
+}
+
+model ExamParticipation {
+  id       String              @id @default(uuid())
+  status   ParticipationStatus @default(PENDING)
+  joinedAt DateTime?
+  exam     Exam                @relation(fields: [examId], references: [id])
+  examId   String
+  user     User                @relation(fields: [userId], references: [id])
+  userId   String
+
+  @@unique([examId, userId])
 }
 
 model Question {
-  id                  String           @id @default(uuid())
+  id                  String   @id @default(uuid())
   text                String
   maxPoints           Float
-  choices             String[] // Pour les QCM : tableau des choix possibles
-  programmingLanguage String? // Pour les questions de Code : langage à utiliser
-  answer              String?          @db.VarChar(15000)
-  exam                Exam             @relation("ExamQuestions", fields: [examId], references: [id], onDelete: Cascade)
-  examId              String
-  answers             QuestionAnswer[]
+  // Pour QCM
+  choices             String[]
+  correctAnswer       String[]
+  explanation         String?
+  feedbackCorrect     String?
+  feedbackIncorrect   String?
+  // Pour CODE
+  programmingLanguage String?
+  testCases           String[]
 
-  @@index([examId])
+  exam   Exam     @relation(fields: [examId], references: [id])
+  examId String
+  Answer Answer[]
 }
 
-model Answer {
+model Submission {
   id            String           @id @default(uuid())
-  filePath      String
   attemptNumber Int              @default(1)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  content       String?          @db.VarChar(15000)
   status        SubmissionStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
 
-  // Relations existantes
-  student   User   @relation(fields: [studentId], references: [id])
-  studentId String
-  exam      Exam   @relation("ExamAnswers", fields: [examId], references: [id], onDelete: Cascade)
-  examId    String
+  // Pour DOCUMENT
+  documentPath String?
 
-  // Nouvelle relation pour les réponses aux questions
-  questionAnswers QuestionAnswer[]
+  // Pour QCM/CODE
+  answers Answer[]
 
-  corrections Correction[] @relation("AnswerCorrections")
-  grade       Grade?
+  // Relations
+  student    User        @relation(fields: [studentId], references: [id])
+  studentId  String
+  exam       Exam        @relation(fields: [examId], references: [id])
+  examId     String
+  correction Correction?
 
   @@unique([studentId, examId, attemptNumber])
 }
 
-// Nouveau modèle pour stocker les réponses aux questions
-model QuestionAnswer {
-  id        String   @id @default(uuid())
-  content   String   @db.VarChar(15000)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  answer     Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
-  answerId   String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId String
-
-  @@unique([answerId, questionId])
+model Answer {
+  id           String     @id @default(uuid())
+  content      String
+  question     Question   @relation(fields: [questionId], references: [id])
+  questionId   String
+  submission   Submission @relation(fields: [submissionId], references: [id])
+  submissionId String
 }
 
 model Correction {
-  id            String   @id @default(uuid())
-  aiFeedback    String
-  autoScore     Float
-  manualScore   Float?
-  improvement   String?
-  correctedBy   User?    @relation(fields: [correctedById], references: [id])
-  correctedById String?
-  createdAt     DateTime @default(now())
+  id          String  @id @default(uuid())
+  aiFeedback  String
+  autoScore   Float
+  manualScore Float?
+  finalScore  Float
+  improvement String?
+  isRevised   Boolean @default(false)
+  comments    String?
 
-  answer   Answer  @relation("AnswerCorrections", fields: [answerId], references: [id], onDelete: Cascade)
-  answerId String
-  grades   Grade[]
-}
+  evaluation String?
 
-model Grade {
-  id         String  @id @default(uuid())
-  finalScore Float
-  isRevised  Boolean @default(false)
-  comments   String?
-
-  student      User       @relation(fields: [studentId], references: [id])
-  studentId    String
-  exam         Exam       @relation("ExamGrades", fields: [examId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt()
+  submission   Submission @relation(fields: [submissionId], references: [id])
+  submissionId String     @unique
+  exam         Exam       @relation(fields: [examId], references: [id])
   examId       String
-  correction   Correction @relation(fields: [correctionId], references: [id], onDelete: Cascade)
-  correctionId String
-  answer       Answer     @relation(fields: [answerId], references: [id])
-  answerId     String     @unique // Ajout de @unique pour répondre à l'erreur
-
-  @@unique([studentId, examId])
-}
-
-model ExamParticipant {
-  id       String            @id @default(uuid())
-  examId   String
-  userId   String
-  status   ParticipantStatus @default(PENDING)
-  joinedAt DateTime          @default(now())
-  exam     Exam              @relation(fields: [examId], references: [id], onDelete: Cascade)
-  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([examId, userId])
 }

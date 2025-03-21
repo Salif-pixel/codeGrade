@@ -32,9 +32,11 @@ interface DashboardPageStudentProps {
 }
 
 export default function DashboardPageStudent({ data }: DashboardPageStudentProps) {
-    if (!data) return null;
 
     const t = useTranslations()
+
+    if (!data) return null;
+
 
     const { metrics, upcomingExams } = data;
 

@@ -9,7 +9,7 @@ import { ExamStatus } from "@prisma/client"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
 
-interface TeacherDashboardData {
+interface AdminDashboardData {
     metrics: {
         totalExams: number;
         examsInProgress: number;
@@ -25,15 +25,16 @@ interface TeacherDashboardData {
     }[];
 }
 
-interface DashboardPageTeacherProps {
-    data: TeacherDashboardData | null;
+interface DashboardPageAdminProps {
+    data: AdminDashboardData | null;
 }
 
-export default function DashboardPageTeacher({ data }: DashboardPageTeacherProps) {
+export default function DashboardPageAdmin({ data }: DashboardPageAdminProps) {
 
     const t = useTranslations()
 
     if (!data) return null;
+
 
     const { metrics, recentExams } = data;
 

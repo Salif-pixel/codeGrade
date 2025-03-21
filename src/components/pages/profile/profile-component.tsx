@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { ProfileHeader } from "@/components/profile/profile-header"
-import { Achievements } from "@/components/profile/achievements"
-import { EditProfileDialog } from "@/components/profile/edit-profile-dialog"
+import { ProfileHeader } from "@/components/pages/profile/profile-header"
+import { Achievements } from "@/components/pages/profile/achievements"
+import { EditProfileDialog } from "@/components/pages/profile/edit-profile-dialog"
 import { motion, AnimatePresence } from "framer-motion"
-import { ModeToggle } from "@/components/theme/button-theme"
-import { Calendar } from "@/components/profile/calendar-profile"
+import { ModeToggle } from "@/components/utilities/theme/button-theme"
+import { Calendar } from "@/components/pages/profile/calendar-profile"
 import { User } from "@prisma/client"
 import { updateUser } from "@/actions/userActions"
 

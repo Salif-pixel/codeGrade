@@ -694,7 +694,6 @@
       "preview": "Aperçu des questions et réponses",
       "error": "Erreur lors de la génération des réponses",
       "generate": "Générer les réponses",
-      "generating": "Génération des réponses en cours...",
       "selectModel": "Sélectionner un modèle",
       "regenerating": "Régénération en cours..."
     },
@@ -1050,5 +1049,5 @@
     },
     "confirmSubmitIncomplete": "Certaines questions n'ont pas été répondues. Voulez-vous quand même soumettre l'examen ?"
   }
-  
+
 }

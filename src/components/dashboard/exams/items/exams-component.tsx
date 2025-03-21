@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Calendar from "@/components/calendar/calendar"
+import Calendar from "@/components/utilities/calendar/calendar"
 import { ChevronRight, Copy, Eye, Link as LinkIcon, FileText } from "lucide-react"
-import { useCustomToast } from "@/components/alert/alert";
+import { useCustomToast } from "@/components/utilities/alert/alert";
 import { Exam, User, Question, ExamStatus, SubmissionStatus, ParticipantStatus } from "@prisma/client"
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -308,12 +308,12 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
 
     // Trouver toutes les réponses de l'étudiant pour cet examen
     const studentAnswers = assignment.answers?.filter(a => a.studentId === participant.userId);
-    
+
     // Prendre la dernière réponse (la plus récente) si elle existe
-    const latestAnswer = studentAnswers?.length 
-      ? studentAnswers.reduce((latest, current) => 
+    const latestAnswer = studentAnswers?.length
+      ? studentAnswers.reduce((latest, current) =>
           latest.createdAt > current.createdAt ? latest : current
-        ) 
+        )
       : null;
 
     return {

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, type ChangeEvent, useTransition, useRef } from "react"
+import React, { useState, useTransition, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import {
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { createExam, extractContentFromDocument, generateAnswers, generateDocumentAnswer, updateDocumentExamAnswer, updateExamAnswers } from "@/actions/examActions"
-import { useCustomToast } from "@/components/alert/alert"
+import { useCustomToast } from "@/components/utilities/alert/alert"
 import { ExamType } from "@prisma/client"
 import { SimpleHeaderTitle } from "@/components/dashboard/header/header-title"
 import { Badge } from "@/components/ui/badge"
@@ -70,18 +70,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   const [type] = useState<ExamType>(ExamType.QCM)
   const [format, setFormat] = useState<ExamFormat>("QCM")
   const [maxAttempts] = useState<number>(1)
-
-  const handleFormatChange = (value: ExamFormat) => {
-    setFormat(value)
-    if(value != "PDF"){
-      setFile(undefined)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
-    }
-  }
-
-  // Date State
+// Date State
   const [startDate, setStartDate] = useState<string>(
     new Date().toISOString().slice(0, 16)
   )
@@ -115,10 +104,10 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
   const [file, setFile] = useState<File>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "success" | "error">("idle");
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [, setUploadProgress] = useState(0);
+  const [, setUploadState] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [, setUploadError] = useState<string | null>(null);
+  const [, setUploadResult] = useState<string | null>(null);
 
   async function uploadFile(file: File) {
     if (!file) return null;
@@ -375,7 +364,7 @@ const ExamCreator = ({ userId }: ExamCreatorProps) => {
     try {
       if (format === "PDF") {
         const answersResult = await generateDocumentAnswer(extractedText, selectedModel)
-        
+
         if (answersResult.success) {
           setQuestions([{
             ...questions[0],

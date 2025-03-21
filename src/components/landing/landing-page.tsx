@@ -7,7 +7,7 @@ import { FloatingElement } from "./items/floating-element"
 import { FeatureCard } from "@/components/landing/items/feature-card"
 import { StatCard } from "@/components/landing/items/sat-card"
 import { WorkflowSection } from "@/components/landing/sections/workflow-section"
-import { ModeToggle } from "@/components/theme/button-theme"
+import { ModeToggle } from "@/components/utilities/theme/button-theme"
 import { Button } from "@/components/ui/button"
 import { WorkflowGrade } from "@/components/landing/sections/workflow-grade"
 import { Link } from '@/i18n/navigation';

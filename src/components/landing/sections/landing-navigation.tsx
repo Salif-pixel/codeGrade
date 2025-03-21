@@ -1,5 +1,5 @@
-import LanguageSwitcher from "@/components/internalization/language-switcher";
-import { ModeToggle } from "@/components/theme/button-theme";
+import LanguageSwitcher from "@/components/utilities/internalization/language-switcher";
+import { ModeToggle } from "@/components/utilities/theme/button-theme";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { Menu, Terminal } from "lucide-react";

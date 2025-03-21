@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import { Clock, FileText } from "lucide-react"
 import PdfUpload from "@/components/dashboard/test/Document/pdf-upload"
-import FileRenderer from "@/components/file-renderer"
+import FileRenderer from "@/components/utilities/file-renderer"
 import { extractContentFromDocument } from "@/actions/examActions"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useTranslations } from "next-intl"
@@ -68,7 +68,7 @@ export default function PdfComponent({
 
       // Extraire le contenu du PDF soumis
       const pdfContent = await extractContentFromDocument(data.file, "pdf")
-      
+
       // Appeler la fonction handleSubmit avec le contenu du PDF
       const result = await handleSubmit(pdfContent)
 

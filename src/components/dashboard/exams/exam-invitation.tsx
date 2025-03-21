@@ -6,7 +6,7 @@ import { Exam, User } from "@prisma/client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { joinExam } from "@/actions/examActions"
-import { useCustomToast } from "@/components/alert/alert"
+import { useCustomToast } from "@/components/utilities/alert/alert"
 import {useLocale} from "next-intl";
 
 interface TeacherInfo {
@@ -29,7 +29,7 @@ const local = useLocale();
     setIsLoading(true)
     try {
       const result = await joinExam(exam.id,user.id)
-      
+
       if (result.success) {
         showToast(
           "Succès",
@@ -133,4 +133,4 @@ const local = useLocale();
       </Card>
     </div>
   )
-} 
+}

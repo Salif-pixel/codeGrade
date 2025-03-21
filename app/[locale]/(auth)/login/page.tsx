@@ -13,16 +13,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ModeToggle } from "@/components/theme/button-theme";
+import { ModeToggle } from "@/components/utilities/theme/button-theme";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RiGithubFill, RiGoogleFill } from "react-icons/ri";
 import { useLocale, useTranslations } from "next-intl";
-import LanguageSwitcher from "@/components/internalization/language-switcher";
+import LanguageSwitcher from "@/components/utilities/internalization/language-switcher";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
-import { useCustomToast } from "@/components/alert/alert";
+import { useCustomToast } from "@/components/utilities/alert/alert";
 
 
 
