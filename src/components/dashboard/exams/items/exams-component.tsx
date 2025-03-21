@@ -190,9 +190,9 @@ const getStatusBadge = (status: ExamStatus) => {
   const t = useTranslations('calendar.details.status')
 
   switch (status) {
-    case "PENDING":
+    case ExamStatus.PUBLISHED:
       return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">{t('PENDING')}</Badge>
-    case "ACTIVE":
+    case E:
       return <Badge variant="outline" className="bg-green-100 text-green-800">{t('ACTIVE')}</Badge>
     case "COMPLETED":
       return <Badge variant="outline" className="bg-blue-100 text-blue-800">{t('COMPLETED')}</Badge>

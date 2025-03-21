@@ -67,7 +67,7 @@ export async function createCodeExam(examData: ExamData, userId: string) {
                             text: q.text,
                             maxPoints : q.maxPoints,
                             programmingLanguage: q.programmingLanguage,
-                            testCases: q.testCases,
+                            testCases: q.testCases?.map(tc => `${tc.input}=>${tc.expectedOutput}`),
                         }
                     })
                 }
