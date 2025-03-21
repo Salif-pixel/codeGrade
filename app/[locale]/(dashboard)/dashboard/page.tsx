@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   }
 
   let dashboardData = null;
-  if (user.role === Role.TEACHER || user.role === Role.SUPERADMIN) {
+  if (user.role === Role.TEACHER) {
     dashboardData = await getTeacherDashboardData(user.id);
   } else if (user.role === Role.STUDENT) {
     dashboardData = await getStudentDashboardData(user.id);
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
           <DashboardPageStudent data={dashboardData as never} />
         }
         {user.role === Role.SUPERADMIN &&
-            <DashboardPageAdmin data={dashboardData as never} />
+            <DashboardPageAdmin />
         }
       </div>
     </>

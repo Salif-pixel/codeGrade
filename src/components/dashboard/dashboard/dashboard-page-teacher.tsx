@@ -39,12 +39,12 @@ export default function DashboardPageTeacher({ data }: DashboardPageTeacherProps
 
     const getStatusText = (status: ExamStatus) => {
         switch (status) {
-            case 'COMPLETED':
-                return t('calendar.details.status.COMPLETED');
-            case 'ACTIVE':
-                return t('calendar.details.status.ACTIVE');
-            case 'PENDING':
-                return t('calendar.details.status.PENDING');
+            case 'PUBLISHED':
+                return "Published";
+            case 'CLOSED':
+                return "Closed";
+            case 'DRAFT':
+                return "Draft";
             default:
                 return status;
         }
@@ -127,9 +127,9 @@ export default function DashboardPageTeacher({ data }: DashboardPageTeacherProps
                                         </TableCell>
                                         <TableCell>
                                             <span
-                                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${exam.status === 'COMPLETED'
+                                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${exam.status === "PUBLISHED"
                                                     ? "bg-green-100 text-green-800"
-                                                    : exam.status === 'ACTIVE'
+                                                    : exam.status === "DRAFT"
                                                         ? "bg-blue-100 text-blue-800"
                                                         : "bg-yellow-100 text-yellow-800"
                                                     }`}

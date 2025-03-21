@@ -148,17 +148,53 @@ export async function generateCodeTestCases(
         const data = await response.json();
         const result = JSON.parse(data.choices[0].message.content);
 
-        return result.testCases.map((tc: { input: never, expectedOutput: never }) => ({
-            input: tc.input,
-            expectedOutput: tc.expectedOutput
-        }));
+        return {success: true, data: result};
 
     } catch (error) {
         console.error('Code tests generation error:', error);
-        return [];
+        return {success: false, error: "Code tests generation error"};
     }
 }
 
-export async function generateDocumentAnswers() {
+export async function generateDocumentAnswers(
+    content: string,
+    model: string = process.env.AI_MODEL || "deepseek/deepseek-chat:free"
+) {
+    try {
+        const response = await fetch(process.env.AI_API_URL ?? 'https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model,
+                messages: [{
+                    role: 'system',
+                    content: 'Vous êtes un expert en rédaction technique. Fournissez des réponses claires et structurées en Markdown.'
+                }, {
+                    role: 'user',
+                    content: `Analysez ce contenu et fournissez un corrigé détaillée en Markdown :\n\n${content}`
+                }],
+                response_format: { type: "text" },
+                temperature: 0.3,
+                max_tokens: 2000
+            })
+        });
 
+        const data = await response.json();
+        const markdownResponse = data.choices[0].message.content;
+
+        return {
+            success: true,
+            data: markdownResponse
+        };
+
+    } catch (error) {
+        console.error('Document processing error:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Erreur lors de la génération du document'
+        };
+    }
 }

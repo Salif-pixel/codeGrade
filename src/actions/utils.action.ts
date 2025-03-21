@@ -13,9 +13,7 @@ export async function extractContentFromDocument(file: File, type: "pdf" | "md" 
 
         switch (type) {
             case "pdf": {
-                // Create a blob from the buffer
                 const blob = new Blob([buffer])
-                // Use PDFLoader to extract text from PDF
                 const loader = new PDFLoader(blob)
                 const docs = await loader.load()
                 return docs.map((doc: { pageContent: string }) => doc.pageContent).join("\n")

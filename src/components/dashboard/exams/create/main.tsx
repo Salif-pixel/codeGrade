@@ -9,9 +9,10 @@ import {useCustomToast} from "@/components/utilities/alert/alert";
 import CreationContentComponent from "@/components/dashboard/exams/create/creation-content-component";
 import StepContent from "@/components/dashboard/exams/create/stepContent";
 import {ExamType} from "@prisma/client"
-import {generateQCMAnswers} from "@/actions/ai-integration.action";
-import {createQcmExam} from "@/actions/create-exam.action";
+import {generateCodeTestCases, generateDocumentAnswers, generateQCMAnswers} from "@/actions/ai-integration.action";
+import {createQcmExam, createCodeExam, createDocumentExam} from "@/actions/create-exam.action";
 import {redirect} from "@/i18n/navigation";
+import {extractContentFromDocument} from "@/actions/utils.action";
 
 export interface CreateExamsPageProps {
     userId?: string
@@ -45,6 +46,14 @@ export interface AiAnswer{
         correct: string,
         incorrect: string
     }
+}
+
+export interface AiTestCase{
+    questionId: number;
+    testCases: {
+        input: string,
+        expectedOutput: string
+    }[];
 }
 
 const CreateExamPage = ({userId}: CreateExamsPageProps) => {
@@ -106,11 +115,77 @@ const CreateExamPage = ({userId}: CreateExamsPageProps) => {
     };
 
     const handleSubmit = async () => {
-        console.log(formData);
         startTransition(async () => {
-            if (formData.format === "DOCUMENT"){
+            if (formData.format === "DOCUMENT")
+            {
+                if (!formData.file) {
+                    showToast("erreur", "veuillez choisir un fichier", "error");
+                    return;
+                }
 
-            }else if(formData.format === "QCM"){
+                const allowedMimeTypes = [
+                    "application/pdf",
+                    "text/markdown",
+                    "text/x-latex",
+                    "text/plain"
+                ];
+
+                const typesExt = [
+                    "pdf",
+                    "md",
+                    "latex",
+                    "txt"
+                ]
+
+                if (!allowedMimeTypes.includes(formData.file.type)) {
+                    showToast("erreur", "Veuillez choisir un fichier de type PDF, MD, LaTeX ou TXT", "error");
+                    return;
+                }
+
+                const text = await extractContentFromDocument(formData.file as File, typesExt[allowedMimeTypes.indexOf(formData.file?.type)] as "pdf" | "md" | "latex" | "txt")
+
+                const aiResponses = await generateDocumentAnswers(text);
+
+                if(!aiResponses.success){
+                    showToast("erreur", aiResponses.error, "error");
+                    return ;
+                }
+
+                const uploadedFileMeta = await edgestore.publicFiles.upload({
+                    file: formData.file as File,
+                    onProgressChange: (progress) => {
+                        console.log(progress);
+                    },
+                });
+
+                const aiData : string = aiResponses.data as string;
+
+
+                const formattedExam = {
+                    title: formData.title,
+                    description: formData.description,
+                    type: ExamType.DOCUMENT,
+                    startDate: new Date(formData.startDate),
+                    endDate: new Date(formData.endDate),
+                    examDocumentPath: uploadedFileMeta.url,
+                    aiCorrection: aiData,
+                }
+
+                console.log(formattedExam);
+
+                const addResult = await createDocumentExam(formattedExam as never, userId as string);
+
+                if(addResult.success){
+                    showToast("success", "exam created !", "success");
+                    redirect({locale: "fr", href: "/exams"});
+
+                }else{
+                    showToast('error', addResult.error, 'error');
+                }
+
+            }
+            else if(formData.format === "QCM")
+            {
 
                 const aiResponses = await generateQCMAnswers(formData.questions);
 
@@ -155,7 +230,49 @@ const CreateExamPage = ({userId}: CreateExamsPageProps) => {
                     showToast('error', addResult.error, 'error');
                 }
 
-            }else{
+            }
+            else
+            {
+
+                const aiResponses = await generateCodeTestCases(formData.questions);
+
+                if(!aiResponses.success){
+                    showToast("erreur", aiResponses.error, "error");
+                    return ;
+                }
+
+                const aiData : AiTestCase[] = aiResponses.data as AiTestCase[];
+
+                const questionsWithTestCases = formData.questions.map((question, index) => {
+                    // const current : AiAnswer = aiData.find(q => q.questionId === index + 1) as AiAnswer;
+                    const current : AiTestCase = aiData[index] as AiTestCase;
+                    if(!current){return question;}
+                    return {
+                        ...question,
+                        testCases: current.testCases ?? "",
+                    }
+                })
+
+                console.log(questionsWithTestCases);
+
+                const formattedExam = {
+                    title: formData.title,
+                    description: formData.description,
+                    type: ExamType.CODE,
+                    startDate: new Date(formData.startDate),
+                    endDate: new Date(formData.endDate),
+                    questions: questionsWithTestCases
+                }
+
+                const addResult = await createCodeExam(formattedExam as never, userId as string);
+
+                if(addResult.success){
+                    showToast("success", "exam created !", "success");
+                    redirect({locale: "fr", href: "/exams"});
+
+                }else{
+                    showToast('error', addResult.error, 'error');
+                }
 
             }
 

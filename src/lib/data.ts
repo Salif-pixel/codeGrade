@@ -1,100 +1,65 @@
-import {prisma} from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const get_user = async (id: string | "") => {
-    const user = await prisma.user.findFirst({
-        where: {
-            id
-        },
-        include: {
-            accounts: true,
-        }
+    return await prisma.user.findFirst({
+        where: { id },
+        include: { accounts: true, sessions: true, participations: true, submissions: true }
     });
-    return user;
-}
-export const get_users = async ()=>{
-    const users = await prisma.user.findMany({
-        include: {
-            accounts: true,
+};
 
-        }
+export const get_users = async () => {
+    return await prisma.user.findMany({
+        include: { accounts: true, sessions: true, participations: true, submissions: true }
     });
-    return users;
 };
 
 export const getExistingSession = async (token: string) => {
-    const session = await prisma.session.findFirst({
-        where: {
-            token: token ?? "",
-        },
+    return await prisma.session.findFirst({
+        where: { token: token ?? "" }
     });
-    return session;
 };
 
 export const getExams = async () => {
-    const exams = await prisma.exam.findMany({
+    return await prisma.exam.findMany({
         include: {
             questions: true,
-            participants: {
-                include: {
-                    user: true
-                }
-            },
-            answers: {
+            participants: { include: { user: true } },
+            submissions: {
                 include: {
                     student: true,
-                    grade: true,
-                    corrections: true
+                    correction: true
                 }
             },
-            createdBy: true
+            creator: true
         }
     });
-    return exams;
 };
 
 export const getTeacherDashboardData = async (userId: string) => {
     const exams = await prisma.exam.findMany({
-        where: {
-            createdById: userId
-        },
+        where: { creatorId: userId },
         include: {
-            participants: {
-                include: {
-                    user: true
-                }
-            },
-            answers: {
-                include: {
-                    grade: true,
-                    corrections: true
-                }
-            }
+            participants: { include: { user: true } },
+            submissions: { include: { correction: true } }
         },
-        orderBy: {
-            createdAt: 'desc'
-        }
+        orderBy: { createdAt: 'desc' }
     });
 
     const totalExams = exams.length;
-    const examsInProgress = exams.filter(exam => exam.status === 'ACTIVE').length;
-    const gradedExams = exams.filter(exam => 
-        exam.answers.every(answer => answer.grade !== null)
+    const examsInProgress = exams.filter(exam => exam.status === 'PUBLISHED').length;
+    const gradedExams = exams.filter(exam =>
+        exam.submissions.every(sub => sub.correction !== null) && exam.submissions.length > 0
     ).length;
 
-    const allGrades = exams.flatMap(exam => 
-        exam.answers.filter(answer => answer.grade).map(answer => answer.grade?.finalScore ?? 0)
+    const allGrades = exams.flatMap(exam =>
+        exam.submissions.map(sub => sub.correction?.finalScore ?? 0)
     );
-    const averageScore = allGrades.length > 0 
+    const averageScore = allGrades.length > 0
         ? Math.round((allGrades.reduce((a, b) => a + b, 0) / allGrades.length) * 100) / 100
         : 0;
 
     return {
-        metrics: {
-            totalExams,
-            examsInProgress,
-            gradedExams,
-            averageScore
-        },
+        metrics: { totalExams, examsInProgress, gradedExams, averageScore },
         recentExams: exams.slice(0, 5).map(exam => ({
             id: exam.id,
             title: exam.title,
@@ -106,38 +71,30 @@ export const getTeacherDashboardData = async (userId: string) => {
 };
 
 export const getStudentDashboardData = async (userId: string) => {
-    const participations = await prisma.examParticipant.findMany({
-        where: {
-            userId: userId
-        },
+    const participations = await prisma.examParticipation.findMany({
+        where: { userId },
         include: {
             exam: {
                 include: {
-                    answers: {
-                        where: {
-                            studentId: userId
-                        },
-                        include: {
-                            grade: true
-                        }
+                    submissions: {
+                        where: { studentId: userId },
+                        include: { correction: true }
                     }
                 }
             }
         },
-        orderBy: {
-            joinedAt: 'desc'
-        }
+        orderBy: { joinedAt: 'desc' }
     });
 
     const completedExams = participations.filter(p => p.status === 'COMPLETED').length;
     const pendingExams = participations.filter(p => p.status === 'PENDING' || p.status === 'ACCEPTED').length;
 
     const grades = participations
-        .flatMap(p => p.exam.answers)
-        .filter(answer => answer.grade)
-        .map(answer => answer.grade?.finalScore ?? 0);
+        .flatMap(p => p.exam.submissions)
+        .filter(sub => sub.correction)
+        .map(sub => sub.correction?.finalScore ?? 0);
 
-    const averageScore = grades.length > 0 
+    const averageScore = grades.length > 0
         ? Math.round((grades.reduce((a, b) => a + b, 0) / grades.length) * 100) / 100
         : 0;
 
@@ -156,14 +113,14 @@ export const getStudentDashboardData = async (userId: string) => {
             } : null
         },
         upcomingExams: participations
-            .filter(p => p.status !== 'COMPLETED' && p.exam.status !== 'COMPLETED')
+            .filter(p => p.status !== 'COMPLETED' && p.exam.status !== 'CLOSED')
             .slice(0, 5)
             .map(p => ({
                 id: p.exam.id,
                 title: p.exam.title,
                 type: p.exam.type,
                 deadline: p.exam.endDate,
-                attemptsLeft: `${p.exam.answers.length}/${p.exam.maxAttempts}`
+                attemptsLeft: `${p.exam.submissions.length}/1`
             }))
     };
 };
