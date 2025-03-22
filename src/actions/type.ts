@@ -29,3 +29,30 @@ export interface ExamData {
     teacherCorrectionPath?: string
     aiCorrection?: string
 }
+
+export type CodeSubmission = {
+    questionId: string;
+    code: string;
+    programmingLanguage: string;
+};
+
+export type QcmSubmission = {
+    questionId: string;
+    answers: string[];
+};
+
+export type DocumentSubmission = {
+    documentPath: string;
+};
+
+export type DocumentCorrectionReport = {
+    summary: string;
+    detailedFeedback: string;
+    score: number;
+    improvements: Array<{
+        section: string;
+        suggestion: string;
+        severity: 'MINOR' | 'MAJOR' | 'CRITICAL';
+    }>;
+    mermaidDiagram: string;
+};
