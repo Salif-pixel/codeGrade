@@ -289,26 +289,26 @@ export default async function ExamResultsPage(props: {
                         {/* Score */}
                         <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
                           <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                            Score : {parsedAnswer.evaluation.score}/{question.maxPoints}
+                            Score : {parsedAnswer?.evaluation.score}/{question.maxPoints}
                           </p>
                         </div>
 
                         {/* Explication */}
                         <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
                           <p className="text-sm font-medium mb-2">Explication détaillée :</p>
-                          <p className="text-sm text-muted-foreground">{parsedAnswer.evaluation.explanation}</p>
+                          <p className="text-sm text-muted-foreground">{parsedAnswer?.evaluation.explanation}</p>
                         </div>
 
                         {/* Feedback */}
                         <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
                           <p className="text-sm font-medium mb-2">Suggestions d&#39;amélioration :</p>
-                          <p className="text-sm text-amber-700 dark:text-amber-300">{parsedAnswer.evaluation.feedback}</p>
+                          <p className="text-sm text-amber-700 dark:text-amber-300">{parsedAnswer?.evaluation.feedback}</p>
                         </div>
 
                         {/* Qualité du code */}
                         <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
                           <p className="text-sm font-medium mb-2">Analyse de la qualité du code :</p>
-                          <p className="text-sm text-purple-700 dark:text-purple-300">{parsedAnswer.evaluation.codeQuality}</p>
+                          <p className="text-sm text-purple-700 dark:text-purple-300">{parsedAnswer?.evaluation.codeQuality}</p>
                         </div>
                       </div>
                     )}
@@ -320,9 +320,9 @@ export default async function ExamResultsPage(props: {
                       <p className="text-sm text-muted-foreground mb-1">Votre réponse:</p>
                       <div className="bg-muted p-4 rounded border">
                         {parsedAnswer?.answers ? (
-                          Array.isArray(parsedAnswer.answers) ?
-                            parsedAnswer.answers.join(', ')
-                            : parsedAnswer.answers
+                          Array.isArray(parsedAnswer?.answers) ?
+                            parsedAnswer?.answers.join(', ')
+                            : parsedAnswer?.answers
                         ) : "Aucune réponse fournie"}
                       </div>
                     </div>
