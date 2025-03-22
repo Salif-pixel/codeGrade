@@ -2,69 +2,82 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import {  ParticipantStatus } from "@prisma/client"
+import { ParticipationStatus } from "@prisma/client"
 import TakeExamComponent from "@/components/dashboard/exams/take-exam-component"
+import {ExamData} from "@/components/dashboard/exams/types";
 
-export default async function TakeExamPage({ params }: { params: Promise<{ id: string }> }) {
-  const header = await headers()
-  const session = await auth.api.getSession({
-    headers: header,
-  });
-
-  const parameters = await params;
-
-  if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=/available-exams/${parameters.id}`)
-  }
-
+async function getExamData(examId: string, userId: string) : Promise<ExamData | null> {
   const exam = await prisma.exam.findUnique({
-    where: { id: parameters.id },
+    where: { id: examId },
     include: {
       questions: true,
       participants: {
-        where: { userId: session.user.id },
+        where: { userId },
+      },
+      submissions: {
+        where: { studentId: userId },
+        orderBy: { attemptNumber: "desc" },
+        take: 1,
+        include: {
+          answers: true,
+        },
       },
     },
-  });
+  })
 
-  if (!exam) {
-    redirect("/404");
+  if (!exam || exam.participants.length === 0 || exam.participants[0].status !== ParticipationStatus.ACCEPTED) {
+    return null
   }
 
-  if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.ACCEPTED) {
-    redirect(`/available-exams`);
-  }
+  const now = new Date()
+  if (exam.startDate && exam.startDate > now) return null
+  if (exam.endDate && exam.endDate < now) return null
 
-  const now = new Date();
-  if (exam.startDate && new Date(exam.startDate) > now) {
-    redirect(`/available-exams?error=not_started`);
-  }
+  const latestSubmission = exam.submissions[0]
+  const currentAttempt = (latestSubmission?.attemptNumber || 0) + 1
 
-  if (exam.endDate && new Date(exam.endDate) < now) {
-    redirect(`/available-exams?error=expired`);
-  }
-
-  const examData = {
+  return {
     id: exam.id,
-    filePath: exam.filePath,
     title: exam.title,
-    description: exam.description || "",
+    description: exam.description,
     type: exam.type,
-    format: exam.filePath?.split(".").pop() || "",
+    examDocumentPath: exam.examDocumentPath,
+    teacherCorrectionPath: exam.teacherCorrectionPath,
     questions: exam.questions.map((q) => ({
       id: q.id,
       text: q.text,
       maxPoints: q.maxPoints,
-      choices: (q.choices as string[]) || [],
-      programmingLanguage: (q.programmingLanguage as "python" | "javascript" | "sql") || undefined,
-      answer: q.answer || "",
-      studentAnswer: "",
+      choices: q.choices,
+      programmingLanguage: (q.programmingLanguage ?? "javascript") as "javascript" | "python" | "java" | "cpp" | "csharp",
     })),
-    timeRemaining: exam.endDate ? Math.max(0, new Date(exam.endDate).getTime() - now.getTime()) : null,
-    maxAttempts: exam.maxAttempts || 1,
-    currentAttempt: 1,
-    fileCorrection: exam.fileCorrection || "",
-  };
+    timeRemaining: exam.endDate ? Math.max(0, exam.endDate.getTime() - now.getTime()) : null,
+    maxAttempts: 1, // Adjust if you add this field to schema
+    currentAttempt,
+  }
+}
 
-  return <TakeExamComponent exam={examData as never} userId={session.user.id} />;
+export default async function TakeExamPage({ params }: { params: Promise<{ id: string }> }) {
+  const header = await headers()
+  const session = await auth.api.getSession({ headers: header })
+  const { id } = await params
+
+  if (!session?.user) {
+    redirect(`/auth/login?callbackUrl=/available-exams/${id}`)
+  }
+
+  const examData : ExamData = await getExamData(id, session.user.id) as ExamData
+
+  if (!examData) {
+    const now = new Date()
+    const exam = await prisma.exam.findUnique({ where: { id } })
+    if (exam?.startDate && exam.startDate > now) {
+      redirect(`/available-exams?error=not_started`)
+    }
+    if (exam?.endDate && exam.endDate < now) {
+      redirect(`/available-exams?error=expired`)
+    }
+    redirect("/available-exams")
+  }
+
+  return <TakeExamComponent exam={examData} userId={session.user.id} />
 }

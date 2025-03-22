@@ -13,6 +13,7 @@ interface NavItem {
 }
 
 export const navigationConfig = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const t = useTranslations("nav-items");
 
   const config: NavItem[] = [
@@ -55,13 +56,6 @@ export const navigationConfig = () => {
       title: t("available_exams"),
       href: "/available-exams",
       icon: <FileText className="w-5 h-5" />,
-      roles: [Role.STUDENT, Role.SUPERADMIN],
-    },
-    {
-      id: "results",
-      title: t("results"),
-      href: "/results",
-      icon: <ClipboardList className="w-5 h-5" />,
       roles: [Role.STUDENT, Role.SUPERADMIN],
     },
     {
@@ -149,13 +143,6 @@ export const navigationConfigForMiddleware = () => {
       icon: <FileText className="w-5 h-5" />,
       roles: [Role.STUDENT, Role.SUPERADMIN],
       isProtectedRoute: true,
-    },
-    {
-      id: "results",
-      title: "Results",
-      href: "/results",
-      icon: <ClipboardList className="w-5 h-5" />,
-      roles: [Role.STUDENT, Role.SUPERADMIN],
     },
   ];
 

@@ -10,7 +10,7 @@ import {CalendarView, type Exam} from "./calendar-view"
 import {ExamForm} from "./exams-form"
 import type {Answer, Question, User} from "@prisma/client";
 
-export function ExamsCalendar({initialExams}:{
+export function ExamsCalendar({initialExams}: {
     user: User;
     initialExams: (Exam & { questions: Question[]; answers: Answer[] })[]
 }) {
@@ -20,11 +20,6 @@ export function ExamsCalendar({initialExams}:{
 
     const handleEditExam = (exam: Exam) => {
         setExamToEdit(exam)
-        setIsFormOpen(true)
-    }
-
-    const handleAddExam = () => {
-        setExamToEdit(null)
         setIsFormOpen(true)
     }
 
@@ -40,23 +35,6 @@ export function ExamsCalendar({initialExams}:{
 
     return (
         <div className="space-y-6">
-            <Card className="border-none bg-gradient-to-r from-primary/10 to-primary/5 shadow-sm">
-                <CardHeader>
-                    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                        <div>
-                            <CardTitle className="text-2xl font-bold">Calendrier des Examens</CardTitle>
-                            <CardDescription className="mt-1">
-                                Gérez et visualisez tous vos examens en un seul endroit
-                            </CardDescription>
-                        </div>
-                        <Button onClick={handleAddExam} className="shadow-sm">
-                            <Plus className="mr-2 h-4 w-4"/>
-                            Nouvel Examen
-                        </Button>
-                    </div>
-                </CardHeader>
-            </Card>
-
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
                 <Card className="lg:col-span-3">
                     <CardContent className="p-4 pt-4">

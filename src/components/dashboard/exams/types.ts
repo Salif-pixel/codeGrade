@@ -44,3 +44,25 @@ export interface AssignmentDetailsProps {
     onBack: () => void
     onCopyInviteLink: (link: string) => void
 }
+
+type QuestionDto = {
+    id: string
+    text: string
+    maxPoints: number
+    choices?: string[]
+    programmingLanguage: "javascript" | "python" | "java" | "cpp" | "csharp"
+    studentAnswer?: string[]
+}
+
+export interface ExamData {
+    id: string
+    title: string
+    description: string | null
+    type: string
+    examDocumentPath: string | null
+    teacherCorrectionPath: string | null
+    questions: QuestionDto[]
+    timeRemaining: number | null
+    maxAttempts: number
+    currentAttempt: number
+}

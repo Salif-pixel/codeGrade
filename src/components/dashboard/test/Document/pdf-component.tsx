@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Clock, FileText } from "lucide-react"
 import PdfUpload from "@/components/dashboard/test/Document/pdf-upload"
 import FileRenderer from "@/components/utilities/file-renderer"
-import { extractContentFromDocument } from "@/actions/examActions"
+import { extractContentFromDocument } from "@/actions/utils.action"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useTranslations } from "next-intl"
 

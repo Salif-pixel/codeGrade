@@ -1,4 +1,4 @@
-import ExamsComponent from "@/components/dashboard/exams/items/exams-component";
+import ExamsComponent from "@/components/dashboard/exams/exams-component";
 import { auth } from "@/lib/auth";
 import { get_user, getExams } from "@/lib/data";
 import { headers } from "next/headers";

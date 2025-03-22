@@ -127,10 +127,6 @@ model Exam {
   // Questions (uniquement pour QCM/CODE)
   questions Question[]
 
-  // Gestion des invitations
-  inviteCode   String?   @unique
-  inviteExpiry DateTime?
-
   // Relations
   creator      User                @relation(fields: [creatorId], references: [id])
   creatorId    String

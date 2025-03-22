@@ -1,5 +1,7 @@
-import {Exam, ExamStatus} from "@prisma/client";
+import {Exam, ExamStatus, ParticipationStatus} from "@prisma/client";
 import {Badge} from "@/components/ui/badge";
+import {cn} from "@/lib/utils";
+import {CheckCircle2, HourglassIcon, XCircle} from "lucide-react";
 
 export const getStatusBadge = (status: ExamStatus) => {
     switch (status) {
@@ -38,3 +40,40 @@ export const getExamStatus = (exam: Exam): ExamStatus => {
     if (!exam.endDate || new Date(exam.endDate) > now) return ExamStatus.PUBLISHED;
     return ExamStatus.CLOSED;
 };
+
+export const StatusBadge = ({ status, t }: { status: ParticipationStatus; t: (key: string) => string }) => {
+    return (
+        <Badge
+            variant="outline"
+            className={cn(
+                "flex items-center gap-1",
+                status === ParticipationStatus.COMPLETED && "bg-green-500/10 text-green-500",
+                status === ParticipationStatus.ACCEPTED && "bg-blue-500/10 text-blue-500",
+                status === ParticipationStatus.DECLINED && "bg-red-500/10 text-red-500",
+                status === ParticipationStatus.PENDING && "bg-yellow-500/10 text-yellow-500",
+            )}
+        >
+            {status === ParticipationStatus.COMPLETED ? (
+                <>
+                    <CheckCircle2 className="h-3 w-3" />
+                    {t("details.results.status.completed")}
+                </>
+            ) : status === ParticipationStatus.ACCEPTED ? (
+                <>
+                    <CheckCircle2 className="h-3 w-3" />
+                    {t("details.results.status.accepted")}
+                </>
+            ) : status === ParticipationStatus.DECLINED ? (
+                <>
+                    <XCircle className="h-3 w-3" />
+                    {t("details.results.status.declined")}
+                </>
+            ) : (
+                <>
+                    <HourglassIcon className="h-3 w-3" />
+                    {t("details.results.status.pending")}
+                </>
+            )}
+        </Badge>
+    )
+}

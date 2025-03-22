@@ -1,6 +1,6 @@
 'use server'
 
-import {QuestionData} from "@/actions/datatype";
+import {QuestionData} from "@/actions/type";
 
 export async function generateQCMAnswers(
     questions: QuestionData[],

@@ -1,13 +1,9 @@
 "use server"
 
 import {revalidatePath} from "next/cache";
-import {ExamData, QuestionData} from "@/actions/datatype";
+import {ExamData, QuestionData} from "@/actions/type";
 import {prisma} from "@/lib/prisma";
 import {ExamStatus, ExamType} from "@prisma/client";
-
-const generateInviteCode: () => string = () => {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
 
 export async function createQcmExam(examData: ExamData, userId: string) {
 
@@ -19,8 +15,6 @@ export async function createQcmExam(examData: ExamData, userId: string) {
                 type: examData.type as ExamType,
                 startDate: examData.startDate,
                 endDate: examData.endDate,
-                inviteCode: generateInviteCode(),
-                inviteExpiry: examData.endDate,
                 status: ExamStatus.PUBLISHED,
                 creator: {connect: {id: userId}},
                 questions: {
@@ -57,8 +51,6 @@ export async function createCodeExam(examData: ExamData, userId: string) {
                 type: examData.type as ExamType,
                 startDate: examData.startDate,
                 endDate: examData.endDate,
-                inviteCode: generateInviteCode(),
-                inviteExpiry: examData.endDate,
                 status: ExamStatus.PUBLISHED,
                 creator: {connect: {id: userId}},
                 questions: {
@@ -92,8 +84,6 @@ export async function createDocumentExam(examData: ExamData, userId: string)  {
                 type: examData.type as ExamType,
                 startDate: examData.startDate,
                 endDate: examData.endDate,
-                inviteCode: generateInviteCode(),
-                inviteExpiry: examData.endDate,
                 status: ExamStatus.PUBLISHED,
                 creator: {connect: {id: userId}},
                 examDocumentPath: examData.examDocumentPath,

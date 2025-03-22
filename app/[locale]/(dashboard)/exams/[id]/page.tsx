@@ -1,20 +1,17 @@
-
-
-import ExamInvitation from "@/components/dashboard/exams/exam-invitation"
+import ExamInvitation from "@/components/dashboard/exams/id/exam-invitation"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { ParticipantStatus } from "@prisma/client";
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
+import { ParticipationStatus} from "@prisma/client"
 
 async function getExamWithDetails(examId: string) {
-
   try {
     const exam = await prisma.exam.findUnique({
       where: { id: examId },
       include: {
         questions: true,
-        createdBy: {
+        creator: {
           select: {
             name: true,
             email: true,
@@ -24,6 +21,7 @@ async function getExamWithDetails(examId: string) {
           include: {
             user: {
               select: {
+                id: true,  // Added id to properly check participant
                 name: true,
                 email: true,
               },
@@ -34,60 +32,64 @@ async function getExamWithDetails(examId: string) {
     })
 
     return exam
-
   } catch (error) {
-
     console.error("Error fetching exam:", error)
     return null
-
   }
 }
 
 export default async function ExamPage({ params }: { params: { id: string } }) {
-
   const header = await headers()
   const session = await auth.api.getSession({
     headers: header,
   })
-  const local = "fr"
 
+  const locale = "fr"  // Changed from 'local' to 'locale' for consistency
+
+  if (!session?.user) {
+    redirect(`/${locale}/login`)
+  }
 
   const exam = await getExamWithDetails(params.id)
   if (!exam) {
     redirect("/404")
   }
 
-  // Vérifier si l'utilisateur est déjà participant
+  // Check if user is already a participant
   const existingParticipant = exam.participants.find(
-    (p) => p.userId === session?.user.id
+      (p) => p.userId === session.user.id
   )
 
-  // Si l'utilisateur est le créateur de l'examen, rediriger vers le dashboard
-  if (exam.createdById === session?.user.id) {
-    redirect(`/${local}/available-exams/`)
+  // If user is the creator, redirect to available exams
+  if (exam.creatorId === session.user.id) {
+    redirect(`/${locale}/available-exams/`)
   }
 
-  // Si l'utilisateur est déjà participant et a accepté, rediriger vers l'examen
-  if (existingParticipant?.status === ParticipantStatus.ACCEPTED || existingParticipant?.status === ParticipantStatus.COMPLETED || existingParticipant?.status === ParticipantStatus.DECLINED) {
-    redirect(`/${local}/available-exams/`)
+  // If user is already a participant with a status, redirect
+  if (existingParticipant && [
+    "ACCEPTED",
+    "COMPLETED",
+    "DECLINED"
+  ].includes(existingParticipant.status as ParticipationStatus)) {
+    redirect(`/${locale}/available-exams/`)
   }
 
-  // Vérifier si l'examen est encore ouvert aux inscriptions
+  // Check if exam registration is still open
   const now = new Date()
   if (exam.endDate && new Date(exam.endDate) < now) {
-    redirect("/${local}/available-exams/expired")
+    redirect(`/${locale}/available-exams/`)
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <ExamInvitation
-        exam={exam}
-        user={session?.user as never}
-        teacher={{
-          name: exam.createdBy.name || "Enseignant",
-          email: exam.createdBy.email,
-        }}
-      />
-    </div>
+      <div className="min-h-screen bg-background">
+        <ExamInvitation
+            exam={exam}
+            user={session.user as { id: string; name: string; email: string;}}
+            teacher={{
+              name: exam.creator.name || "Enseignant",
+              email: exam.creator.email || "",
+            }}
+        />
+      </div>
   )
 }

@@ -10,35 +10,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { ExamType } from "@prisma/client"
 import { Clock, Save, Send, AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { evaluatePdfSubmission, extractContentFromDocument, submitExamAnswers } from "@/actions/examActions"
+import { evaluatePdfSubmission, submitExamAnswers } from "@/actions/examActions"
+import {extractContentFromDocument} from "@/actions/utils.action";
 import { cn } from "@/lib/utils"
 import QuizForm from "../test/Qcm/qcm";
 import PdfComponent from "../test/Document/pdf-component"
 import CodeComponent from "../test/Code/code-component"
-
-
-type Question = {
-  id: string
-  text: string
-  maxPoints: number
-  choices?: string[]
-  programmingLanguage: "javascript" | "python" | "java" | "cpp" | "csharp"
-  studentAnswer: string
-}
-
-type ExamData = {
-  id: string
-  title: string
-  description: string
-  type: ExamType
-  format: string
-  questions: Question[]
-  timeRemaining: number | null
-  maxAttempts: number
-  currentAttempt: number
-  fileCorrection: string
-  filePath: string
-}
+import {ExamData} from "@/components/dashboard/exams/types";
 
 export default function TakeExamComponent({ exam, userId }: { exam: ExamData; userId: string }) {
   const t = useTranslations("exam-taking")
