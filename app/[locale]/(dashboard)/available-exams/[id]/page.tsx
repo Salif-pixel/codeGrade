@@ -3,12 +3,15 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { ParticipationStatus } from "@prisma/client"
-import TakeExamComponent from "@/components/dashboard/exams/take-exam-component"
+import TakeExamComponent from "@/components/dashboard/available-exams/id/take-exam-component"
 import {ExamData} from "@/components/dashboard/exams/types";
 
 async function getExamData(examId: string, userId: string) : Promise<ExamData | null> {
   const exam = await prisma.exam.findUnique({
-    where: { id: examId },
+    where: {
+      id: examId,
+      status: "PUBLISHED"
+    },
     include: {
       questions: true,
       participants: {
@@ -41,6 +44,7 @@ async function getExamData(examId: string, userId: string) : Promise<ExamData | 
     title: exam.title,
     description: exam.description,
     type: exam.type,
+    status: exam.status,
     examDocumentPath: exam.examDocumentPath,
     teacherCorrectionPath: exam.teacherCorrectionPath,
     questions: exam.questions.map((q) => ({
@@ -51,7 +55,6 @@ async function getExamData(examId: string, userId: string) : Promise<ExamData | 
       programmingLanguage: (q.programmingLanguage ?? "javascript") as "javascript" | "python" | "java" | "cpp" | "csharp",
     })),
     timeRemaining: exam.endDate ? Math.max(0, exam.endDate.getTime() - now.getTime()) : null,
-    maxAttempts: 1, // Adjust if you add this field to schema
     currentAttempt,
   }
 }

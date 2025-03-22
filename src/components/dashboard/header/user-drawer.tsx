@@ -17,24 +17,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   Bell,
-  ChevronRight,
-  LayoutDashboard,
   LogOut,
   Menu,
   Settings,
-  UserIcon,
-  ClipboardCheck,
-  FileDown,
-  BarChart3,
   Moon,
   Globe,
-  type LucideIcon,
   User2,
 } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import type { User } from "@prisma/client"
 import { cn } from "@/lib/utils"
-import { SignOut } from "@/actions/signOutactions"
 import {ModeToggle} from "@/components/utilities/theme/button-theme"
 import LanguageSwitcher from "@/components/utilities/internalization/language-switcher"
 import { navigationConfig } from "@/lib/nav-config"

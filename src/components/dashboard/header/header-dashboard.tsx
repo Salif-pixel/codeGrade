@@ -31,7 +31,6 @@ import UserDrawer from "./user-drawer"
 import { useTranslations } from "next-intl"
 import Navigation from "@/components/utilities/navigation/Navigation"
 import {Link, useRouter} from "@/i18n/navigation";
-import {SignOut} from "@/actions/signOutactions";
 import {authClient} from "@/lib/auth-client";
 
 export default function HeaderDashboard({ user }: { user: User }) {

@@ -2,15 +2,49 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { ExamType, ParticipantStatus } from "@prisma/client"
+import { ExamType, ParticipationStatus, Question, Exam } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+type QuestionAnswer = {
+  id: string
+  content: string
+  questionId: string
+  submissionId: string
+  createdAt: Date
+  updatedAt: Date
+}
 
+type ExamSubmission = {
+  id: string
+  createdAt: Date
+  documentPath: string | null
+  answers: QuestionAnswer[]
+  correction: {
+    id: string
+    finalScore: number
+    comments: string | null
+    evaluation: string | null
+  } | null
+}
+
+type ExamWithDetails = Exam & {
+  questions: (Question & {
+    correctAnswer: string[] | null
+    maxPoints: number
+  })[]
+  participants: {
+    id: string
+    status: ParticipationStatus
+    userId: string
+  }[]
+  submissions: ExamSubmission[]
+}
 
 export default async function ExamResultsPage(props: {
-  params: Promise<{ id: string }>}) {
+  params: Promise<{ id: string }>
+}) {
   const params = await props.params
   const header = await headers()
   const session = await auth.api.getSession({
@@ -18,61 +52,56 @@ export default async function ExamResultsPage(props: {
   })
 
   const parameters = await params
-  
+
   if (!session?.user) {
     redirect(`/auth/login?callbackUrl=/available-exams/${await parameters.id}/results`)
   }
-  
+
   const exam = await prisma.exam.findUnique({
     where: { id: await parameters.id },
     include: {
       questions: true,
-      grades:true,
       participants: {
         where: { userId: session.user.id }
       },
-      answers: {
+      submissions: {
         where: { studentId: session.user.id },
         include: {
-          questionAnswers: {
-            include: {
-              question: true,
-              answer: true
-            }
-          },
-          grade: true,
+          answers: true,
+          correction: true
         }
       }
     }
   })
 
-  console.log(exam)
-
   if (!exam) {
     redirect("/404")
   }
 
+  const examWithDetails = exam as unknown as ExamWithDetails
+
   // Vérifier si l'utilisateur a bien complété cet examen
-  if (exam.participants.length === 0 || exam.participants[0].status !== ParticipantStatus.COMPLETED) {
+  if (examWithDetails.participants.length === 0 || examWithDetails.participants[0].status !== ParticipationStatus.COMPLETED) {
     redirect(`/fr/available-exams/${await parameters.id}`)
   }
 
-  console.log(exam)
+  const latestSubmission = examWithDetails.submissions[0]
+  const correction = latestSubmission?.correction
 
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-6">Résultats de l&apos;examen</h1>
 
       <div className="bg-card dark:bg-zinc-900 rounded-lg shadow p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-2">{exam.title}</h2>
-        <p className="text-muted-foreground mb-4">{exam.description}</p>
+        <h2 className="text-2xl font-semibold mb-2">{examWithDetails.title}</h2>
+        <p className="text-muted-foreground mb-4">{examWithDetails.description}</p>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
             <p className="text-sm text-muted-foreground">Date de soumission</p>
             <p className="font-medium">
-              {exam.answers.length > 0
-                ? new Date(exam.answers[0].createdAt).toLocaleString()
+              {latestSubmission
+                ? new Date(latestSubmission.createdAt).toLocaleString()
                 : "Non soumis"}
             </p>
           </div>
@@ -80,20 +109,20 @@ export default async function ExamResultsPage(props: {
           <div>
             <p className="text-sm text-muted-foreground">Note</p>
             <p className="font-medium">
-              {exam.grades.length > 0
-                ? `${exam.grades.find((grade) => grade.studentId === session.user.id)?.finalScore}/${exam.type == ExamType.DOCUMENT ? 20 : (exam.questions.reduce((sum, q) => sum + q.maxPoints, 0))}`
+              {correction
+                ? `${correction.finalScore}/${examWithDetails.type === ExamType.DOCUMENT ? 20 : examWithDetails.questions.reduce((sum, q) => sum + q.maxPoints, 0)}`
                 : "En attente de notation"}
             </p>
           </div>
         </div>
 
-        {exam.grades.length > 0 && exam.grades[0].comments && exam.type !== ExamType.DOCUMENT && (
+        {correction?.comments && examWithDetails.type !== ExamType.DOCUMENT && (
           <div className="mb-6">
             <p className="text-sm text-muted-foreground mb-1">Feedback</p>
             <div className="bg-muted p-4 rounded border">
               <div className="prose dark:prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {exam.grades[0].comments}
+                  {correction.comments}
                 </ReactMarkdown>
               </div>
             </div>
@@ -104,7 +133,7 @@ export default async function ExamResultsPage(props: {
       <h3 className="text-xl font-semibold mb-4">Questions et réponses</h3>
 
       <div className="space-y-6">
-        {exam.type === ExamType.DOCUMENT ? (
+        {examWithDetails.type === ExamType.DOCUMENT ? (
           <div className="bg-card rounded-lg dark:bg-zinc-900 shadow p-6">
             <div className="flex items-start gap-3 mb-4">
               <span className="bg-primary/10 text-primary rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
@@ -122,20 +151,20 @@ export default async function ExamResultsPage(props: {
               <div className="bg-muted p-4 rounded border">
                 <div className="prose dark:prose-invert max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {exam.answers[0]?.content ? JSON.parse(exam.answers[0].content).submittedContent : "Aucune réponse fournie"}
+                    {latestSubmission?.documentPath || "Aucune réponse fournie"}
                   </ReactMarkdown>
                 </div>
               </div>
             </div>
 
             {/* Correction du document */}
-            {exam.fileCorrection && (
+            {examWithDetails.teacherCorrectionPath && (
               <div className="mb-4">
                 <p className="text-sm text-muted-foreground mb-1">Correction :</p>
                 <div className="bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 p-4 rounded border border-blue-200 dark:border-blue-800">
                   <div className="prose dark:prose-invert max-w-none">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {exam.fileCorrection}
+                      {examWithDetails.teacherCorrectionPath}
                     </ReactMarkdown>
                   </div>
                 </div>
@@ -143,11 +172,11 @@ export default async function ExamResultsPage(props: {
             )}
 
             {/* Évaluation IA */}
-            {exam.answers[0]?.content && (
+            {correction?.evaluation && (
               <div className="space-y-4">
                 {(() => {
                   try {
-                    const evaluation = JSON.parse(exam.answers[0].content).evaluation;
+                    const evaluation = JSON.parse(correction.evaluation)
                     return (
                       <>
                         {/* Score */}
@@ -195,31 +224,30 @@ export default async function ExamResultsPage(props: {
                           </div>
                         </div>
                       </>
-                    );
+                    )
                   } catch (e) {
-                    console.error('Error parsing evaluation:', e);
-                    return null;
+                    console.error('Error parsing evaluation:', e)
+                    return null
                   }
                 })()}
               </div>
             )}
           </div>
         ) : (
-          exam.questions.map((question, index) => {
-            const studentAnswer = exam.answers[0]?.questionAnswers.find(
-              qa => qa.questionId === question.id
-            );
-
-            let parsedStudentAnswer;
-            let parsedCorrectAnswer;
+          examWithDetails.questions.map((question, index) => {
+            const answer = latestSubmission?.answers.find(a => a.questionId === question.id)
+            let parsedAnswer = null
+            let parsedCorrectAnswer = null
 
             try {
-              parsedStudentAnswer = studentAnswer ? JSON.parse(studentAnswer.content) : null;
-              parsedCorrectAnswer = question.answer ? JSON.parse(question.answer) : null;
+              if (answer?.content) {
+                parsedAnswer = JSON.parse(answer.content)
+              }
+              if (question.correctAnswer) {
+                parsedCorrectAnswer = JSON.parse(question.correctAnswer[0])
+              }
             } catch (e) {
-              console.error('Error parsing answers:', e);
-              parsedStudentAnswer = null;
-              parsedCorrectAnswer = null;
+              console.error('Error parsing answers:', e)
             }
 
             return (
@@ -234,27 +262,17 @@ export default async function ExamResultsPage(props: {
                   </div>
                 </div>
 
-                {/* Explication de la réponse */}
-                {parsedCorrectAnswer?.explanation && (
-                  <div className="mb-4 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 p-4 rounded border border-blue-200 dark:border-blue-800">
-                    <p className="text-sm font-medium mb-1">Explication :</p>
-                    <p>{parsedCorrectAnswer.explanation}</p>
-                  </div>
-                )}
-
-                {exam.type == ExamType.CODE ? (
+                {examWithDetails.type === ExamType.CODE ? (
                   <div>
-                    {/* Affichage du code soumis */}
-                    
                     {/* Résultats des tests */}
                     <div className="mb-4">
                       <p className="text-sm text-muted-foreground mb-1">Résultats des tests :</p>
                       <div className="space-y-2">
-                        {parsedStudentAnswer?.testResults?.map((test: any, index: number) => (
+                        {parsedAnswer?.testResults?.map((test: { passed : boolean, expected: string, output: string }, index: number) => (
                           <div key={index} className={cn(
                             "p-3 rounded border",
-                            test.passed 
-                              ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" 
+                            test.passed
+                              ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
                               : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
                           )}>
                             <p className="text-sm font-medium">Test {index + 1}</p>
@@ -266,130 +284,78 @@ export default async function ExamResultsPage(props: {
                     </div>
 
                     {/* Évaluation IA */}
-                    <div className="space-y-4">
-                      {/* Score */}
-                      <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
-                        <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Score : {parsedStudentAnswer?.evaluation?.score}/{question.maxPoints}</p>
-                      </div>
+                    {parsedAnswer?.evaluation && (
+                      <div className="space-y-4">
+                        {/* Score */}
+                        <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
+                          <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                            Score : {parsedAnswer.evaluation.score}/{question.maxPoints}
+                          </p>
+                        </div>
 
-                      {/* Explication */}
-                      <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
-                        <p className="text-sm font-medium mb-2">Explication détaillée :</p>
-                        <p className="text-sm text-muted-foreground">{parsedStudentAnswer?.evaluation?.explanation}</p>
-                      </div>
+                        {/* Explication */}
+                        <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
+                          <p className="text-sm font-medium mb-2">Explication détaillée :</p>
+                          <p className="text-sm text-muted-foreground">{parsedAnswer.evaluation.explanation}</p>
+                        </div>
 
-                      {/* Feedback */}
-                      <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
-                        <p className="text-sm font-medium mb-2">Suggestions d'amélioration :</p>
-                        <p className="text-sm text-amber-700 dark:text-amber-300">{parsedStudentAnswer?.evaluation?.feedback}</p>
-                      </div>
+                        {/* Feedback */}
+                        <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
+                          <p className="text-sm font-medium mb-2">Suggestions d&#39;amélioration :</p>
+                          <p className="text-sm text-amber-700 dark:text-amber-300">{parsedAnswer.evaluation.feedback}</p>
+                        </div>
 
-                      {/* Qualité du code */}
-                      <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
-                        <p className="text-sm font-medium mb-2">Analyse de la qualité du code :</p>
-                        <p className="text-sm text-purple-700 dark:text-purple-300">{parsedStudentAnswer?.evaluation?.codeQuality}</p>
+                        {/* Qualité du code */}
+                        <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
+                          <p className="text-sm font-medium mb-2">Analyse de la qualité du code :</p>
+                          <p className="text-sm text-purple-700 dark:text-purple-300">{parsedAnswer.evaluation.codeQuality}</p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ) : exam.type == ExamType.DOCUMENT ? (
-                  <div className="space-y-4">
-                    {/* Contenu soumis */}
-                    <div className="mb-4">
-                      <p className="text-sm text-muted-foreground mb-1">Votre réponse :</p>
-                      <div className="bg-muted p-4 rounded border whitespace-pre-wrap">
-                        {parsedStudentAnswer?.submittedContent || "Aucune réponse fournie"}
-                      </div>
-                    </div>
-
-                    {/* Évaluation IA */}
-                    <div className="space-y-4">
-                      {/* Score */}
-                      <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
-                        <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Score : {parsedStudentAnswer?.evaluation?.score}/{question.maxPoints}</p>
-                      </div>
-
-                      {/* Feedback général */}
-                      <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
-                        <p className="text-sm font-medium mb-2">Feedback général :</p>
-                        <p className="text-sm text-muted-foreground">{parsedStudentAnswer?.evaluation?.feedback}</p>
-                      </div>
-
-                      {/* Points forts */}
-                      <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded border border-green-200 dark:border-green-800">
-                        <p className="text-sm font-medium mb-2">Points forts :</p>
-                        <ul className="list-disc list-inside text-sm text-green-700 dark:text-green-300">
-                          {parsedStudentAnswer?.evaluation?.pointsForts?.map((point: string, index: number) => (
-                            <li key={index}>{point}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Points faibles */}
-                      <div className="bg-red-50 dark:bg-red-950/30 p-4 rounded border border-red-200 dark:border-red-800">
-                        <p className="text-sm font-medium mb-2">Points à améliorer :</p>
-                        <ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300">
-                          {parsedStudentAnswer?.evaluation?.pointsFaibles?.map((point: string, index: number) => (
-                            <li key={index}>{point}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Justification de la note */}
-                      <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
-                        <p className="text-sm font-medium mb-2">Justification de la note :</p>
-                        <p className="text-sm text-purple-700 dark:text-purple-300">{parsedStudentAnswer?.evaluation?.justificationNote}</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground mb-1">Votre réponse:</p>
-                    <div className="bg-muted p-4 rounded border">
-                      {parsedStudentAnswer?.correctAnswers ? (
-                        Array.isArray(parsedStudentAnswer.correctAnswers) ? 
-                          parsedStudentAnswer.correctAnswers.map((answer: string, index: number) => (
-                            <span key={index}>
-                              {answer}
-                              {index < parsedStudentAnswer.correctAnswers.length - 1 ? ', ' : ''}
-                            </span>
-                          ))
-                        : parsedStudentAnswer.correctAnswers
-                      ) : "Aucune réponse fournie"}
+                  <>
+                    {/* Réponse de l'étudiant */}
+                    <div className="mb-4">
+                      <p className="text-sm text-muted-foreground mb-1">Votre réponse:</p>
+                      <div className="bg-muted p-4 rounded border">
+                        {parsedAnswer?.answers ? (
+                          Array.isArray(parsedAnswer.answers) ?
+                            parsedAnswer.answers.join(', ')
+                            : parsedAnswer.answers
+                        ) : "Aucune réponse fournie"}
+                      </div>
                     </div>
-                  </div>
-                )}
 
-                {exam.type !== ExamType.CODE && parsedCorrectAnswer && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Réponse correcte:</p>
-                    <div className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 p-4 rounded border border-emerald-200 dark:border-emerald-800">
-                      {Array.isArray(parsedCorrectAnswer.correctAnswers) ? 
-                        parsedCorrectAnswer.correctAnswers.map((answer: string, index: number) => (
-                          <span key={index}>
-                            {answer}
-                            {index < parsedCorrectAnswer.correctAnswers.length - 1 ? ', ' : ''}
-                          </span>
-                        ))
-                      : parsedCorrectAnswer.correctAnswers}
-                    </div>    
-                  </div>
-                )}
+                    {/* Réponse correcte */}
+                    {parsedCorrectAnswer && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Réponse correcte:</p>
+                        <div className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 p-4 rounded border border-emerald-200 dark:border-emerald-800">
+                          {Array.isArray(parsedCorrectAnswer.answers) ?
+                            parsedCorrectAnswer.answers.join(', ')
+                            : parsedCorrectAnswer.answers}
+                        </div>
+                      </div>
+                    )}
 
-                {/* Feedback selon la réponse */}
-                {exam.type !== ExamType.CODE && parsedStudentAnswer?.isCorrect ? (
-                  <div className="mt-4 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 p-4 rounded border border-green-200 dark:border-green-800">
-                    <p>{parsedCorrectAnswer?.feedback?.correct}</p>
-                  </div>
-                ) : exam.type !== ExamType.CODE && (
-                  <div className="mt-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 p-4 rounded border border-red-200 dark:border-red-800">
-                    <p>{parsedCorrectAnswer?.feedback?.incorrect}</p>
-                  </div>
+                    {/* Feedback */}
+                    {parsedAnswer?.isCorrect ? (
+                      <div className="mt-4 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 p-4 rounded border border-green-200 dark:border-green-800">
+                        <p>{parsedCorrectAnswer?.feedback?.correct}</p>
+                      </div>
+                    ) : (
+                      <div className="mt-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 p-4 rounded border border-red-200 dark:border-red-800">
+                        <p>{parsedCorrectAnswer?.feedback?.incorrect}</p>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
-            );
+            )
           })
         )}
       </div>
     </div>
   )
-} 
+}

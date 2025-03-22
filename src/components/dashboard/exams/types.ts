@@ -59,10 +59,10 @@ export interface ExamData {
     title: string
     description: string | null
     type: string
+    status: ExamStatus
     examDocumentPath: string | null
     teacherCorrectionPath: string | null
     questions: QuestionDto[]
     timeRemaining: number | null
-    maxAttempts: number
     currentAttempt: number
 }

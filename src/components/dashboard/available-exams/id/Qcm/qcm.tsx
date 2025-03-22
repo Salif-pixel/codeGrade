@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,21 +9,22 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, Loader2, CheckCircle } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface Question {
     id: string
     text: string
     options: { id: string; text: string }[]
-    multipleAnswers?: boolean
 }
 
 interface QuizFormProps {
     questions: Question[]
-    onSubmit: (answers: Record<string, string | string[]>) => void
+    onSubmit: () => Promise<void>
     isSubmitting: boolean
 }
 
 export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizFormProps) {
+    const t = useTranslations("exam-taking")
     const [answers, setAnswers] = useState<Record<string, string[]>>({})
     const [errors, setErrors] = useState<string[]>([])
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -46,16 +46,14 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
             }
         })
 
-        // Supprimer l'erreur si elle existe
         if (errors.includes(questionId)) {
             setErrors(errors.filter((id) => id !== questionId))
         }
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Vérifier que toutes les questions ont une réponse
         const unansweredQuestions = questions.filter((q) => {
             const answer = answers[q.id]
             return !answer || answer.length === 0
@@ -63,31 +61,14 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
 
         if (unansweredQuestions.length > 0) {
             setErrors(unansweredQuestions)
-
-            // Trouver l'index de la première question sans réponse
             const firstUnansweredIndex = questions.findIndex((q) => unansweredQuestions.includes(q.id))
             if (firstUnansweredIndex !== -1) {
                 setCurrentQuestionIndex(firstUnansweredIndex)
             }
-
             return
         }
 
-        // Convertir les réponses à choix unique (un seul élément dans le tableau) en chaîne simple
-        const formattedAnswers: Record<string, string | string[]> = {}
-        
-        Object.entries(answers).forEach(([questionId, answerArray]) => {
-            // Si la question n'est pas à choix multiples et qu'il n'y a qu'une seule réponse,
-            // on peut la convertir en chaîne simple
-            const question = questions.find(q => q.id === questionId)
-            if (!question?.multipleAnswers && answerArray.length === 1) {
-                formattedAnswers[questionId] = answerArray[0]
-            } else {
-                formattedAnswers[questionId] = answerArray
-            }
-        })
-        
-        onSubmit(formattedAnswers)
+        await onSubmit()
     }
 
     const goToNextQuestion = () => {
@@ -104,8 +85,6 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
 
     const currentQuestion = questions[currentQuestionIndex]
     const progressPercentage = (Object.keys(answers).filter(id => answers[id].length > 0).length / questions.length) * 100
-    
-    // Obtenir les réponses actuelles pour la question courante
     const currentAnswers = answers[currentQuestion?.id] || []
 
     return (
@@ -113,10 +92,16 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
             <div className="mb-6">
                 <div className="mb-2 flex items-center justify-between">
                     <div className="text-sm font-medium text-muted-foreground">
-                        Progression: {Object.keys(answers).filter(id => answers[id].length > 0).length}/{questions.length} questions répondues
+                        {t("progress", {
+                            answered: Object.keys(answers).filter(id => answers[id].length > 0).length,
+                            total: questions.length
+                        })}
                     </div>
                     <div className="text-sm font-medium text-muted-foreground">
-                        Question {currentQuestionIndex + 1} sur {questions.length}
+                        {t("questionNumber", {
+                            current: currentQuestionIndex + 1,
+                            total: questions.length
+                        })}
                     </div>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
@@ -126,13 +111,11 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                 <Card className="mb-6 border shadow-md">
                     <CardHeader className="bg-muted/50 pb-3">
                         <CardTitle className="text-lg font-medium">
-                            Question {currentQuestionIndex + 1}: {currentQuestion?.text}
+                            {t("questionTitle", {
+                                number: currentQuestionIndex + 1,
+                                text: currentQuestion?.text
+                            })}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            {currentQuestion?.multipleAnswers 
-                                ? "Vous pouvez sélectionner plusieurs réponses" 
-                                : "Sélectionnez une ou plusieurs réponses"}
-                        </p>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="space-y-3">
@@ -175,7 +158,7 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                         {errors.includes(currentQuestion?.id) && (
                             <div className="mt-4 flex items-center gap-2 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                                 <AlertCircle className="h-5 w-5" />
-                                <span>Veuillez sélectionner au moins une réponse pour cette question</span>
+                                <span>{t("selectAnswer")}</span>
                             </div>
                         )}
                     </CardContent>
@@ -186,24 +169,28 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                             onClick={goToPreviousQuestion}
                             disabled={currentQuestionIndex === 0}
                         >
-                            Question précédente
+                            {t("previousQuestion")}
                         </Button>
 
                         {currentQuestionIndex < questions.length - 1 ? (
                             <Button type="button" onClick={goToNextQuestion}>
-                                Question suivante
+                                {t("nextQuestion")}
                             </Button>
                         ) : (
-                            <Button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800">
+                            <Button 
+                                type="submit" 
+                                disabled={isSubmitting}
+                                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+                            >
                                 {isSubmitting ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Soumission en cours...
+                                        {t("submitting")}
                                     </>
                                 ) : (
                                     <>
                                         <CheckCircle className="mr-2 h-4 w-4" />
-                                        Terminer le QCM
+                                        {t("finishQuiz")}
                                     </>
                                 )}
                             </Button>
@@ -233,26 +220,6 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                             </button>
                         )
                     })}
-                </div>
-
-                <div className="flex justify-end">
-                    <Button 
-                        type="submit" 
-                        className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800" 
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Soumission en cours...
-                            </>
-                        ) : (
-                            <>
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                Terminer le QCM
-                            </>
-                        )}
-                    </Button>
                 </div>
             </form>
         </div>

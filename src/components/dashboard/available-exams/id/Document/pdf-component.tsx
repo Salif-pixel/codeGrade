@@ -1,12 +1,23 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import { Clock, FileText } from "lucide-react"
-import PdfUpload from "@/components/dashboard/test/Document/pdf-upload"
+import PdfUpload from "@/components/dashboard/available-exams/id/Document/pdf-upload"
 import FileRenderer from "@/components/utilities/file-renderer"
 import { extractContentFromDocument } from "@/actions/utils.action"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useTranslations } from "next-intl"
+import { ExamData } from "@/components/dashboard/exams/types"
+
+interface PdfComponentProps {
+  assignment: ExamData
+  activeTab: string
+  setActiveTab: (tab: string) => void
+  handleSubmit: () => Promise<void>
+  isSubmitting: boolean
+}
 
 export default function PdfComponent({
   assignment,
@@ -14,15 +25,7 @@ export default function PdfComponent({
   setActiveTab,
   handleSubmit,
   isSubmitting,
-  submittedFile,
-}: {
-  assignment: any
-  activeTab: string
-  setActiveTab: any
-  handleSubmit: any
-  isSubmitting: any
-  submittedFile?: { url: string; type: string }
-}) {
+}: PdfComponentProps) {
   const t = useTranslations("exam-taking")
   const [file, setFile] = useState<File | null>(null)
   const [content, setContent] = useState<string | ArrayBuffer | null>(null)
@@ -30,12 +33,11 @@ export default function PdfComponent({
   const [success, setSuccess] = useState<string | null>(null)
 
   useEffect(() => {
-    if (assignment.filePath) {
-      fetch(assignment.filePath)
+    if (assignment.examDocumentPath) {
+      fetch(assignment.examDocumentPath)
         .then((res) => res.blob())
         .then((blob) => {
-          const fileType = assignment.format || "txt"
-          const newFile = new File([blob], "document." + fileType, { type: blob.type })
+          const newFile = new File([blob], "document.pdf", { type: "application/pdf" })
           setFile(newFile)
 
           const reader = new FileReader()
@@ -47,36 +49,25 @@ export default function PdfComponent({
           setError(t("fileLoadError"))
         })
     }
-  }, [assignment.filePath, t])
+  }, [assignment.examDocumentPath, t])
 
   const onSubmit = async (data: { file: File }) => {
     try {
       setError(null)
       setSuccess(null)
 
-      // Vérifier le type de fichier
       if (!data.file.type.includes('pdf')) {
         setError(t("invalidFileType"))
         return
       }
 
-      // Vérifier la taille du fichier (max 10MB)
       if (data.file.size > 10 * 1024 * 1024) {
         setError(t("fileTooLarge"))
         return
       }
 
-      // Extraire le contenu du PDF soumis
-      const pdfContent = await extractContentFromDocument(data.file, "pdf")
-
-      // Appeler la fonction handleSubmit avec le contenu du PDF
-      const result = await handleSubmit(pdfContent)
-
-      if (result?.success) {
-        setSuccess(t("submitSuccess"))
-      } else {
-        setError(result?.error || t("submitError"))
-      }
+      await handleSubmit()
+      setSuccess(t("submitSuccess"))
     } catch (error) {
       console.error("Erreur lors de la soumission :", error)
       setError(t("submitError"))
@@ -103,13 +94,13 @@ export default function PdfComponent({
               </div>
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-orange-500" />
-                <span>{t("duration", { minutes: assignment.duration })}</span>
+                <span>{t("timeRemaining", { time: assignment.timeRemaining })}</span>
               </div>
             </Card>
           </TabsContent>
           <TabsContent value="document" className="mt-4">
             <div className="rounded border p-4">
-              {assignment.filePath && file ? (
+              {assignment.examDocumentPath && file ? (
                 <div>
                   <h3 className="mb-2 text-lg font-semibold">{t("professorDocument")}</h3>
                   <FileRenderer file={file} content={content} />
@@ -143,7 +134,7 @@ export default function PdfComponent({
       <div className="hidden lg:block">
         <h2 className="mb-4 text-lg font-semibold">{t("professorDocument")}</h2>
         <div className="rounded border p-4">
-          {assignment.filePath && file ? (
+          {assignment.examDocumentPath && file ? (
             <FileRenderer file={file} content={content} />
           ) : (
             <div className="flex h-[800px] items-center justify-center bg-gray-100">

@@ -1,49 +1,52 @@
+"use client"
+
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Clock, CodeIcon } from "lucide-react"
-import CodeEditor from "@/components/dashboard/test/Code/code"
+import CodeEditor from "@/components/dashboard/available-exams/id/Code/code"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-import executeCode  from "./code"
+import { useTranslations } from "next-intl"
+import { ExamData } from "@/components/dashboard/exams/types"
 
-interface Question {
-  id: string
-  text: string
-  maxPoints: number
-  programmingLanguage: "javascript" | "python" | "sql"
-  initialCode?: string
-  answer?: string
-}
-
-interface Answer {
+interface CodeSubmission {
   code: string
   testResults: any[]
   isCorrect: boolean
 }
 
+interface CodeQuestion {
+  id: string
+  text: string
+  maxPoints: number
+  programmingLanguage: string
+  initialCode?: string
+  tests?: { input: string; expectedOutput: string }[]
+}
+
 interface CodeComponentProps {
-  assignment: {
-    questions: Question[]
-    description?: string
-  }
-  handleSubmit: (answers: Record<string, any>) => void
+  assignment: ExamData
+  handleSubmit: () => Promise<void>
   isSubmitting: boolean
 }
 
 export default function CodeComponent({ assignment, handleSubmit, isSubmitting }: CodeComponentProps) {
+  const t = useTranslations("exam-taking")
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, Answer>>({})
-  console.log(assignment.questions)
-  const handleCodeSubmit = async (questionId: string, data: { code: string; testResults: any[]; isCorrect: boolean }) => {
-    console.log('Saving code answer:', data);
+  const [answers, setAnswers] = useState<Record<string, CodeSubmission>>({})
+
+  const handleCodeSubmit = async (code: string, testResults: any[]) => {
+    const currentQuestion = assignment.questions[currentQuestionIndex] as CodeQuestion
+    const isCorrect = testResults.every(result => result.passed)
+
     setAnswers(prev => ({
       ...prev,
-      [questionId]: {
-        code: data.code,
-        testResults: data.testResults,
-        isCorrect: data.isCorrect
+      [currentQuestion.id]: {
+        code,
+        testResults,
+        isCorrect
       }
-    }));
+    }))
   }
 
   const goToNextQuestion = () => {
@@ -59,68 +62,54 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
   }
 
   const handleFinalSubmit = async () => {
-    // Envoyer toutes les réponses d'un coup lors de la soumission finale
-    const formattedAnswers = Object.entries(answers).map(([questionId, answer]) => ({
-      questionId,
-      content: JSON.stringify({
-        type: "code",
-        code: answer.code,
-        testResults: answer.testResults,
-        correctAnswers: answer.code,
-        isCorrect: answer.isCorrect
-      })
-    }));
-
-    console.log('Submitting answers:', formattedAnswers);
-    handleSubmit(formattedAnswers);
+    await handleSubmit()
   }
 
-  const currentQuestion = assignment.questions[currentQuestionIndex]
+  const currentQuestion = assignment.questions[currentQuestionIndex] as CodeQuestion
   const progressPercentage = (Object.keys(answers).length / assignment.questions.length) * 100
-  let currentTests = [];
-  
-  try {
-    // Extraire les tests de la réponse correcte
-    if (currentQuestion.answer) {
-      const answerData = JSON.parse(currentQuestion.answer);
-      currentTests = answerData.tests || [];
-    }
-  } catch (error) {
-    console.error("Erreur lors de l'analyse des tests:", error);
-  }
 
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-sm font-medium text-muted-foreground">
-            Progression: {Object.keys(answers).length}/{assignment.questions.length} questions répondues
+            {t("progress", {
+              answered: Object.keys(answers).length,
+              total: assignment.questions.length
+            })}
           </div>
           <div className="text-sm font-medium text-muted-foreground">
-            Question {currentQuestionIndex + 1} sur {assignment.questions.length}
+            {t("questionNumber", {
+              current: currentQuestionIndex + 1,
+              total: assignment.questions.length
+            })}
           </div>
         </div>
         <Progress value={progressPercentage} className="h-2" />
       </div>
 
       <Card className="mb-6 p-4">
-        <h2 className="mb-2 text-lg font-semibold">Question {currentQuestionIndex + 1}</h2>
-        <p className="mb-4">{currentQuestion.text}</p>
+        <h2 className="mb-2 text-lg font-semibold">
+          {t("questionTitle", {
+            number: currentQuestionIndex + 1,
+            text: currentQuestion.text
+          })}
+        </h2>
         <div className="flex items-center gap-2 text-sm">
           <CodeIcon className="h-4 w-4 text-indigo-500"/>
-          <span>Langage: {currentQuestion.programmingLanguage?.toUpperCase()}</span>
+          <span>{t("language", { language: currentQuestion.programmingLanguage?.toUpperCase() })}</span>
         </div>
         <div className="mt-2 flex items-center gap-2 text-sm">
           <Clock className="h-4 w-4 text-orange-500"/>
-          <span>Points: {currentQuestion.maxPoints}</span>
+          <span>{t("points", { points: currentQuestion.maxPoints })}</span>
         </div>
       </Card>
 
       <CodeEditor
         initialCode={currentQuestion.initialCode || ""}
         language={currentQuestion.programmingLanguage}
-        tests={currentTests}
-        onSubmit={(data) => handleCodeSubmit(currentQuestion.id, data)}
+        tests={currentQuestion.tests || []}
+        onSubmit={handleCodeSubmit}
         isSubmitting={isSubmitting}
       />
 
@@ -130,20 +119,20 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
           onClick={goToPreviousQuestion}
           disabled={currentQuestionIndex === 0}
         >
-          Question précédente
+          {t("previousQuestion")}
         </Button>
 
         {currentQuestionIndex < assignment.questions.length - 1 ? (
           <Button onClick={goToNextQuestion}>
-            Question suivante
+            {t("nextQuestion")}
           </Button>
         ) : (
-          <Button 
+          <Button
             onClick={handleFinalSubmit}
             disabled={isSubmitting || Object.keys(answers).length !== assignment.questions.length}
             className="bg-green-600 hover:bg-green-700"
           >
-            Terminer l&apos;examen
+            {t("finishExam")}
           </Button>
         )}
       </div>
@@ -151,7 +140,7 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
       <div className="mt-6 flex flex-wrap gap-2">
         {assignment.questions.map((question, index) => {
           const hasAnswer = answers[question.id]
-          
+
           return (
             <button
               key={question.id}
