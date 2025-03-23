@@ -28,7 +28,6 @@ import { User, ParticipationStatus, ExamType} from "@prisma/client"
 import {useLocale, useTranslations} from "next-intl"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem} from "@/components/ui/dropdown-menu"
 import {cn} from "@/lib/utils"
-import {updateParticipantStatus} from "@/actions/examActions"
 import {SimpleHeaderTitle} from "@/components/dashboard/header/header-title"
 import {formatDuration, getExamStatus, getStatusBadge, StatusBadge} from "./utils"
 import {Assignment, AssignmentDetailsProps, AssignmentListProps} from "@/components/dashboard/exams/types";
@@ -432,21 +431,21 @@ function AssignmentDetails({ assignment, onBack, onCopyInviteLink }: AssignmentD
     const [studentResults, setStudentResults] = useState(studentsResults || [])
 
     const handleStatusUpdate = async (participantId: string, newStatus: ParticipationStatus) => {
-        try {
-            const result = await updateParticipantStatus(participantId, newStatus)
+        // try {
+        //     const result = await updateParticipantStatus(participantId, newStatus)
 
-            if (result.success) {
-                showToast("Succès", t("toast.statusUpdate.success"), "success")
-                const updatedResults = studentResults.map((student) =>
-                    student?.id === participantId ? { ...student, status: newStatus } : student,
-                )
-                setStudentResults(updatedResults)
-            } else {
-                throw new Error(result.error)
-            }
-        } catch {
-            showToast("Erreur", t("toast.statusUpdate.error"), "error")
-        }
+        //     if (result.success) {
+        //         showToast("Succès", t("toast.statusUpdate.success"), "success")
+        //         const updatedResults = studentResults.map((student) =>
+        //             student?.id === participantId ? { ...student, status: newStatus } : student,
+        //         )
+        //         setStudentResults(updatedResults)
+        //     } else {
+        //         throw new Error(result.error)
+        //     }
+        // } catch {
+        //     showToast("Erreur", t("toast.statusUpdate.error"), "error")
+        // }
     }
 
     const totalMaxPoints = assignment.questions.reduce((acc, q) => acc + q.maxPoints, 0)
