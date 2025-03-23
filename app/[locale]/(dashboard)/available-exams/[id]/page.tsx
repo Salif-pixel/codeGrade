@@ -64,6 +64,8 @@ export default async function TakeExamPage({ params }: { params: Promise<{ id: s
   const session = await auth.api.getSession({ headers: header })
   const { id } = await params
 
+  const locale = "fr"
+
   if (!session?.user) {
     redirect(`/auth/login?callbackUrl=/available-exams/${id}`)
   }
@@ -74,12 +76,12 @@ export default async function TakeExamPage({ params }: { params: Promise<{ id: s
     const now = new Date()
     const exam = await prisma.exam.findUnique({ where: { id } })
     if (exam?.startDate && exam.startDate > now) {
-      redirect(`/available-exams?error=not_started`)
+      redirect(`/${locale}/available-exams?error=not_started`)
     }
     if (exam?.endDate && exam.endDate < now) {
-      redirect(`/available-exams?error=expired`)
+      redirect(`/${locale}/available-exams?error=expired`)
     }
-    redirect("/available-exams")
+    redirect(`/${locale}/available-exams`)
   }
 
   return <TakeExamComponent exam={examData} userId={session.user.id} />

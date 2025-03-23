@@ -607,9 +607,9 @@
   },
   "exams": {
     "choices": {
-        "QCM": "Choix multiples",
-        "document": "Document",
-        "code": "Code"
+      "QCM": "Choix multiples",
+      "document": "Document",
+      "code": "Code"
     },
     "aiGeneration-generate": "Generer les réponses",
     "addChoice": "Ajouter un choix",
@@ -1012,6 +1012,16 @@
       "code": "Écrivez votre code dans l'espace prévu.",
       "document": "Répondez aux questions dans les zones de texte fournies."
     },
+    "questionTitle": "Question {number} : {text}",
+    "progress": "Progrès : {answered} sur {total}",
+    "questionNumber": "Question {current} sur {total}",
+    "previousQuestion": "Précédente",
+    "nextQuestion": "Suivante",
+    "finishQuiz": "Terminer",
+    "finishExam": "Terminer",
+    "selectAnswer" : "choisir une reponse au moins",
+    "language": "Langage : {language}",
+    "points": "{points} points",
     "maxPoints": "Points maximum",
     "answerPlaceholder": "Écrivez votre réponse ici...",
     "codePlaceholder": "Écrivez votre code {language} ici...",
@@ -1049,5 +1059,4 @@
     },
     "confirmSubmitIncomplete": "Certaines questions n'ont pas été répondues. Voulez-vous quand même soumettre l'examen ?"
   }
-
 }

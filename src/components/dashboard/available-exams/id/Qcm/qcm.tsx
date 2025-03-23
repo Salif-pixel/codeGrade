@@ -20,19 +20,20 @@ interface Question {
 interface QuizFormProps {
     questions: Question[]
     onSubmit: () => Promise<void>
-    isSubmitting: boolean
+    isSubmitting: boolean,
+    answers: Record<string, string[]>,
+    setAnswers: React.Dispatch<React.SetStateAction<Record<string, string[]>>>
 }
 
-export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizFormProps) {
+export default function QuizForm({ questions, onSubmit, isSubmitting, answers, setAnswers }: QuizFormProps) {
     const t = useTranslations("exam-taking")
-    const [answers, setAnswers] = useState<Record<string, string[]>>({})
     const [errors, setErrors] = useState<string[]>([])
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
     const handleAnswerChange = (questionId: string, optionId: string, checked: boolean) => {
         setAnswers((prev) => {
             const currentAnswers = prev[questionId] || []
-            
+
             if (checked) {
                 return {
                     ...prev,
@@ -121,31 +122,31 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                         <div className="space-y-3">
                             {currentQuestion?.options.map((option) => {
                                 const isChecked = currentAnswers.includes(option.id)
-                                
+
                                 return (
                                     <div
                                         key={option.id}
                                         className={cn(
                                             "flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent/50",
-                                            isChecked 
-                                                ? "border-primary bg-primary/10" 
+                                            isChecked
+                                                ? "border-primary bg-primary/10"
                                                 : "border-border"
                                         )}
                                     >
-                                        <Checkbox 
+                                        <Checkbox
                                             id={`${currentQuestion.id}-${option.id}`}
                                             checked={isChecked}
-                                            onCheckedChange={(checked) => 
+                                            onCheckedChange={(checked) =>
                                                 handleAnswerChange(
-                                                    currentQuestion.id, 
-                                                    option.id, 
+                                                    currentQuestion.id,
+                                                    option.id,
                                                     checked as boolean
                                                 )
                                             }
                                             className="h-5 w-5"
                                         />
-                                        <Label 
-                                            htmlFor={`${currentQuestion.id}-${option.id}`} 
+                                        <Label
+                                            htmlFor={`${currentQuestion.id}-${option.id}`}
                                             className="flex-grow cursor-pointer text-base"
                                         >
                                             {option.text}
@@ -156,7 +157,7 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                         </div>
 
                         {errors.includes(currentQuestion?.id) && (
-                            <div className="mt-4 flex items-center gap-2 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                            <div className="mt-4 flex items-center gap-2 rounded-md bg-primary/10 p-3 text-sm text-primary">
                                 <AlertCircle className="h-5 w-5" />
                                 <span>{t("selectAnswer")}</span>
                             </div>
@@ -177,8 +178,8 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                                 {t("nextQuestion")}
                             </Button>
                         ) : (
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isSubmitting}
                                 className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
                             >
@@ -201,7 +202,7 @@ export default function QuizForm({ questions, onSubmit, isSubmitting }: QuizForm
                 <div className="mb-6 flex flex-wrap gap-2">
                     {questions.map((question, index) => {
                         const hasAnswer = answers[question.id]?.length > 0
-                        
+
                         return (
                             <button
                                 key={question.id}
