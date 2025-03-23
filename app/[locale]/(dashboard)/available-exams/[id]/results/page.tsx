@@ -1,11 +1,13 @@
-import {redirect} from "next/navigation"
-import {headers} from "next/headers"
-import {auth} from "@/lib/auth"
-import {prisma} from "@/lib/prisma"
-import {ExamType, ParticipationStatus, Question, Exam} from "@prisma/client"
-import {cn} from "@/lib/utils"
+import { redirect } from "next/navigation"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import { ExamType, ParticipationStatus, Question, Exam } from "@prisma/client"
+import { cn } from "@/lib/utils"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
 type QuestionAnswer = {
     id: string
@@ -26,6 +28,8 @@ type ExamSubmission = {
         finalScore: number
         comments: string | null
         evaluation: string | null
+        aiFeedback: string | null
+        improvement: string | null
     } | null
 }
 
@@ -40,6 +44,21 @@ type ExamWithDetails = Exam & {
         userId: string
     }[]
     submissions: ExamSubmission[]
+}
+
+const inferLanguage = (lang : 'javascript' | 'python' | 'java' | 'cpp') => {
+    switch (lang) {
+        case 'javascript':
+            return 'js'
+        case 'python':
+            return 'py'
+        case 'java':
+            return 'java'
+        case 'cpp':
+            return 'cpp'
+        default:
+            return 'js'
+    }
 }
 
 export default async function ExamResultsPage(props: {
@@ -58,14 +77,14 @@ export default async function ExamResultsPage(props: {
     }
 
     const exam = await prisma.exam.findUnique({
-        where: {id: await parameters.id},
+        where: { id: await parameters.id },
         include: {
             questions: true,
             participants: {
-                where: {userId: session.user.id}
+                where: { userId: session.user.id }
             },
             submissions: {
-                where: {studentId: session.user.id},
+                where: { studentId: session.user.id },
                 include: {
                     answers: true,
                     correction: true
@@ -136,10 +155,10 @@ export default async function ExamResultsPage(props: {
                 {examWithDetails.type === ExamType.DOCUMENT ? (
                     <div className="bg-card rounded-lg dark:bg-zinc-900 shadow p-6">
                         <div className="flex items-start gap-3 mb-4">
-              <span
-                  className="bg-primary/10 text-primary rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-                1
-              </span>
+                            <span
+                                className="bg-primary/10 text-primary rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                1
+                            </span>
                             <div>
                                 <h4 className="font-medium">Document soumis</h4>
                                 <p className="text-sm text-muted-foreground">Points maximum: 20</p>
@@ -247,7 +266,7 @@ export default async function ExamResultsPage(props: {
                         let parsedAnswer = null
                         let parsedCorrectAnswer = null
 
-                        console.log("--------------",answer,"--------------",question,"--------------")
+                        // console.log("--------------", answer, "--------------", question, "--------------", latestSubmission, "--------------")
 
                         const answerArray = answer?.content.split(',') ?? []
                         const isCorrect = question.correctAnswer?.every(correctAnswer => answerArray.includes(correctAnswer)) && question.correctAnswer?.length === answerArray.length
@@ -266,10 +285,10 @@ export default async function ExamResultsPage(props: {
                         return (
                             <div key={question.id} className="bg-card rounded-lg dark:bg-zinc-900 shadow p-6">
                                 <div className="flex items-start gap-3 mb-4">
-                  <span
-                      className="bg-primary/10 text-primary rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-                    {index + 1}
-                  </span>
+                                    <span
+                                        className="bg-primary/10 text-primary rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                        {index + 1}
+                                    </span>
                                     <div>
                                         <h4 className="font-medium">{question.text}</h4>
                                         <p className="text-sm text-muted-foreground">Points
@@ -279,64 +298,39 @@ export default async function ExamResultsPage(props: {
 
                                 {examWithDetails.type === ExamType.CODE ? (
                                     <div>
-                                        {/* Résultats des tests */}
+                                        {/* Code soumis */}
                                         <div className="mb-4">
-                                            <p className="text-sm text-muted-foreground mb-1">Résultats des tests :</p>
-                                            <div className="space-y-2">
-                                                {parsedAnswer?.testResults?.map((test: {
-                                                    passed: boolean,
-                                                    expected: string,
-                                                    output: string
-                                                }, index: number) => (
-                                                    <div key={index} className={cn(
-                                                        "p-3 rounded border",
-                                                        test.passed
-                                                            ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
-                                                            : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
-                                                    )}>
-                                                        <p className="text-sm font-medium">Test {index + 1}</p>
-                                                        <p className="text-sm mt-1">Attendu : {test.expected}</p>
-                                                        <p className="text-sm">Obtenu
-                                                            : {test.output || "Pas de sortie"}</p>
-                                                    </div>
-                                                ))}
+                                            <p className="text-sm text-muted-foreground mb-1">Code soumis :</p>
+                                            <div className="bg-muted rounded border overflow-hidden">
+                                                <SyntaxHighlighter
+                                                    language={inferLanguage(question.programmingLanguage as 'javascript' | 'python' | 'java' | 'cpp')}
+                                                    style={oneDark}
+                                                    customStyle={{
+                                                        margin: 0,
+                                                        borderRadius: 0,
+                                                    }}
+                                                >
+                                                    {answer?.content || ''}
+                                                </SyntaxHighlighter>
                                             </div>
                                         </div>
 
-                                        {/* Évaluation IA */}
-                                        {parsedAnswer?.evaluation && (
-                                            <div className="space-y-4">
-                                                {/* Score */}
-                                                <div
-                                                    className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
-                                                    <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                                                        Score : {parsedAnswer?.evaluation.score}/{question.maxPoints}
-                                                    </p>
-                                                </div>
-
-                                                {/* Explication */}
-                                                <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
-                                                    <p className="text-sm font-medium mb-2">Explication détaillée :</p>
-                                                    <p className="text-sm text-muted-foreground">{parsedAnswer?.evaluation.explanation}</p>
-                                                </div>
-
-                                                {/* Feedback */}
-                                                <div
-                                                    className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
-                                                    <p className="text-sm font-medium mb-2">Suggestions
-                                                        d&#39;amélioration :</p>
-                                                    <p className="text-sm text-amber-700 dark:text-amber-300">{parsedAnswer?.evaluation.feedback}</p>
-                                                </div>
-
-                                                {/* Qualité du code */}
-                                                <div
-                                                    className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
-                                                    <p className="text-sm font-medium mb-2">Analyse de la qualité du
-                                                        code :</p>
-                                                    <p className="text-sm text-purple-700 dark:text-purple-300">{parsedAnswer?.evaluation.codeQuality}</p>
-                                                </div>
+                                        {/* Cas de tests */}
+                                        <div className="mb-4">
+                                            <p className="text-sm text-muted-foreground mb-1">Cas de tests :</p>
+                                            <div className="space-y-2">
+                                                {question.testCases?.map((test, index) => {
+                                                    const [input, expectedOutput] = test.split("=>")
+                                                    return (
+                                                        <div key={index} className="p-3 rounded border bg-muted">
+                                                            <p className="text-sm font-medium">Test {index + 1}</p>
+                                                            <p className="text-sm mt-1">Entrée : {input}</p>
+                                                            <p className="text-sm">Sortie attendue : {expectedOutput}</p>
+                                                        </div>
+                                                    )
+                                                })}
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                 ) : (
                                     <>
@@ -392,6 +386,51 @@ export default async function ExamResultsPage(props: {
                     })
                 )}
             </div>
+
+            {/* Bloc de correction globale pour les examens de type CODE */}
+            {examWithDetails.type === ExamType.CODE && latestSubmission?.correction && (
+                <div className="mt-8 bg-card dark:bg-zinc-900 rounded-lg shadow p-6">
+                    <h3 className="text-xl font-semibold mb-4">Évaluation globale</h3>
+                    <div className="space-y-4">
+                        {/* Score global */}
+                        <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded border border-blue-200 dark:border-blue-800">
+                            <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                Score total : {latestSubmission.correction.finalScore}/{examWithDetails.questions.reduce((sum, q) => sum + q.maxPoints, 0)}
+                            </p>
+                        </div>
+
+                        {/* Feedback IA */}
+                        {latestSubmission.correction.aiFeedback && (
+                            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
+                                <p className="text-sm font-medium mb-2">Feedback global :</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {latestSubmission.correction.aiFeedback}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Suggestions d'amélioration */}
+                        {latestSubmission.correction.improvement && (
+                            <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
+                                <p className="text-sm font-medium mb-2">Suggestions d'amélioration :</p>
+                                <p className="text-sm text-amber-700 dark:text-amber-300">
+                                    {latestSubmission.correction.improvement}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Commentaires manuels */}
+                        {latestSubmission.correction.comments && (
+                            <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded border border-purple-200 dark:border-purple-800">
+                                <p className="text-sm font-medium mb-2">Commentaires du correcteur :</p>
+                                <p className="text-sm text-purple-700 dark:text-purple-300">
+                                    {latestSubmission.correction.comments}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
