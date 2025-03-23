@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2 } from "lucide-react"
 import Editor from "@monaco-editor/react"
@@ -23,12 +22,12 @@ interface TestResult {
     expected: string
 }
 
-export default function CodeEditor({ initialCode, language, tests, onSubmit, isSubmitting }: CodeEditorProps) {
+export default function CodeEditor({ initialCode, language, onSubmit, isSubmitting }: CodeEditorProps) {
     const [code, setCode] = useState(initialCode || "")
     const [output, setOutput] = useState("")
     const [isRunning, setIsRunning] = useState(false)
     const [testResults, setTestResults] = useState<TestResult[]>([])
-    const [allTestsPassed, setAllTestsPassed] = useState(false)
+    // const [allTestsPassed, setAllTestsPassed] = useState(false)
 
     const handleEditorChange = (value: string | undefined) => {
         if (value !== undefined) {
@@ -51,12 +50,7 @@ export default function CodeEditor({ initialCode, language, tests, onSubmit, isS
 
     const handleSubmit = () => {
         // Soumettre le code sans exécuter les tests
-        onSubmit({
-            code: code,
-            testResults: [],
-            type: "code",
-            correctAnswers: code,
-        })
+        onSubmit(code, testResults)
     }
 
     async function executeCode(code: string, language: string) {
@@ -66,7 +60,7 @@ export default function CodeEditor({ initialCode, language, tests, onSubmit, isS
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code, language })
             });
-            
+
             const result = await response.json();
             return { output: result.output || result.error };
         } catch (error) {
