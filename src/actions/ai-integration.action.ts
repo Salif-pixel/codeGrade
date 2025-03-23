@@ -100,28 +100,31 @@ export async function generateCodeTestCases(
     model: string = process.env.AI_MODEL || "deepseek/deepseek-chat:free"
 ) {
     const schema = {
-        type: "object",
-        properties: {
-            testCases: {
-                type: "array",
-                items: {
-                    type: "object",
-                    properties: {
-                        input: {
-                            type: "string",
-                            description: "Entrée du test au format approprié pour le langage"
+        type: "array",
+        items: {
+            type: "object",
+            properties: {
+                testCases: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            input: {
+                                type: "string",
+                                description: "Entrée du test au format approprié pour le langage"
+                            },
+                            expectedOutput: {
+                                type: "string",
+                                description: "Résultat exact attendu"
+                            }
                         },
-                        expectedOutput: {
-                            type: "string",
-                            description: "Résultat exact attendu"
-                        }
-                    },
-                    required: ["input", "expectedOutput"]
-                }
-            }
-        },
-        required: ["testCases"],
-        additionalProperties: false
+                        required: ["input", "expectedOutput"]
+                    }
+                },
+            },
+            required: ["testCases"],
+            additionalProperties: false
+        }
     };
 
     try {

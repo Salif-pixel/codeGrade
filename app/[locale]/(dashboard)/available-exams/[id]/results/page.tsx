@@ -247,6 +247,8 @@ export default async function ExamResultsPage(props: {
                         let parsedAnswer = null
                         let parsedCorrectAnswer = null
 
+                        console.log("--------------",answer,"--------------",question,"--------------")
+
                         const answerArray = answer?.content.split(',') ?? []
                         const isCorrect = question.correctAnswer?.every(correctAnswer => answerArray.includes(correctAnswer)) && question.correctAnswer?.length === answerArray.length
 

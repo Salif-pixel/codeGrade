@@ -20,12 +20,19 @@ interface CodeSubmission {
     programmingLanguage: string;
 }
 
+interface CodeSub {
+    code: string
+    testResults: any[]
+    isCorrect: boolean
+  }
+
 export default function TakeExamComponent({exam, userId}: { exam: ExamData; userId: string }) {
     const t = useTranslations("exam-taking")
     const router = useRouter()
     const local = useLocale()
 
     const [answers, setAnswers] = useState<Record<string, string[]>>({})
+    const [codeAnswers, setCodeAnswers] = useState<Record<string, CodeSub[]>>({})
     const [submitting, setSubmitting] = useState(false)
     const [timeLeft, setTimeLeft] = useState<string | null>(null)
     const [alert, setAlert] = useState<{
@@ -114,17 +121,17 @@ export default function TakeExamComponent({exam, userId}: { exam: ExamData; user
                 }))
                 result = await handleQcmSubmission(exam.id, userId, qcmSubmissions)
             } else if (exam.type === ExamType.CODE) {
-                console.log(Object.entries(answers).map(([questionId, code]) => ({
-                    questionId,
-                    code: code[0] || "",
-                    programmingLanguage: exam.questions.find(q => q.id === questionId)?.programmingLanguage || "javascript"
-                })) as CodeSubmission[])
-                // const codeSubmissions = Object.entries(answers).map(([questionId, code]) => ({
-                //     questionId,
-                //     code: code[0] || "",
-                //     programmingLanguage: exam.questions.find(q => q.id === questionId)?.programmingLanguage || "javascript"
-                // })) as CodeSubmission[]
-                // result = await handleCodeSubmission(exam.id, userId, codeSubmissions)
+                const codeSubmissions = Object.entries(codeAnswers).map(([questionId, submissions]) => {
+                    const latestSubmission = submissions[submissions.length - 1]
+                    return {
+                        questionId,
+                        code: latestSubmission?.code || "",
+                        programmingLanguage: exam.questions.find(q => q.id === questionId)?.programmingLanguage || "javascript"
+                    }
+                }) as CodeSubmission[]
+                
+                console.log(codeSubmissions)
+                result = await handleCodeSubmission(exam.id, userId, codeSubmissions)
             } else if (exam.type === ExamType.DOCUMENT) {
                 const documentSubmission = {
                     documentPath: answers[exam.questions[0].id]?.[0] || "",
@@ -222,6 +229,8 @@ export default function TakeExamComponent({exam, userId}: { exam: ExamData; user
             ) : exam.type === ExamType.CODE ? (
                 <CodeComponent
                     assignment={exam as never}
+                    answers={codeAnswers}
+                    setAnswers={setCodeAnswers}
                     handleSubmit={handleSubmit}
                     isSubmitting={submitting}
                 />

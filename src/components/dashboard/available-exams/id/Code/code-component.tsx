@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
 import { ExamData } from "@/components/dashboard/exams/types"
 
-interface CodeSubmission {
+interface CodeSub {
   code: string
   testResults: any[]
   isCorrect: boolean
@@ -28,12 +28,23 @@ interface CodeComponentProps {
   assignment: ExamData
   handleSubmit: () => Promise<void>
   isSubmitting: boolean
+  answers: Record<string, CodeSub[]>
+  setAnswers: React.Dispatch<React.SetStateAction<Record<string, CodeSub[]>>>
 }
 
-export default function CodeComponent({ assignment, handleSubmit, isSubmitting }: CodeComponentProps) {
+export default function CodeComponent({ assignment, handleSubmit, isSubmitting, answers, setAnswers }: CodeComponentProps) {
   const t = useTranslations("exam-taking")
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, CodeSubmission>>({})
+  const [currentCode, setCurrentCode] = useState<Record<string, string>>({})
+
+  // Initialiser le code pour chaque question
+  useState(() => {
+    const initialCode: Record<string, string> = {}
+    assignment.questions.forEach((question: CodeQuestion) => {
+      initialCode[question.id] = question.initialCode || ""
+    })
+    setCurrentCode(initialCode)
+  })
 
   const handleCodeSubmit = async (code: string, testResults: any[]) => {
     const currentQuestion = assignment.questions[currentQuestionIndex] as CodeQuestion
@@ -41,11 +52,17 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
 
     setAnswers(prev => ({
       ...prev,
-      [currentQuestion.id]: {
+      [currentQuestion.id]: [...(prev[currentQuestion.id] || []), {
         code,
-        testResults,
+        testResults, 
         isCorrect
-      }
+      }]
+    }))
+
+    // Mettre à jour le code actuel pour cette question
+    setCurrentCode(prev => ({
+      ...prev,
+      [currentQuestion.id]: code
     }))
   }
 
@@ -96,17 +113,18 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
           })}
         </h2>
         <div className="flex items-center gap-2 text-sm">
-          <CodeIcon className="h-4 w-4 text-indigo-500"/>
+          <CodeIcon className="h-4 w-4 text-indigo-500" />
           <span>{t("language", { language: currentQuestion.programmingLanguage?.toUpperCase() })}</span>
         </div>
         <div className="mt-2 flex items-center gap-2 text-sm">
-          <Clock className="h-4 w-4 text-orange-500"/>
+          <Clock className="h-4 w-4 text-orange-500" />
           <span>{t("points", { points: currentQuestion.maxPoints })}</span>
         </div>
       </Card>
 
       <CodeEditor
-        initialCode={currentQuestion.initialCode || ""}
+        key={currentQuestion.id} // Ajouter une clé unique pour chaque question
+        initialCode={currentCode[currentQuestion.id] || currentQuestion.initialCode || ""}
         language={currentQuestion.programmingLanguage}
         tests={currentQuestion.tests || []}
         onSubmit={handleCodeSubmit}
@@ -139,14 +157,14 @@ export default function CodeComponent({ assignment, handleSubmit, isSubmitting }
 
       <div className="mt-6 flex flex-wrap gap-2">
         {assignment.questions.map((question, index) => {
-          const hasAnswer = answers[question.id]
+          const hasAnswer = answers[question.id]?.length > 0
 
           return (
             <button
               key={question.id}
               onClick={() => setCurrentQuestionIndex(index)}
               className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium
-                ${currentQuestionIndex === index 
+                ${currentQuestionIndex === index
                   ? "bg-primary text-primary-foreground"
                   : hasAnswer
                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
