@@ -203,7 +203,7 @@ export default async function ExamResultsPage(props: {
 
                                 {/* Feedback IA */}
                                 <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded border">
-                                    <p className="text-sm font-medium mb-2">Feedback de l'IA :</p>
+                                    <p className="text-sm font-medium mb-2">Feedback de l&apos;IA :</p>
                                     <div className="prose dark:prose-invert max-w-none">
                                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                             {correction.aiFeedback}
@@ -214,7 +214,7 @@ export default async function ExamResultsPage(props: {
                                 {/* Suggestions d'amélioration */}
                                 {correction.improvement && (
                                     <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded border border-amber-200 dark:border-amber-800">
-                                        <p className="text-sm font-medium mb-4">Suggestions d'amélioration :</p>
+                                        <p className="text-sm font-medium mb-4">Suggestions d&apos;amélioration :</p>
                                         <div className="space-y-4">
                                             {(() => {
                                                 try {
