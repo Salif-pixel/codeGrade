@@ -209,7 +209,7 @@ const CreateExamPage = ({userId}: CreateExamsPageProps) => {
                     }
                 })
 
-                console.log(questionsWithAiAnswers);
+
 
                 const formattedExam = {
                     title: formData.title,
@@ -264,7 +264,7 @@ const CreateExamPage = ({userId}: CreateExamsPageProps) => {
                     questions: questionsWithTestCases
                 }
 
-                console.log(formattedExam);
+
 
                 const addResult = await createCodeExam(formattedExam as never, userId as string);
 
