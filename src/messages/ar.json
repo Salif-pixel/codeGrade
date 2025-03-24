@@ -848,107 +848,136 @@
       }
     }
   },
-  "exams-component": {
-    "title": "الاختبارات",
-    "noExams": {
-      "title": "لا توجد اختبارات متاحة",
-      "description": "ليس لديك أي اختبارات معينة حتى الآن."
-    },
-    "tabs": {
-      "list": "قائمة",
-      "calendar": "تقويم"
-    },
-    "assignment": {
-      "deadline": "الموعد النهائي",
-      "viewDetails": "عرض التفاصيل",
-      "invite": "دعوة",
-      "status": {
-        "pending": "قيد الانتظار",
+    "exams-component": {
+      "title": "الاختبارات",
+      "noExams": {
+        "title": "لا توجد اختبارات متاحة",
+        "description": "لم يتم تعيين أي اختبارات لك بعد"
+      },
+      "dashboard": {
         "active": "نشط",
-        "completed": "مكتمل"
+        "completed": "مكتمل",
+        "pending": "قيد الانتظار",
+        "expired": "منتهي الصلاحية",
+        "notStarted": "لم يبدأ بعد",
+        "starts": "يبدأ في",
+        "grade": "الدرجة",
+        "total": "المجموع"
       },
-      "type": {
-        "QCM": "QCM",
-        "CODE": "كود",
-        "DOCUMENT": "مستند"
+      "tabs": {
+        "list": "القائمة",
+        "calendar": "التقويم"
       },
-      "inviteLink": {
-        "title": "رابط الدعوة",
-        "description": "شارك هذا الرابط مع طلابك للانضمام إلى هذا الواجب.",
-        "button": "رابط الدعوة",
-        "copy": "نسخ"
-      },
-      "questions": "أسئلة",
-      "submissions": "إرسالات",
-      "students": "طلاب",
-      "participation": "مشاركة",
-      "upcoming": "قادم",
-      "expired": "منتهي الصلاحية",
-      "notStarted": "لم يبدأ بعد",
-      "starts": "يبدأ في",
-      "grade": "الدرجة",
-      "loading": "جارٍ التحميل...",
-      "viewResults": "عرض النتائج",
-      "takeQuiz": "اجتياز الاختبار",
-      "uploadFile": "تحميل ملف",
-      "writeCode": "كتابة كود"
-    },
-    "details": {
-      "title": "تفاصيل الواجب",
-      "back": "عودة",
-      "information": {
-        "title": "المعلومات",
-        "type": "النوع",
-        "questions": "الأسئلة",
-        "duration": "المدة",
-        "status": "الحالة",
-        "description": "الوصف"
-      },
-      "results": {
-        "title": "نتائج الطلاب",
-        "submissions": "إرسالات",
-        "students": "طلاب",
-        "table": {
-          "student": "الطالب",
-          "email": "البريد الإلكتروني",
-          "status": "الحالة",
-          "submissionDate": "تاريخ الإرسال",
-          "score": "النتيجة"
-        },
+      "assignment": {
+        "progress": "التقدم",
+        "types": "الأنواع",
+        "actions": "الإجراءات",
+        "title": "المهمة",
+        "deadline": "الموعد النهائي",
+        "viewDetails": "عرض التفاصيل",
+        "invite": "دعوة",
+        "create": "إنشاء",
         "status": {
-          "completed": "مكتمل",
-          "accepted": "مقبول",
-          "declined": "مرفوض",
-          "pending": "قيد الانتظار"
-        }
-      }
-    },
-    "duration": {
-      "day": "يوم",
-      "days": "أيام",
-      "hour": "ساعة",
-      "hours": "ساعات",
-      "minute": "دقيقة",
-      "minutes": "دقائق",
-      "undefined": "المدة غير محددة"
-    },
-    "toast": {
-      "linkCopied": {
-        "title": "تم نسخ الرابط",
-        "description": "تم نسخ رابط الدعوة إلى الحافظة"
+          "pending": "قيد الانتظار",
+          "active": "نشط",
+          "completed": "مكتمل"
+        },
+        "type": {
+          "QCM": "اختيار متعدد",
+          "CODE": "برمجة",
+          "DOCUMENT": "مستند"
+        },
+        "inviteLink": {
+          "title": "رابط الدعوة",
+          "description": "شارك هذا الرابط مع طلابك للانضمام إلى هذه المهمة",
+          "button": "رابط الدعوة",
+          "copy": "نسخ"
+        },
+        "questions": "أسئلة",
+        "submissions": "التسليمات",
+        "students": "الطلاب",
+        "participation": "المشاركة",
+        "upcoming": "قادم",
+        "expired": "منتهي الصلاحية",
+        "notStarted": "لم يبدأ بعد",
+        "starts": "يبدأ في",
+        "grade": "الدرجة",
+        "loading": "جاري التحميل...",
+        "viewResults": "عرض النتائج",
+        "takeQuiz": "بدء الاختبار",
+        "uploadFile": "رفع ملف",
+        "writeCode": "كتابة الكود"
       },
-      "statusUpdate": {
-        "success": "تم تحديث الحالة",
-        "error": "تعذر تحديث الحالة"
+      "search": {
+        "placeholder": "البحث عن اختبار..."
+      },
+      "filters": {
+        "label": "تصفية حسب"
+      },
+      "details": {
+        "tabs": {
+          "results": "النتائج",
+          "overview": "نظرة عامة"
+        },
+        "title": "تفاصيل المهمة",
+        "back": "رجوع",
+        "information": {
+          "title": "المعلومات",
+          "type": "النوع",
+          "noDescription": "لا يوجد وصف",
+          "questions": "الأسئلة",
+          "duration": "المدة",
+          "status": "الحالة",
+          "description": "الوصف"
+        },
+        "results": {
+          "summary": "الملخص",
+          "title": "نتائج الطلاب",
+          "submissions": "التسليمات",
+          "students": "الطلاب",
+          "totalStudents": "إجمالي الطلاب",
+          "maxPoints": "أقصى درجة",
+          "table": {
+            "student": "الطالب",
+            "email": "البريد الإلكتروني",
+            "status": "الحالة",
+            "submissionDate": "تاريخ التسليم",
+            "score": "الدرجة"
+          },
+          "status": {
+            "completed": "مكتمل",
+            "accepted": "مقبول",
+            "declined": "مرفوض",
+            "pending": "قيد الانتظار"
+          }
+        }
+      },
+      "duration": {
+        "day": "يوم",
+        "days": "أيام",
+        "hour": "ساعة",
+        "hours": "ساعات",
+        "minute": "دقيقة",
+        "minutes": "دقائق",
+        "undefined": "المدة غير محددة"
+      },
+      "toast": {
+        "linkCopied": {
+          "title": "تم نسخ الرابط",
+          "description": "تم نسخ رابط الدعوة إلى الحافظة"
+        },
+        "statusUpdate": {
+          "success": "تم تحديث الحالة بنجاح",
+          "error": "فشل في تحديث الحالة"
+        }
+      },
+      "status": {
+        "undefined": "غير محدد"
+      },
+      "score": {
+        "percentage": "%"
       }
     },
-    "status": {
-      "undefined": "غير محدد"
-    },
-    "score": {
-      "percentage": "%"
-    }
-  },
   "dashboard": {
     "teacher": {
       "title": "لوحة تحكم المعلم",

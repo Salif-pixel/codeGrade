@@ -264,7 +264,7 @@ function AssignmentList({ assignments, onViewDetails, onCopyInviteLink, user }: 
                                     className="flex items-center gap-1 hover:text-white transition-colors"
                                     onClick={() => toggleSort("type")}
                                 >
-                                    {t("assignment.type") || "Type"}
+                                    {t("assignment.types") || "Type"}
                                     <ArrowUpDown className="h-3 w-3" />
                                 </button>
                             </TableHead>

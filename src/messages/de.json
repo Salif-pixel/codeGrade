@@ -848,107 +848,136 @@
       }
     }
   },
-  "exams-component": {
-    "title": "Prüfungen",
-    "noExams": {
-      "title": "Keine Prüfungen verfügbar",
-      "description": "Sie haben noch keine zugewiesenen Prüfungen."
-    },
-    "tabs": {
-      "list": "Liste",
-      "calendar": "Kalender"
-    },
-    "assignment": {
-      "deadline": "Frist",
-      "viewDetails": "Details anzeigen",
-      "invite": "Einladen",
-      "status": {
-        "pending": "Ausstehend",
+    "exams-component": {
+      "title": "Prüfungen",
+      "noExams": {
+        "title": "Keine Prüfungen verfügbar",
+        "description": "Du hast noch keine zugewiesenen Prüfungen."
+      },
+      "dashboard": {
         "active": "Aktiv",
-        "completed": "Abgeschlossen"
+        "completed": "Abgeschlossen",
+        "pending": "Ausstehend",
+        "expired": "Abgelaufen",
+        "notStarted": "Noch nicht begonnen",
+        "starts": "Beginnt am",
+        "grade": "Note",
+        "total": "Gesamt"
       },
-      "type": {
-        "QCM": "QCM",
-        "CODE": "Code",
-        "DOCUMENT": "Dokument"
+      "tabs": {
+        "list": "Liste",
+        "calendar": "Kalender"
       },
-      "inviteLink": {
-        "title": "Einladungslink",
-        "description": "Teilen Sie diesen Link mit Ihren Schülern, damit sie dieser Aufgabe beitreten können.",
-        "button": "Einladungslink",
-        "copy": "Kopieren"
-      },
-      "questions": "Fragen",
-      "submissions": "Einreichungen",
-      "students": "Schüler",
-      "participation": "Teilnahme",
-      "upcoming": "Bevorstehend",
-      "expired": "Abgelaufen",
-      "notStarted": "Noch nicht gestartet",
-      "starts": "Beginnt am",
-      "grade": "Note",
-      "loading": "Wird geladen...",
-      "viewResults": "Ergebnisse anzeigen",
-      "takeQuiz": "Quiz machen",
-      "uploadFile": "Datei hochladen",
-      "writeCode": "Code schreiben"
-    },
-    "details": {
-      "title": "Aufgabendetails",
-      "back": "Zurück",
-      "information": {
-        "title": "Informationen",
-        "type": "Typ",
-        "questions": "Fragen",
-        "duration": "Dauer",
-        "status": "Status",
-        "description": "Beschreibung"
-      },
-      "results": {
-        "title": "Schülerergebnisse",
-        "submissions": "Einreichungen",
-        "students": "Schüler",
-        "table": {
-          "student": "Schüler",
-          "email": "E-Mail",
-          "status": "Status",
-          "submissionDate": "Einreichungsdatum",
-          "score": "Punktzahl"
-        },
+      "assignment": {
+        "progress": "Fortschritt",
+        "types": "Typen",
+        "actions": "Aktionen",
+        "title": "Aufgabe",
+        "deadline": "Frist",
+        "viewDetails": "Details anzeigen",
+        "invite": "Einladen",
+        "create": "Erstellen",
         "status": {
-          "completed": "Abgeschlossen",
-          "accepted": "Akzeptiert",
-          "declined": "Abgelehnt",
-          "pending": "Ausstehend"
-        }
-      }
-    },
-    "duration": {
-      "day": "Tag",
-      "days": "Tage",
-      "hour": "Stunde",
-      "hours": "Stunden",
-      "minute": "Minute",
-      "minutes": "Minuten",
-      "undefined": "Dauer nicht definiert"
-    },
-    "toast": {
-      "linkCopied": {
-        "title": "Link kopiert",
-        "description": "Einladungslink wurde in die Zwischenablage kopiert"
+          "pending": "Ausstehend",
+          "active": "Aktiv",
+          "completed": "Abgeschlossen"
+        },
+        "type": {
+          "QCM": "Multiple Choice",
+          "CODE": "Code",
+          "DOCUMENT": "Dokument"
+        },
+        "inviteLink": {
+          "title": "Einladungslink",
+          "description": "Teile diesen Link mit deinen Studenten, damit sie der Aufgabe beitreten können.",
+          "button": "Einladungslink",
+          "copy": "Kopieren"
+        },
+        "questions": "Fragen",
+        "submissions": "Einreichungen",
+        "students": "Studenten",
+        "participation": "Teilnahme",
+        "upcoming": "Bevorstehend",
+        "expired": "Abgelaufen",
+        "notStarted": "Noch nicht begonnen",
+        "starts": "Beginnt am",
+        "grade": "Note",
+        "loading": "Lädt...",
+        "viewResults": "Ergebnisse anzeigen",
+        "takeQuiz": "Quiz starten",
+        "uploadFile": "Datei hochladen",
+        "writeCode": "Code schreiben"
       },
-      "statusUpdate": {
-        "success": "Status aktualisiert",
-        "error": "Status konnte nicht aktualisiert werden"
+      "search": {
+        "placeholder": "Prüfung suchen..."
+      },
+      "filters": {
+        "label": "Filtern nach"
+      },
+      "details": {
+        "tabs": {
+          "results": "Ergebnisse",
+          "overview": "Übersicht"
+        },
+        "title": "Aufgabendetails",
+        "back": "Zurück",
+        "information": {
+          "title": "Informationen",
+          "type": "Typ",
+          "noDescription": "Keine Beschreibung",
+          "questions": "Fragen",
+          "duration": "Dauer",
+          "status": "Status",
+          "description": "Beschreibung"
+        },
+        "results": {
+          "summary": "Zusammenfassung",
+          "title": "Studentenergebnisse",
+          "submissions": "Einreichungen",
+          "students": "Studenten",
+          "totalStudents": "Gesamtzahl Studenten",
+          "maxPoints": "Maximale Punktzahl",
+          "table": {
+            "student": "Student",
+            "email": "E-Mail",
+            "status": "Status",
+            "submissionDate": "Einreichungsdatum",
+            "score": "Punktzahl"
+          },
+          "status": {
+            "completed": "Abgeschlossen",
+            "accepted": "Akzeptiert",
+            "declined": "Abgelehnt",
+            "pending": "Ausstehend"
+          }
+        }
+      },
+      "duration": {
+        "day": "Tag",
+        "days": "Tage",
+        "hour": "Stunde",
+        "hours": "Stunden",
+        "minute": "Minute",
+        "minutes": "Minuten",
+        "undefined": "Dauer nicht definiert"
+      },
+      "toast": {
+        "linkCopied": {
+          "title": "Link kopiert",
+          "description": "Der Einladungslink wurde in die Zwischenablage kopiert"
+        },
+        "statusUpdate": {
+          "success": "Status wurde aktualisiert",
+          "error": "Status konnte nicht aktualisiert werden"
+        }
+      },
+      "status": {
+        "undefined": "Nicht definiert"
+      },
+      "score": {
+        "percentage": "%"
       }
     },
-    "status": {
-      "undefined": "Nicht definiert"
-    },
-    "score": {
-      "percentage": "%"
-    }
-  },
   "dashboard": {
     "teacher": {
       "title": "Lehrer-Dashboard",

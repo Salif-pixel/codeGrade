@@ -392,23 +392,21 @@
     "required": "Required",
     "needHelp": "Need help?",
     "contactSupport": "Contact our support",
-    "common": {
-      "search": {
-        "title": "Search",
-        "placeholder": "Search...",
-        "noResults": "No results found.",
-        "navigation": "Navigation",
-        "results": "Results",
-        "searching": "Searching..."
-      },
-      "navigation": {
-        "available-exams": "Available Exams",
-        "my-exams": "My Exams",
-        "results": "Results",
-        "dashboard": "Dashboard",
-        "settings": "Settings",
-        "profile": "Profile"
-      }
+    "search": {
+      "title": "Search",
+      "placeholder": "Search...",
+      "noResults": "No results found.",
+      "navigation": "Navigation",
+      "results": "Results",
+      "searching": "Searching..."
+    },
+    "navigation": {
+      "available-exams": "Available Exams",
+      "my-exams": "My Exams",
+      "results": "Results",
+      "dashboard": "Dashboard",
+      "settings": "Settings",
+      "profile": "Profile"
     }
   },
   "steps": {
@@ -849,95 +847,137 @@
       }
     }
   },
-  "exams-component": {
-    "title": "Exams",
-    "noExams": {
+    "exams-component": {
+      "title": "Exams",
+      "noExams": {
         "title": "No exams available",
         "description": "You don't have any assigned exams yet."
-    },
-    "tabs": {
-      "list": "List",
-      "calendar": "Calendar"
-    },
-    "assignment": {
-      "deadline": "Deadline",
-      "viewDetails": "View details",
-      "invite": "Invite",
-      "status": {
-        "pending": "Pending",
+      },
+      "dashboard": {
         "active": "Active",
-        "completed": "Completed"
+        "completed": "Completed",
+        "pending": "Pending",
+        "expired": "Expired",
+        "notStarted": "Not started yet",
+        "starts": "Starts on",
+        "grade": "Grade",
+        "total": "Total"
       },
-      "type": {
-        "QCM": "QCM",
-        "CODE": "Code",
-        "DOCUMENT": "Document"
+      "tabs": {
+        "list": "List",
+        "calendar": "Calendar"
       },
-      "inviteLink": {
-        "title": "Invitation Link",
-        "description": "Share this link with your students so they can join this assignment.",
-        "copy": "Copy Link",
-        "button": "invited students"
-      },
-      "questions": "questions",
-      "submissions": "submissions",
-      "students": "students",
-      "participation": "participation",
-      "upcoming": "Upcoming",
-      "expired": "Expired",
-      "notStarted": "Not started yet",
-      "starts": "Starts on",
-      "grade": "Grade",
-      "loading": "Loading...",
-      "viewResults": "View results",
-      "takeQuiz": "Take quiz",
-      "uploadFile": "Upload file",
-      "writeCode": "Write code"
-    },
-    "details": {
-      "title": "Assignment Details",
-      "back": "Back",
-      "information": {
-        "title": "Information",
-        "type": "Type",
-        "questions": "Questions",
-        "duration": "Duration",
-        "status": "Status",
-        "description": "Description"
-      },
-      "results": {
-        "title": "Student Results",
+      "assignment": {
+        "progress": "Progress",
+        "types": "Types",
+        "actions": "Actions",
+        "title": "Assignment",
+        "deadline": "Deadline",
+        "viewDetails": "View details",
+        "invite": "Invite",
+        "create": "Create",
+        "status": {
+          "pending": "Pending",
+          "active": "Active",
+          "completed": "Completed"
+        },
+        "type": {
+          "QCM": "MCQ",
+          "CODE": "Code",
+          "DOCUMENT": "Document"
+        },
+        "inviteLink": {
+          "title": "Invitation link",
+          "description": "Share this link with your students so they can join this assignment.",
+          "button": "Invitation link",
+          "copy": "Copy"
+        },
+        "questions": "questions",
         "submissions": "submissions",
         "students": "students",
-        "table": {
-          "student": "Student",
-          "email": "Email",
-          "status": "Status",
-          "submissionDate": "Submission Date",
-          "score": "Score"
+        "participation": "participation",
+        "upcoming": "Upcoming",
+        "expired": "Expired",
+        "notStarted": "Not started yet",
+        "starts": "Starts on",
+        "grade": "Grade",
+        "loading": "Loading...",
+        "viewResults": "View results",
+        "takeQuiz": "Take quiz",
+        "uploadFile": "Upload file",
+        "writeCode": "Write code"
+      },
+      "search": {
+        "placeholder": "Search for an exam..."
+      },
+      "filters": {
+        "label": "Filter by"
+      },
+      "details": {
+        "tabs": {
+          "results": "Results",
+          "overview": "Overview"
         },
-        "status": {
-          "completed": "Completed",
-          "accepted": "Accepted",
-          "declined": "Declined",
-          "pending": "Pending"
+        "title": "Assignment details",
+        "back": "Back",
+        "information": {
+          "title": "Information",
+          "type": "Type",
+          "noDescription": "No description",
+          "questions": "Questions",
+          "duration": "Duration",
+          "status": "Status",
+          "description": "Description"
+        },
+        "results": {
+          "summary": "Summary",
+          "title": "Student results",
+          "submissions": "submissions",
+          "students": "students",
+          "totalStudents": "Total students",
+          "maxPoints": "Maximum points",
+          "table": {
+            "student": "Student",
+            "email": "Email",
+            "status": "Status",
+            "submissionDate": "Submission date",
+            "score": "Score"
+          },
+          "status": {
+            "completed": "Completed",
+            "accepted": "Accepted",
+            "declined": "Declined",
+            "pending": "Pending"
+          }
         }
+      },
+      "duration": {
+        "day": "day",
+        "days": "days",
+        "hour": "hour",
+        "hours": "hours",
+        "minute": "minute",
+        "minutes": "minutes",
+        "undefined": "Duration undefined"
+      },
+      "toast": {
+        "linkCopied": {
+          "title": "Link copied",
+          "description": "The invitation link has been copied to clipboard"
+        },
+        "statusUpdate": {
+          "success": "Status has been updated",
+          "error": "Unable to update status"
+        }
+      },
+      "status": {
+        "undefined": "Undefined"
+      },
+      "score": {
+        "percentage": "%"
       }
     },
-    "duration": {
-      "day": "day",
-      "days": "days",
-      "hour": "hour",
-      "hours": "hours",
-      "minute": "minute",
-      "minutes": "minutes",
-      "undefined": "Duration undefined"
-    },
-    "noExams": {
-      "title": "No exams available",
-      "description": "You don't have any assigned exams yet."
-    }
-  },
+  
   "dashboard": {
     "teacher": {
       "title": "Teacher Dashboard",

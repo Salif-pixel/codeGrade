@@ -853,14 +853,29 @@
       "title": "No exams available",
       "description": "You don't have any assigned exams yet."
     },
+    "dashboard": {
+      "active": "Actif",
+      "completed": "Terminé",
+      "pending": "En attente",
+      "expired": "Expiré",
+      "notStarted": "Pas encore commencé",
+      "starts": "Commence le",
+      "grade": "Note",
+      "total": "Total"
+    },
     "tabs": {
       "list": "Liste",
       "calendar": "Calendrier"
     },
     "assignment": {
+      "progress": "Progression",
+      "types": "Types",
+      "actions": "Actions",
+      "title": "Devoir",
       "deadline": "Date limite",
       "viewDetails": "Voir les détails",
       "invite": "Inviter",
+      "create": "Créer",
       "status": {
         "pending": "En attente",
         "active": "Actif",
@@ -892,21 +907,37 @@
       "uploadFile": "Télécharger le fichier",
       "writeCode": "Écrire du code"
     },
+  
+    "search": {
+      "placeholder": "Rechercher un examen..."
+    },
+    "filters": {
+      "label": "Filtrer par"
+    },
     "details": {
+      "tabs": {
+        "results": "Résultats",
+        "overview": "Aperçu"
+      },
+      
       "title": "Détails du devoir",
       "back": "Retour",
       "information": {
         "title": "Informations",
         "type": "Type",
+        "noDescription": "Aucune description",
         "questions": "Questions",
         "duration": "Durée",
         "status": "Statut",
         "description": "Description"
       },
       "results": {
+        "summary": "Résumé",
         "title": "Résultats des étudiants",
         "submissions": "soumissions",
         "students": "étudiants",
+        "totalStudents": "Total des étudiants",
+        "maxPoints": "Points maximum",
         "table": {
           "student": "Étudiant",
           "email": "Email",
@@ -949,6 +980,7 @@
     }
   },
   "dashboard": {
+    
     "teacher": {
       "title": "Tableau de bord enseignant",
       "description": "Gérez vos évaluations et suivez les progrès de vos étudiants",

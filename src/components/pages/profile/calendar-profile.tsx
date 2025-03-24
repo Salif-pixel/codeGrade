@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
     ChevronLeft,
     ChevronRight,
-    Plus,
     CalendarIcon,
     CalendarPlus2Icon as CalendarIcon2,
     Clock,
@@ -15,7 +14,8 @@ import { motion, AnimatePresence} from "framer-motion";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {getExamsForUser} from "@/actions/examActions";
+import {getExamsForUser} from "@/actions/take-exam.action";
+
 
 // Ajoutez ces définitions de variants au début de votre composant Calendar
 const containerVariants = {
@@ -81,7 +81,7 @@ export function Calendar({ viewMode }: { viewMode: string }) {
                 } else {
                     setError(result.error || "Failed to fetch exams"); 
                 }
-            } catch (err) {
+            } catch  {
                 setError("Failed to fetch exams");
             } finally {
                 setLoading(false);
