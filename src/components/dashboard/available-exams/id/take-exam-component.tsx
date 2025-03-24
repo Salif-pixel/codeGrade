@@ -13,6 +13,7 @@ import PdfComponent from "@/components/dashboard/available-exams/id/Document/pdf
 import CodeComponent from "@/components/dashboard/available-exams/id/Code/code-component"
 import {ExamData} from "@/components/dashboard/exams/types"
 import {handleQcmSubmission, handleCodeSubmission, handleDocumentSubmission} from "@/actions/take-exam.action"
+import { useEdgeStore } from "@/lib/edgestore"
 
 interface CodeSubmission {
     questionId: string;
@@ -26,13 +27,21 @@ interface CodeSub {
     isCorrect: boolean
   }
 
+interface DocumentSubmission {
+    documentPath: string;
+    examText: string;
+}
+
 export default function TakeExamComponent({exam, userId}: { exam: ExamData; userId: string }) {
     const t = useTranslations("exam-taking")
     const router = useRouter()
     const local = useLocale()
 
+    const { edgestore } = useEdgeStore()
+
     const [answers, setAnswers] = useState<Record<string, string[]>>({})
     const [codeAnswers, setCodeAnswers] = useState<Record<string, CodeSub[]>>({})
+    const [documentAnswer, setDocumentAnswer] = useState<File | null>(null)
     const [submitting, setSubmitting] = useState(false)
     const [timeLeft, setTimeLeft] = useState<string | null>(null)
     const [alert, setAlert] = useState<{
@@ -130,16 +139,31 @@ export default function TakeExamComponent({exam, userId}: { exam: ExamData; user
                     }
                 }) as CodeSubmission[]
                 
-                console.log(codeSubmissions)
                 result = await handleCodeSubmission(exam.id, userId, codeSubmissions)
             } else if (exam.type === ExamType.DOCUMENT) {
-                const documentSubmission = {
-                    documentPath: answers[exam.questions[0].id]?.[0] || "",
-                    examText: await extractContentFromDocument(
-                        new File([answers[exam.questions[0].id]?.[0] || ""], "submission.txt", {type: "text/plain"}),
-                        "txt"
-                    )
+                if (!documentAnswer) {
+                    throw new Error("Aucun document soumis")
                 }
+
+                const documentText = await extractContentFromDocument(
+                    documentAnswer,
+                    "pdf"
+                )
+
+                const res = await edgestore.publicFiles.upload({
+                    file: documentAnswer,
+                    onProgressChange: (progress) => {
+                        console.log(progress);
+                    },
+                });
+
+                const documentSubmission: DocumentSubmission = {
+                    documentPath: res.url,
+                    examText: documentText
+                }
+
+                // console.log(documentSubmission)
+
                 result = await handleDocumentSubmission(exam.id, userId, documentSubmission)
             }
 
@@ -167,7 +191,8 @@ export default function TakeExamComponent({exam, userId}: { exam: ExamData; user
             setSubmitting(false)
         }
     }
-// Préparer les données pour le composant QCM
+
+    // Préparer les données pour le composant QCM
     const formatQuestionsForQuizForm = () => {
         return exam.questions.map(q => ({
             id: q.id,
@@ -220,11 +245,13 @@ export default function TakeExamComponent({exam, userId}: { exam: ExamData; user
                 />
             ) : exam.type === ExamType.DOCUMENT ? (
                 <PdfComponent
-                    assignment={exam as never}
+                    assignment={exam}
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                     handleSubmit={handleSubmit}
                     isSubmitting={submitting}
+                    documentAnswer={documentAnswer}
+                    setDocumentAnswer={setDocumentAnswer}
                 />
             ) : exam.type === ExamType.CODE ? (
                 <CodeComponent

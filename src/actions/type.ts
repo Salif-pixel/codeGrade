@@ -43,6 +43,7 @@ export type QcmSubmission = {
 
 export type DocumentSubmission = {
     documentPath: string;
+    examText?: string;
 };
 
 export type DocumentCorrectionReport = {

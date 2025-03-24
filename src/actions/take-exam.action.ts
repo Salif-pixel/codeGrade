@@ -195,18 +195,12 @@ export async function handleDocumentSubmission(
     try {
         const { exam } = await validateParticipation(examId, userId);
 
-        const [
-            examDocumentContent,
-            studentSubmissionContent,
-        ] = await Promise.all([
-            fetchContent(exam.examDocumentPath as string),
-            fetchContent(document.documentPath)
-        ]);
+        const examDocumentContent = await fetchContent(exam.examDocumentPath as string);
         const aiCorrection = exam.aiCorrection ?? "correction automatique";
 
         const correctionReport = await generateDocumentCorrection(
             examDocumentContent,
-            studentSubmissionContent,
+            document.examText!,
             aiCorrection
         );
 

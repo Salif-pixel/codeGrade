@@ -20,7 +20,7 @@ export default function FileRenderer({ file, content }: FileRendererProps) {
   // Gestion de l'URL blob pour le PDF
   useEffect(() => {
     if (fileType === "pdf") {
-      const url = content instanceof ArrayBuffer 
+      const url = content instanceof ArrayBuffer
         ? URL.createObjectURL(new Blob([content], { type: 'application/pdf' }))
         : URL.createObjectURL(file)
       setPdfUrl(url)
@@ -55,8 +55,8 @@ export default function FileRenderer({ file, content }: FileRendererProps) {
   if (fileType === "pdf") {
     return (
       <iframe
-        src={pdfUrl}
-        className="w-full aspect-[1/1.4142] h-auto rounded-lg border border-gray-200" 
+        src={pdfUrl ? (pdfUrl == "" ? undefined : pdfUrl) : undefined}
+        className="w-full aspect-[1/1.4142] h-auto rounded-lg border border-gray-200"
         title="PDF Viewer"
       />
     )

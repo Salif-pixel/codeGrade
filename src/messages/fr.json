@@ -1023,6 +1023,8 @@
     "language": "Langage : {language}",
     "points": "{points} points",
     "maxPoints": "Points maximum",
+    "document": "document",
+    "professorDocument": "Document du professeur",
     "answerPlaceholder": "Écrivez votre réponse ici...",
     "codePlaceholder": "Écrivez votre code {language} ici...",
     "save": "Enregistrer",

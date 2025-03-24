@@ -381,6 +381,47 @@
     color: inherit;
   }
 
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    font-size: 0.875em;
+  }
+  
+  .prose table th {
+    background-color: color-mix(in oklch, var(--color-prose-body) 5%, transparent);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75em 1em;
+    border: 1px solid color-mix(in oklch, var(--color-prose-body) 20%, transparent);
+  }
+
+  .prose table td {
+    padding: 0.75em 1em;
+    border: 1px solid color-mix(in oklch, var(--color-prose-body) 20%, transparent);
+    vertical-align: top;
+  }
+
+  .prose table tr:nth-child(even) {
+    background-color: color-mix(in oklch, var(--color-prose-body) 2%, transparent);
+  }
+
+
+  .dark .prose table th {
+    background-color: color-mix(in oklch, var(--color-prose-body) 95%, transparent);
+    border: 1px solid color-mix(in oklch, var(--color-prose-body) 80%, transparent);
+  }
+
+  .dark .prose table td {
+    border: 1px solid color-mix(in oklch, var(--color-prose-body) 80%, transparent);
+  }
+
+  .dark .prose table tr:nth-child(even) {
+    background-color: color-mix(in oklch, var(--color-prose-body) 98%, transparent);
+  }
+
+
   /* Dark mode styles */
   .dark .prose {
     color: var(--color-prose-body-dark);
@@ -409,5 +450,18 @@
 
   .dark .prose pre {
     background-color: var(--color-prose-code-bg-dark);
+  }
+
+  .dark .prose table th {
+    background-color: color-mix(in oklch, var(--color-prose-body-dark) 20%, transparent);
+    border-color: color-mix(in oklch, var(--color-prose-body-dark) 30%, transparent);
+  }
+
+  .dark .prose table td {
+    border-color: color-mix(in oklch, var(--color-prose-body-dark) 30%, transparent);
+  }
+
+  .dark .prose table tr:nth-child(even) {
+    background-color: color-mix(in oklch, var(--color-prose-body-dark) 10%, transparent);
   }
 }

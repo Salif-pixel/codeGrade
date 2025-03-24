@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
-import { Clock, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import PdfUpload from "@/components/dashboard/available-exams/id/Document/pdf-upload"
 import FileRenderer from "@/components/utilities/file-renderer"
-import { extractContentFromDocument } from "@/actions/utils.action"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useTranslations } from "next-intl"
 import { ExamData } from "@/components/dashboard/exams/types"
@@ -17,6 +16,8 @@ interface PdfComponentProps {
   setActiveTab: (tab: string) => void
   handleSubmit: () => Promise<void>
   isSubmitting: boolean
+  documentAnswer: File | null
+  setDocumentAnswer: React.Dispatch<React.SetStateAction<File | null>>
 }
 
 export default function PdfComponent({
@@ -25,6 +26,8 @@ export default function PdfComponent({
   setActiveTab,
   handleSubmit,
   isSubmitting,
+  documentAnswer,
+  setDocumentAnswer
 }: PdfComponentProps) {
   const t = useTranslations("exam-taking")
   const [file, setFile] = useState<File | null>(null)
@@ -51,29 +54,6 @@ export default function PdfComponent({
     }
   }, [assignment.examDocumentPath, t])
 
-  const onSubmit = async (data: { file: File }) => {
-    try {
-      setError(null)
-      setSuccess(null)
-
-      if (!data.file.type.includes('pdf')) {
-        setError(t("invalidFileType"))
-        return
-      }
-
-      if (data.file.size > 10 * 1024 * 1024) {
-        setError(t("fileTooLarge"))
-        return
-      }
-
-      await handleSubmit()
-      setSuccess(t("submitSuccess"))
-    } catch (error) {
-      console.error("Erreur lors de la soumission :", error)
-      setError(t("submitError"))
-    }
-  }
-
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div>
@@ -91,10 +71,6 @@ export default function PdfComponent({
               <div className="flex items-center gap-2 text-sm">
                 <FileText className="h-4 w-4 text-blue-500" />
                 <span>{t("professorDocument")}</span>
-              </div>
-              <div className="mt-4 flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-orange-500" />
-                <span>{t("timeRemaining", { time: assignment.timeRemaining })}</span>
               </div>
             </Card>
           </TabsContent>
@@ -114,7 +90,7 @@ export default function PdfComponent({
           </TabsContent>
         </Tabs>
 
-        <PdfUpload onSubmit={onSubmit} isSubmitting={isSubmitting} />
+        <PdfUpload onSubmit={handleSubmit} isSubmitting={isSubmitting} documentAnswer={documentAnswer} setDocumentAnswer={setDocumentAnswer} />
 
         {error && (
           <Alert variant="destructive" className="mt-4">

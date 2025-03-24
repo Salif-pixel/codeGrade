@@ -11,10 +11,11 @@ import { AlertCircle, FileText, Upload, Loader2, X } from "lucide-react"
 interface PdfUploadProps {
     onSubmit: (data: { file: File }) => void
     isSubmitting: boolean
+    documentAnswer: File | null
+    setDocumentAnswer: React.Dispatch<React.SetStateAction<File | null>>
 }
 
-export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
-    const [file, setFile] = useState<File | null>(null)
+export default function PdfUpload({ onSubmit, isSubmitting, documentAnswer, setDocumentAnswer }: PdfUploadProps) {
     const [error, setError] = useState<string | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -37,7 +38,7 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
                 return
             }
 
-            setFile(selectedFile)
+            setDocumentAnswer(selectedFile)
 
             // Créer une URL pour la prévisualisation
             const fileUrl = URL.createObjectURL(selectedFile)
@@ -48,16 +49,16 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!file) {
+        if (!documentAnswer) {
             setError("Veuillez sélectionner un fichier PDF")
             return
         }
 
-        onSubmit({ file })
+        onSubmit({ file: documentAnswer })
     }
 
     const clearFile = () => {
-        setFile(null)
+        setDocumentAnswer(null)
         setPreview(null)
         if (fileInputRef.current) {
             fileInputRef.current.value = ""
@@ -83,7 +84,7 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
                                 onChange={handleFileChange}
                             />
 
-                            {!file ? (
+                            {!documentAnswer ? (
                                 <div
                                     className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-zinc-500 p-6 hover:bg-zinc-200 dark:hover:bg-zinc-950 "
                                     onClick={() => fileInputRef.current?.click()}
@@ -98,8 +99,8 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
                                         <div className="flex items-center gap-2">
                                             <FileText className="h-5 w-5 text-blue-500" />
                                             <div>
-                                                <p className="font-medium">{file.name}</p>
-                                                <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} Mo</p>
+                                                <p className="font-medium">{documentAnswer.name}</p>
+                                                <p className="text-xs text-gray-500">{(documentAnswer.size / 1024 / 1024).toFixed(2)} Mo</p>
                                             </div>
                                         </div>
                                         <Button type="button" variant="ghost" size="icon" onClick={clearFile}>
@@ -125,7 +126,7 @@ export default function PdfUpload({ onSubmit, isSubmitting }: PdfUploadProps) {
                     </div>
                 </CardContent>
                 <CardFooter>
-                    <Button type="submit" className="w-full" disabled={!file || isSubmitting}>
+                    <Button type="submit" className="w-full" disabled={!documentAnswer || isSubmitting} onClick={handleSubmit}>
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
