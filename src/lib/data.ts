@@ -34,7 +34,22 @@ export const getExams = async () => {
         }
     });
 };
-
+export const getExamTeacher = async (teacherId:string) => {
+    return await prisma.exam.findMany({
+        where: { creatorId: teacherId },
+        include: {
+            questions: true,
+            participants: { include: { user: true } },
+            submissions: {
+                include: {
+                    student: true,
+                    correction: true
+                }
+            },
+            creator: true
+        }
+    });
+};
 export const getTeacherDashboardData = async (userId: string) => {
     const exams = await prisma.exam.findMany({
         where: { creatorId: userId },
